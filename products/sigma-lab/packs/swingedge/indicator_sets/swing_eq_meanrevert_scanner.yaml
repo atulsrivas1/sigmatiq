@@ -1,0 +1,12 @@
+name: swing_eq_meanrevert_scanner
+version: 1
+description: SwingSigma (equities) — Mean reversion pullback with oversold confirmation
+indicators:
+  - {name: sma, window: 20}
+  - {name: sma, window: 50}
+  - {name: rsi, period: 14}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: keltner, window: 20, mult: 1.5}
+  - {name: cmf, period: 20}
+  - {name: atr, period: 14}
+

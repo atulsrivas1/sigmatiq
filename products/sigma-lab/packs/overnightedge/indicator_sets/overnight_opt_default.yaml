@@ -1,0 +1,19 @@
+name: overnight_opt_default
+version: 1
+description: OvernightSigma options default indicators
+indicators:
+  - name: rsi
+    period: 7
+    column: close
+  - name: atr
+    period: 14
+  - name: iv_realized_spread
+    window: 20
+  - name: iv_skew_25d
+  - name: iv_term_slope
+    days_fwd: 30
+  - name: atm_iv_eod
+  - name: pcr_eod
+  - name: div_eod
+  - name: vix_delta
+  - name: calendar_flags

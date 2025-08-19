@@ -1,0 +1,16 @@
+name: long_eq_carry
+version: 1
+description: LongSigma (equities) — Carry & Trend Quality
+indicators:
+  - {name: ret, window: 63, column: close}
+  - {name: ret, window: 126, column: close}
+  - {name: ret, window: 252, column: close}
+  - {name: ema, window: 50}
+  - {name: ema, window: 200}
+  - {name: ema_slope, window: 200, period: 1}
+  - {name: rsi, period: 21}
+  - {name: lr_r2, window: 126}
+  - {name: atr, period: 20}
+  - {name: rolling_std, window: 63}
+  - {name: vix_term_slope, near: "1m", far: "3m"}
+

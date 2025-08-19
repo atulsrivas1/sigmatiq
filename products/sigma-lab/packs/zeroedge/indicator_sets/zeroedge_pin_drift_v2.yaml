@@ -1,0 +1,29 @@
+# Imported from zeroedge_pin_drift_files (Generated 2025-08-15 03:28 UTC)
+# ZeroSigma (0DTE) — Late-Day Pin Drift v2 (adds OI/Gamma peak proxies)
+name: zeroedge_pin_drift_v2
+version: 1
+indicators:
+  # Underlying intraday context
+  - {name: rsi, period: 7}
+  - {name: ema, window: 21}
+  - {name: atr, period: 14}
+  - {name: stddev, window: 20}
+
+  # Options flow & vol
+  - {name: iv_realized_spread, window: 20}
+  - {name: pcr_volume}
+  - {name: pcr_oi}
+  - {name: oi_change_1d}
+
+  # OI/Gamma peak approximate pin metrics (to implement if missing)
+  - {name: oi_peak_strike}
+  - {name: dist_to_oi_peak}
+  - {name: oi_concentration_hhi, top_n: 5}
+  - {name: gamma_peak_strike}
+  - {name: dist_to_gamma_peak}
+  - {name: gamma_concentration, top_n: 5}
+
+  # Regime & time
+  - {name: vix_level}
+  - {name: hour_of_day}
+  - {name: iv_smile_wings, wing_points: 10, sampling: "10:00-11:00"}

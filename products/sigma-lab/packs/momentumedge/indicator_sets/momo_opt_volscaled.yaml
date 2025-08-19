@@ -1,0 +1,13 @@
+name: momo_opt_volscaled
+version: 1
+description: MomentumSigma (options) — Vol-Scaled Momentum + Light Vol Filters
+indicators:
+  - {name: ret, window: 5, column: close}
+  - {name: rsi, period: 14}
+  - {name: ema_slope, window: 20, period: 1}
+  - {name: rolling_std, window: 20}
+  - {name: iv_realized_spread, window: 20}
+  - {name: pcr_volume}
+  - {name: oi_trend, window: 5}
+  - {name: atm_iv_zscore, window_days: 20}
+

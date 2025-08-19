@@ -1,0 +1,29 @@
+/* Sigmatiq Sigma — Alerts (minimal port) */
+.alert {
+  border:1px solid var(--color-border);
+  background: var(--color-surface-1);
+  color: var(--color-text-1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-1);
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+.alert .icon { width: 18px; height: 18px; margin-top: 2px; }
+.alert .title { font-weight: 600; }
+.alert .meta { color: var(--color-text-2); font-size: var(--fs-12); }
+.alert .actions { display:flex; gap: 8px; }
+.alert + .alert { margin-top: 10px; }
+
+.alert.info    { border-color: var(--info-border);    background: var(--info-bg);    color: var(--info-fg); }
+.alert.success { border-color: var(--success-border); background: var(--success-bg); color: var(--success-fg); }
+.alert.warning { border-color: var(--warning-border); background: var(--warning-bg); color: var(--warning-fg); }
+.alert.danger  { border-color: var(--danger-border);  background: var(--danger-bg);  color: var(--danger-fg); }
+
+.alert.signal  { border-color: var(--sigma-accent); background: var(--tint-12); color: var(--color-text-1); }
+.alert .btn { appearance: none; border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-1); padding: 6px 10px; border-radius: 8px; font-weight: 600; cursor:pointer; box-shadow: var(--shadow-1); }
+.alert .btn-primary { background: var(--sigma-accent); color:#fff; border-color: var(--sigma-accent); }
+.alert .btn-outline { background: transparent; color: var(--sigma-accent); border-color: var(--sigma-accent); }
+

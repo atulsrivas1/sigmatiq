@@ -1,0 +1,20 @@
+name: momo_opt_default
+version: 1
+description: MomentumSigma options default indicators
+indicators:
+  - name: ret
+    window: 1
+    column: close
+  - name: rsi
+    period: 14
+    column: close
+  - name: ema_slope
+    window: 20
+    period: 1
+    column: close
+  - name: adx
+    period: 14
+  - name: iv_realized_spread
+    window: 20
+  - name: momentum_score_total
+

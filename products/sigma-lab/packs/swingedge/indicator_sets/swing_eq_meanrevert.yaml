@@ -1,0 +1,12 @@
+name: swing_eq_meanrevert
+version: 1
+description: SwingSigma (equities) — 3-Day Mean Reversion
+indicators:
+  - {name: rsi, period: 2}
+  - {name: ret, window: 3, column: close}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: rolling_std, window: 20}
+  - {name: atr, period: 14}
+  - {name: ema, window: 20}
+  - {name: vix_level}
+

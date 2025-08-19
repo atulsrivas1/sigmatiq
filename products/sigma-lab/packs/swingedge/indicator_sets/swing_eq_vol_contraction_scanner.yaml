@@ -1,0 +1,10 @@
+name: swing_eq_vol_contraction_scanner
+version: 1
+description: SwingSigma (equities) — Volatility contraction (squeeze) with expansion potential
+indicators:
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: keltner, window: 20, mult: 1.5}
+  - {name: roll_std, window: 20}
+  - {name: obv, price_col: close, volume_col: volume}
+  - {name: cmf, period: 20}
+

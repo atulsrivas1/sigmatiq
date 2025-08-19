@@ -1,0 +1,14 @@
+name: overnight_eq_gap
+version: 1
+description: OvernightSigma (equities) — Gap Continuation vs Fill
+indicators:
+  - {name: rsi_last_hour, period: 7}
+  - {name: returns_last_30m}
+  - {name: close_vs_vwap}
+  - {name: day_range_pos}
+  - {name: ret, window: 1, column: close}
+  - {name: atr, period: 14}
+  - {name: vol_zscore, window: 20}
+  - {name: vix_delta}
+  - {name: calendar_flags}
+

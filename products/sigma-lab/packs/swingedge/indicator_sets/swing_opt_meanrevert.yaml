@@ -1,0 +1,18 @@
+name: swing_opt_meanrevert
+version: 1
+description: SwingSigma (options) — 3-Day Mean Reversion
+indicators:
+  # Underlying stretch/mean signals
+  - {name: rsi, period: 2}
+  - {name: ret, window: 3, column: close}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: atr, period: 14}
+
+  # Options bias & risk
+  - {name: iv_rank_52w}
+  - {name: iv_percentile_52w}
+  - {name: atm_iv_zscore}
+  - {name: iv_realized_spread, window: 20}
+  - {name: pcr_oi}
+  - {name: vix_level}
+

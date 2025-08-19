@@ -1,0 +1,24 @@
+name: zeroedge_opening_drive
+version: 1
+description: ZeroSigma — Opening Drive + IV Compression
+indicators:
+  # Underlying intraday momentum & trend
+  - {name: rsi, period: 7}
+  - {name: ema, window: 8}
+  - {name: ema, window: 21}
+  - {name: macd, fast: 8, slow: 21, signal: 5}
+  - {name: atr, period: 14}
+  - {name: rolling_std, window: 20}
+
+  # Options & volatility
+  - {name: iv_realized_spread, window: 20}
+  - {name: iv_term_slope, days_fwd: 30}
+  - {name: pcr_volume}
+  - {name: pcr_oi}
+  - {name: oi_change_1d}
+
+  # Regime & time
+  - {name: vix_level}
+  - {name: hour_of_day}
+  - {name: day_of_week}
+

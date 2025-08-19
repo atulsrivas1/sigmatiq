@@ -1,0 +1,30 @@
+/* Sigmatiq Sigma — Signal Cards (minimal port) */
+.signal-card {
+  border:1px solid var(--color-border);
+  background: var(--color-surface-1);
+  border-radius: 14px;
+  box-shadow: var(--shadow-1);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+.signal-card .header { display:flex; align-items:center; gap: 8px; }
+.signal-card .ticker { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-18); }
+.signal-card .model { color: var(--color-text-2); }
+.signal-card .time { color: var(--color-text-2); font-size: var(--fs-12); }
+.signal-card .side { font-weight:700; }
+.signal-card .badge { border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-2); border-radius: 999px; padding: 3px 8px; font-size: var(--fs-12); }
+.signal-card .body { display:grid; grid-template-columns: 1fr 160px; gap: 10px; align-items:center; }
+.signal-card .spark { width: 100%; height: 44px; border:1px solid var(--color-border); border-radius: 8px; background: var(--color-surface-1); }
+.signal-card .confidence { height: 8px; background: var(--color-surface-2); border:1px solid var(--color-border); border-radius: 999px; overflow: hidden; }
+.signal-card .confidence > span { display:block; height: 100%; background: var(--sigma-accent); width: 50%; }
+.signal-card .tags { display:flex; flex-wrap: wrap; gap: 6px; }
+.signal-card .tag { border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-2); border-radius: 999px; padding: 2px 6px; font-size: var(--fs-12); }
+.signal-card .actions { display:flex; gap: 8px; justify-content:flex-end; align-items:center; }
+.signal-card .btn { appearance:none; border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-1); padding: 8px 12px; border-radius: 10px; font-weight:600; cursor:pointer; box-shadow: var(--shadow-1); }
+.signal-card .btn-primary { background: var(--sigma-accent); color: #fff; border-color: var(--sigma-accent); }
+.signal-card .btn-outline { background: transparent; color: var(--sigma-accent); border-color: var(--sigma-accent); }
+.signal-card.positive .side { color: #16A34A; }
+.signal-card.negative .side { color: #DC2626; }
+

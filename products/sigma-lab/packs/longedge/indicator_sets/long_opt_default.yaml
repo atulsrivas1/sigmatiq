@@ -1,0 +1,22 @@
+name: long_opt_default
+version: 1
+description: LongSigma options default indicators
+indicators:
+  - name: ret
+    window: 63
+    column: close
+  - name: ema
+    window: 50
+    column: close
+  - name: ema
+    window: 200
+    column: close
+  - name: iv_realized_spread
+    window: 63
+  - name: iv_term_slope
+    days_fwd: 180
+  - name: iv_skew_25d
+  - name: iv_rank_52w
+  - name: iv_percentile_52w
+  - name: atm_iv_zscore
+  - name: momentum_score_total

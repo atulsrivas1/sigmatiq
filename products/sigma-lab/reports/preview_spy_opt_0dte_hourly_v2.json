@@ -1,0 +1,313 @@
+{
+  "ok": true,
+  "model_id": "spy_opt_0dte_hourly",
+  "pack_id": "zeroedge",
+  "start": "2024-07-01",
+  "end": "2024-07-03",
+  "n_rows": 19,
+  "columns": [
+    "date",
+    "hour_et",
+    "calls_sold_d-5",
+    "puts_sold_d-5",
+    "calls_premium_d-5",
+    "puts_premium_d-5",
+    "calls_sold_d-4",
+    "puts_sold_d-4",
+    "calls_premium_d-4",
+    "puts_premium_d-4",
+    "calls_sold_d-3",
+    "puts_sold_d-3",
+    "calls_premium_d-3",
+    "puts_premium_d-3",
+    "calls_sold_d-2",
+    "puts_sold_d-2",
+    "calls_premium_d-2",
+    "puts_premium_d-2",
+    "calls_sold_d-1",
+    "puts_sold_d-1",
+    "calls_premium_d-1",
+    "puts_premium_d-1",
+    "calls_sold_d0",
+    "puts_sold_d0",
+    "calls_premium_d0",
+    "puts_premium_d0",
+    "calls_sold_d1",
+    "puts_sold_d1",
+    "calls_premium_d1",
+    "puts_premium_d1",
+    "calls_sold_d2",
+    "puts_sold_d2",
+    "calls_premium_d2",
+    "puts_premium_d2",
+    "calls_sold_d3",
+    "puts_sold_d3",
+    "calls_premium_d3",
+    "puts_premium_d3",
+    "calls_sold_d4",
+    "puts_sold_d4",
+    "calls_premium_d4",
+    "puts_premium_d4",
+    "calls_sold_d5",
+    "puts_sold_d5",
+    "calls_premium_d5",
+    "puts_premium_d5",
+    "spy_prev_close",
+    "close",
+    "day_of_week",
+    "calls_sold_total",
+    "puts_sold_total",
+    "pc_ratio",
+    "imbalance",
+    "calls_premium_total",
+    "puts_premium_total",
+    "dealer_sold_premium_imbalance",
+    "ret_next_hour",
+    "y_syn",
+    "y"
+  ],
+  "nan_stats": [
+    {
+      "column": "date",
+      "nan_pct": 100.0
+    },
+    {
+      "column": "hour_et",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d-5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d-5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d-5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d-5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d-4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d-4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d-4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d-4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d-3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d-3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d-3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d-3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d-2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d-2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d-2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d-2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d-1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d-1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d-1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d-1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d0",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d0",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d0",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d0",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d1",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d3",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d4",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_d5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_d5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_d5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_d5",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "spy_prev_close",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "close",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "day_of_week",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_sold_total",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_sold_total",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "pc_ratio",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "imbalance",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "calls_premium_total",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "puts_premium_total",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "dealer_sold_premium_imbalance",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "ret_next_hour",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "y_syn",
+      "nan_pct": 100.0
+    },
+    {
+      "column": "y",
+      "nan_pct": 100.0
+    }
+  ],
+  "warnings": [],
+  "v2_nan_summary": {
+    "warn": [],
+    "fail": []
+  },
+  "csv": "C:\\github\\gemini\\Sigmatix-ZeroSigma\\Sigmatix-Sigma\\matrices\\spy_opt_0dte_hourly\\preview_matrix.csv"
+}

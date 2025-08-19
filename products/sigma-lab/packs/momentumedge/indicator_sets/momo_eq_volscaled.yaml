@@ -1,0 +1,12 @@
+name: momo_eq_volscaled
+version: 1
+description: MomentumSigma (equities) — Vol-Scaled Momentum
+indicators:
+  - {name: ret, window: 5, column: close}
+  - {name: ret, window: 20, column: close}
+  - {name: ret, window: 63, column: close}
+  - {name: rsi, period: 14}
+  - {name: ema_slope, window: 20, period: 1}
+  - {name: rolling_std, window: 20}
+  - {name: adx, period: 14}
+

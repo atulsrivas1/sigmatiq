@@ -1,0 +1,17 @@
+/* Sigmatiq Sigma – Typography Tokens & Utilities */
+:root {
+  --font-display: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-20: 1.25rem;
+}
+.font-body { font-family: var(--font-body); }
+.font-display { font-family: var(--font-display); }
+.small { font-size: var(--fs-14); color: var(--color-text-2); }
+.label { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-14); color: var(--color-text-2); }
+.hint { font-size: var(--fs-12); color: var(--color-text-2); }
