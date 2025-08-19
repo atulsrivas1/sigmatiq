@@ -28,7 +28,7 @@ def main():
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 ON CONFLICT (date, model_id, ticker) DO NOTHING
                 """,
-                (today, 'sample_model', 'SPY', 'buy', 'next_session_open', 500.0, 495.0, 510.0, 120, 2.0, 0.75, 1, 'zeroedge', 'v1'),
+                (today, 'sample_model', 'SPY', 'buy', 'next_session_open', 500.0, 495.0, 510.0, 120, 2.0, 0.75, 1, 'zerosigma', 'v1'),
             )
             conn.commit()
             print("Seeded signals: 1")
@@ -70,7 +70,7 @@ def main():
                 INSERT INTO backtest_runs (pack_id, model_id, params, metrics)
                 VALUES (%s,%s,%s,%s)
                 """,
-                ('zeroedge','sample_model', Json(params), Json(metrics)),
+                ('zerosigma','sample_model', Json(params), Json(metrics)),
             )
             conn.commit()
             print("Seeded backtest_runs: 1")

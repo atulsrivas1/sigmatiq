@@ -21,7 +21,7 @@ class CreateModelRequest(BaseModel):
     cadence: str | None = 'hourly'
     algo: str | None = 'gbm'
     variant: str | None = None
-    pack_id: str | None = 'zeroedge'
+    pack_id: str | None = 'zerosigma'
     indicator_set_name: str | None = None
 
 @router.post('/models')
@@ -35,7 +35,7 @@ def create_model_ep(payload: CreateModelRequest):
         algo = str(payload.algo or 'gbm').lower()
         suffix = f"_{payload.variant}" if payload.variant else ''
         model_id = f"{ticker.lower()}_{asset}_{horizon}_{cadence}{suffix}"
-        ws = workspace_paths(model_id, payload.pack_id or 'zeroedge')
+        ws = workspace_paths(model_id, payload.pack_id or 'zerosigma')
         cfg_dir = ws['config'].parent
         pol_dir = ws['policy'].parent
         ind_dir = cfg_dir.parent / 'indicator_sets'
@@ -84,7 +84,7 @@ class IndicatorSetUpsertRequest(BaseModel):
 @router.post('/indicator_sets')
 def upsert_indicator_set_ep(payload: IndicatorSetUpsertRequest):
     try:
-        pack_id = payload.pack_id or 'zeroedge'
+        pack_id = payload.pack_id or 'zerosigma'
         scope = (payload.scope or 'pack').lower()
         name = payload.name
         inds = payload.indicators or []
@@ -120,13 +120,13 @@ class PreviewMatrixRequest(BaseModel):
     model_id: str
     start: str
     end: str
-    pack_id: str | None = 'zeroedge'
+    pack_id: str | None = 'zerosigma'
     max_rows: int | None = 200
 
 @router.post('/preview_matrix')
 def preview_matrix_ep(payload: PreviewMatrixRequest):
     model_id = payload.model_id
-    pack_id = payload.pack_id or 'zeroedge'
+    pack_id = payload.pack_id or 'zerosigma'
     pol_err = ensure_policy_exists(model_id, pack_id)
     if pol_err:
         return {"ok": False, "error": pol_err}
@@ -225,7 +225,7 @@ def preview_matrix_ep(payload: PreviewMatrixRequest):
 
 
 class PatchModelRequest(BaseModel):
-    pack_id: str | None = 'zeroedge'
+    pack_id: str | None = 'zerosigma'
     # Provide a partial config to merge into existing config
     config: Dict[str, Any]
 
@@ -233,7 +233,7 @@ class PatchModelRequest(BaseModel):
 @router.patch('/models/{model_id}')
 def patch_model_config(model_id: str, payload: PatchModelRequest):
     try:
-        pack_id = payload.pack_id or 'zeroedge'
+        pack_id = payload.pack_id or 'zerosigma'
         cfg_path = workspace_paths(model_id, pack_id)['config']
         if not cfg_path.exists():
             return {"ok": False, "error": f"config not found: {cfg_path}"}

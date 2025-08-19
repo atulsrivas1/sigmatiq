@@ -419,7 +419,7 @@ export function render() {
       // Update final summary on step 5
       if (currentStep === 5) {
         container.querySelector('#final-model-id').textContent = wizardData.basics.modelId || '-';
-        container.querySelector('#final-pack').textContent = 'zeroedge'; // Default pack
+        container.querySelector('#final-pack').textContent = 'zerosigma'; // Default pack
         container.querySelector('#final-indicators').textContent = wizardData.indicators.setName || '-';
         container.querySelector('#final-policy').textContent = wizardData.policy.templateName || '-';
       }

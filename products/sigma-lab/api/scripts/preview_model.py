@@ -4,7 +4,7 @@ Run a short preview build for a model and emit NaN stats.
 
 Usage:
   python scripts/preview_model.py --model_id spy_opt_0dte_hourly \
-      --pack_id zeroedge --start 2024-07-01 --end 2024-07-03 \
+      --pack_id zerosigma --start 2024-07-01 --end 2024-07-03 \
       --out reports/preview_spy_opt_0dte_hourly.json
 """
 from __future__ import annotations
@@ -44,7 +44,7 @@ def resolve_indicator_set_path(pack_id: str, model_id: str) -> Path:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--model_id', required=True)
-    ap.add_argument('--pack_id', default='zeroedge')
+    ap.add_argument('--pack_id', default='zerosigma')
     ap.add_argument('--start', required=True)
     ap.add_argument('--end', required=True)
     ap.add_argument('--out', default=None)

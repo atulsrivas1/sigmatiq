@@ -4,7 +4,7 @@ Scope: UI for Sigma Lab (authoring + evaluation). This document enumerates pages
 
 ## Global
 - Navigation: Dashboard, Models, Packs, Build/Train/Backtest, Sweeps, Leaderboard, Signals, Overlay, Health, Docs.
-- Theming: semantic tokens with multiple themes (`light|dark|slate|paper`), app-level theme switcher, `prefers-color-scheme` default + `localStorage` override, pack accent via `data-edge` or `--accent` token.
+- Theming: semantic tokens with multiple themes (`light|dark|slate|paper`), app-level theme switcher, `prefers-color-scheme` default + `localStorage` override, pack accent via `data-sigma` or `--accent` token.
 - Density: global density modes `compact|cozy|comfortable` via `data-density` tokens for tables/cards.
 - Assistant: docked chat panel with context-aware guidance across pages; suggests next actions and can read DB/CSV/Excel reports (read-only) to answer questions. Actions that trigger compute require explicit user confirmation in-chat.
 - Risk: global Risk Profile selector (Conservative/Balanced/Aggressive) persisted per user; Selection Cart drawer persists chosen configurations across pages.

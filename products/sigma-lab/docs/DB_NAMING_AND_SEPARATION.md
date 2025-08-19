@@ -2,10 +2,10 @@
 - Model: Separate database per product (prod), optional shared platform DB. In dev/staging, one Postgres with per-product schemas is acceptable for convenience.
 
 **Databases (prod)**
-- edge_lab: Sigma Lab (packs/models authoring, lineage, backtests, model cards, QA gates)
-- edge_sim: Sigma Sim (scenarios, simulation runs, artifacts index, reports)
-- edge_market: Sigma Market (catalog/listings, subscriptions, entitlements)
-- edge_pilot: Sigma Pilot (playbooks, guardrails, run logs, approvals)
+- sigma_lab: Sigma Lab (packs/models authoring, lineage, backtests, model cards, QA gates)
+- sigma_sim: Sigma Sim (scenarios, simulation runs, artifacts index, reports)
+- sigma_market: Sigma Market (catalog/listings, subscriptions, entitlements)
+- sigma_pilot: Sigma Pilot (playbooks, guardrails, run logs, approvals)
 - sigma_platform (optional): Identity/tenancy, orgs/users/roles; global catalog mirror; global audit aggregator
 
 **Schemas (within each DB)**
@@ -32,7 +32,7 @@
 - Staging/Prod: separate DB per product; backups and PITR per DB
 
 **Environment Variables (per repo)**
-- Required: `DB_HOST`, `DB_PORT`, `DB_NAME` (e.g., `edge_lab`), `DB_USER`, `DB_PASSWORD`
+- Required: `DB_HOST`, `DB_PORT`, `DB_NAME` (e.g., `sigma_lab`), `DB_USER`, `DB_PASSWORD`
 - Optional: `DB_SCHEMA` (default `public` or `app`), `DB_SSLMODE`, `DB_CONN_MAX`
 
 **Gateway & Cross-Product Data**
@@ -41,9 +41,9 @@
 
 **Quick Examples**
 - Sigma Lab local dev (single Postgres):
-  - DB_NAME=edge_lab, DB_SCHEMA=app
+  - DB_NAME=sigma_lab, DB_SCHEMA=app
 - Sigma Products consolidated dev DB (optional):
-  - DB_NAME=edge_products, DB_SCHEMA=lab|sim|market|pilot|platform
+  - DB_NAME=sigma_products, DB_SCHEMA=lab|sim|market|pilot|platform
 
 **Checklist**
 - DB per product in prod; optional platform DB only for global concerns

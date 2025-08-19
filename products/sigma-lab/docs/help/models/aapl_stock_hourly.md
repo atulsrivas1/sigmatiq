@@ -1,18 +1,18 @@
 # Model Help — aapl_stock_hourly
 
-Example equities model (hourly) for AAPL. Use with an equities-focused indicator set (e.g., `swingedge`).
+Example equities model (hourly) for AAPL. Use with an equities-focused indicator set (e.g., `swingsigma`).
 
 ## Quick Start
 ```
 # Create (API)
 curl -sS -X POST http://localhost:8001/models -H 'Content-Type: application/json' \
- -d '{"pack_id":"swingedge","ticker":"AAPL","asset_type":"eq","horizon":"intraday","cadence":"hourly","indicator_set_name":"swing_eq_default"}'
+ -d '{"pack_id":"swingsigma","ticker":"AAPL","asset_type":"eq","horizon":"intraday","cadence":"hourly","indicator_set_name":"swing_eq_default"}'
 
 # Preview (1–2 days)
-make preview MODEL_ID=aapl_eq_intraday_hourly PACK_ID=swingedge START=2024-07-01 END=2024-07-03
+make preview MODEL_ID=aapl_eq_intraday_hourly PACK_ID=swingsigma START=2024-07-01 END=2024-07-03
 
 # Build → Train → Backtest
-make build    MODEL_ID=aapl_eq_intraday_hourly PACK_ID=swingedge TICKER=AAPL START=2024-07-01 END=2024-07-12
+make build    MODEL_ID=aapl_eq_intraday_hourly PACK_ID=swingsigma TICKER=AAPL START=2024-07-01 END=2024-07-12
 make train    MODEL_ID=aapl_eq_intraday_hourly
 make backtest MODEL_ID=aapl_eq_intraday_hourly THRESHOLDS=0.55,0.60,0.65 SPLITS=5
 ```

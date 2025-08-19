@@ -108,7 +108,7 @@ def compute_breakout_momentum_score(df: pd.DataFrame, cfg: dict) -> pd.DataFrame
 
 def main():
     ap = argparse.ArgumentParser(description='Breakout & Momentum Scanner')
-    ap.add_argument('--pack_id', default='swingedge')
+    ap.add_argument('--pack_id', default='swingsigma')
     ap.add_argument('--model_id', default='universe_eq_swing_daily_scanner')
     ap.add_argument('--tickers', required=False, help='Comma-separated universe, e.g., AAPL,MSFT,SPY')
     ap.add_argument('--universe_csv', required=False, help='CSV file with a ticker column')

@@ -7,7 +7,7 @@ basic types before allowing build/train/backtest.
 Minimal example:
 
 ```
-name: zeroedge_default_v1
+name: zerosigma_default_v1
 version: 1
 policy:
   # BTB v1 additions (optional, see Risk_Profile_Schema.md)

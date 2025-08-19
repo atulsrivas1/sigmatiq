@@ -13,12 +13,12 @@ This runbook shows a consistent way to preview and run pipelines for all packs. 
 
 ## ZeroSigma (0DTE, options)
 - Models:
-  - spy_opt_0dte_hourly_headfake_1030 (indicator_set: zeroedge_headfake_reversal_v2)
-  - spy_opt_0dte_hourly_pin_1500 (indicator_set: zeroedge_pin_drift_v2)
+  - spy_opt_0dte_hourly_headfake_1030 (indicator_set: zerosigma_headfake_reversal_v2)
+  - spy_opt_0dte_hourly_pin_1500 (indicator_set: zerosigma_pin_drift_v2)
 - Preview (v2 gates apply for v2 features):
-  - make preview MODEL_ID=spy_opt_0dte_hourly_headfake_1030 PACK_ID=zeroedge START=2024-07-01 END=2024-07-03
+  - make preview MODEL_ID=spy_opt_0dte_hourly_headfake_1030 PACK_ID=zerosigma START=2024-07-01 END=2024-07-03
 - Build -> Train -> Backtest:
-  - make build MODEL_ID=spy_opt_0dte_hourly_headfake_1030 PACK_ID=zeroedge TICKER=SPY START=2024-07-01 END=2024-07-12
+  - make build MODEL_ID=spy_opt_0dte_hourly_headfake_1030 PACK_ID=zerosigma TICKER=SPY START=2024-07-01 END=2024-07-12
   - make train MODEL_ID=spy_opt_0dte_hourly_headfake_1030 ALLOWED_HOURS=13,14,15
   - make backtest MODEL_ID=spy_opt_0dte_hourly_headfake_1030 THRESHOLDS=0.55,0.60,0.65 SPLITS=5
 - Live alerts (scores latest rows; for true intraday, rebuild today first):
@@ -31,9 +31,9 @@ This runbook shows a consistent way to preview and run pipelines for all packs. 
   - spy_eq_swing_daily (indicator_set: swing_eq_default, labels: fwd_ret_20d)
   - spy_opt_swing_daily (indicator_set: swing_opt_default, labels: fwd_ret_20d)
 - Preview (stocks path):
-  - python scripts/preview_stock_model.py --model_id spy_eq_swing_daily --pack_id swingedge --start 2023-01-01 --end 2023-06-30 --label_kind fwd_ret_20d --out reports/preview_spy_eq_swing_daily.json
+  - python scripts/preview_stock_model.py --model_id spy_eq_swing_daily --pack_id swingsigma --start 2023-01-01 --end 2023-06-30 --label_kind fwd_ret_20d --out reports/preview_spy_eq_swing_daily.json
 - Build (API alternative):
-  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"swingedge","model_id":"spy_eq_swing_daily","start":"2023-01-01","end":"2023-12-31","label_kind":"fwd_ret_20d"}'
+  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"swingsigma","model_id":"spy_eq_swing_daily","start":"2023-01-01","end":"2023-12-31","label_kind":"fwd_ret_20d"}'
 - Train -> Backtest:
   - make train MODEL_ID=spy_eq_swing_daily
   - make backtest MODEL_ID=spy_eq_swing_daily THRESHOLDS=0.55,0.60,0.65 SPLITS=5
@@ -69,9 +69,9 @@ make scan-breakout UNIVERSE_CSV=data/universe/sample10.csv START=2025-08-01 END=
   - spy_eq_long_daily (indicator_set: long_eq_default, labels: fwd_ret_63d)
   - spy_opt_long_daily (indicator_set: long_opt_default, labels: fwd_ret_63d)
 - Preview (use a long window for lookahead):
-  - python scripts/preview_stock_model.py --model_id spy_eq_long_daily --pack_id longedge --start 2022-01-01 --end 2023-12-31 --label_kind fwd_ret_63d --out reports/preview_spy_eq_long_daily.json
+  - python scripts/preview_stock_model.py --model_id spy_eq_long_daily --pack_id longsigma --start 2022-01-01 --end 2023-12-31 --label_kind fwd_ret_63d --out reports/preview_spy_eq_long_daily.json
 - Build -> Train -> Backtest (equities example):
-  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"longedge","model_id":"spy_eq_long_daily","start":"2022-01-01","end":"2023-12-31","label_kind":"fwd_ret_63d"}'
+  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"longsigma","model_id":"spy_eq_long_daily","start":"2022-01-01","end":"2023-12-31","label_kind":"fwd_ret_63d"}'
   - make train MODEL_ID=spy_eq_long_daily
   - make backtest MODEL_ID=spy_eq_long_daily THRESHOLDS=0.55,0.60,0.65 SPLITS=5
 
@@ -82,7 +82,7 @@ make scan-breakout UNIVERSE_CSV=data/universe/sample10.csv START=2025-08-01 END=
   - spy_eq_intraday_daily (indicator_set: overnight_eq_default, labels: close_to_open supported via stocks builder)
   - spy_opt_intraday_daily (indicator_set: overnight_opt_default)
 - Preview (equities):
-  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"overnightedge","model_id":"spy_eq_intraday_daily","start":"2024-07-01","end":"2024-07-05","label_kind":"close_to_open"}'
+  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"overnightsigma","model_id":"spy_eq_intraday_daily","start":"2024-07-01","end":"2024-07-05","label_kind":"close_to_open"}'
 - Train -> Backtest:
   - make train MODEL_ID=spy_eq_intraday_daily
   - make backtest MODEL_ID=spy_eq_intraday_daily THRESHOLDS=0.55,0.60,0.65 SPLITS=5
@@ -94,9 +94,9 @@ make scan-breakout UNIVERSE_CSV=data/universe/sample10.csv START=2025-08-01 END=
   - spy_eq_intraday_hourly (indicator_set: momo_eq_default, next-bar labels)
   - spy_opt_intraday_hourly (indicator_set: momo_opt_default)
 - Preview (equities):
-  - python scripts/preview_stock_model.py --model_id spy_eq_intraday_hourly --pack_id momentumedge --start 2024-06-01 --end 2024-06-30 --out products/sigma-lab/reports/preview_spy_eq_intraday_hourly.json
+  - python scripts/preview_stock_model.py --model_id spy_eq_intraday_hourly --pack_id momentumsigma --start 2024-06-01 --end 2024-06-30 --out products/sigma-lab/reports/preview_spy_eq_intraday_hourly.json
 - Build -> Train -> Backtest (equities):
-  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"momentumedge","model_id":"spy_eq_intraday_hourly","start":"2024-06-01","end":"2024-06-30"}'
+  - curl -sS -X POST http://localhost:8001/build_stock_matrix -H "Content-Type: application/json" -d '{"ticker":"SPY","pack_id":"momentumsigma","model_id":"spy_eq_intraday_hourly","start":"2024-06-01","end":"2024-06-30"}'
   - make train MODEL_ID=spy_eq_intraday_hourly
 - make backtest MODEL_ID=spy_eq_intraday_hourly THRESHOLDS=0.55,0.60,0.65 SPLITS=5
 

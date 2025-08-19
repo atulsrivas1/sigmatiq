@@ -11,15 +11,15 @@ Draft — introduces template-first model creation; no code changes yet
 ## Template Content (YAML)
 ```yaml
 # products/sigma-lab/packs/<pack>/model_templates/<slug>.yaml
-template_id: zeroedge_starter_v1
+template_id: zerosigma_starter_v1
 template_version: 1
 name: ZeroSigma Starter (0DTE hourly)
-pack: zeroedge
+pack: zerosigma
 horizon: 0dte
 cadence: hourly
 
 indicator_set:
-  name: zeroedge_core_v2
+  name: zerosigma_core_v2
   params: {}
 
 policy_defaults:
@@ -53,8 +53,8 @@ metadata:
 ```json
 {
   "templates": [
-    {"template_id": "zeroedge_starter_v1", "name": "ZeroSigma Starter", "pack": "zeroedge", "horizon": "0dte", "cadence": "hourly", "template_version": 1},
-    {"template_id": "swing_momentum_daily_v1", "name": "Swing Momentum", "pack": "swingedge", "horizon": "swing", "cadence": "daily", "template_version": 1}
+    {"template_id": "zerosigma_starter_v1", "name": "ZeroSigma Starter", "pack": "zerosigma", "horizon": "0dte", "cadence": "hourly", "template_version": 1},
+    {"template_id": "swing_momentum_daily_v1", "name": "Swing Momentum", "pack": "swingsigma", "horizon": "swing", "cadence": "daily", "template_version": 1}
   ]
 }
 ```

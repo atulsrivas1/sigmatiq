@@ -42,7 +42,7 @@ Optional Next
 - [ ] Add Leaderboard view with TAG filter and quick link from panel
 
 Validation Plan (one-model end-to-end)
-- Model: spy_opt_0dte_hourly, Pack: zeroedge
+- Model: spy_opt_0dte_hourly, Pack: zerosigma
 - Window: 2024-06-01 to 2024-06-30
 - Grids:
   - thresholds_variants: ["0.50,0.52,0.54", "0.55,0.60,0.65"]

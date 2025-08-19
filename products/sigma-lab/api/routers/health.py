@@ -22,7 +22,7 @@ def health():
 
 
 @router.get("/healthz")
-def healthz(ticker: str = Query("SPY"), pack_id: str = Query("zeroedge"), model_id: str | None = Query(None)):
+def healthz(ticker: str = Query("SPY"), pack_id: str = Query("zerosigma"), model_id: str | None = Query(None)):
     errors: Dict[str, str] = {}
     checks: Dict[str, Any] = {}
     poly = os.getenv("POLYGON_API_KEY") or os.getenv("ZE_POLYGON_API_KEY")

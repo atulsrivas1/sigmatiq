@@ -61,7 +61,7 @@ class TrainRequest(BaseModel):
     calibration: Optional[str] = 'sigmoid'
     model_out: Optional[str] = None
     target: Optional[str] = None
-    pack_id: Optional[str] = 'zeroedge'
+    pack_id: Optional[str] = 'zerosigma'
 
 @router.post('/train')
 def train_ep(payload: TrainRequest):
@@ -70,17 +70,17 @@ def train_ep(payload: TrainRequest):
         return {'ok': False, 'error': 'model_id is required'}
     if select_features_train is None or XGBClassifier is None:
         return {'ok': False, 'error': 'Training deps missing'}
-    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zeroedge')
+    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zerosigma')
     if pol_err:
         return {'ok': False, 'error': pol_err}
-    paths = workspace_paths(model_id, payload.pack_id or 'zeroedge')
+    paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
     csv = payload.csv or str(paths['matrices'] / 'training_matrix_built.csv')
     allowed_hours = payload.allowed_hours
     if isinstance(allowed_hours, str) and allowed_hours:
         allowed_hours = [int(x) for x in allowed_hours.split(',')]
     calib = payload.calibration or 'sigmoid'
     out_path = _Path(payload.model_out or (paths['artifacts'] / 'gbm.pkl'))
-    cfgm = load_config(model_id, payload.pack_id or 'zeroedge')
+    cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
     fcfg = cfgm.get('features') or {}
     try:
         df_tmp = pd.read_csv(csv, nrows=1000)
@@ -136,13 +136,13 @@ def train_ep(payload: TrainRequest):
             lineage_vals = None
             if _compute_lineage is not None:
                 try:
-                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zeroedge', model_id)
-                    lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zeroedge'), model_id=model_id, indicator_set_path=ind_path)
+                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+                    lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
                 except Exception:
                     pass
             if write_model_card is not None:
                 write_model_card(
-                    pack_id=(payload.pack_id or 'zeroedge'),
+                    pack_id=(payload.pack_id or 'zerosigma'),
                     model_id=model_id,
                     event='train',
                     params={'csv': csv, 'allowed_hours': allowed_hours, 'calibration': calib, 'target': payload.target},

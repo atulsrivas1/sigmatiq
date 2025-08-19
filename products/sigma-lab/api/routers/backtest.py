@@ -36,7 +36,7 @@ class BacktestRequest(BaseModel):
     per_hour_thresholds: bool = False
     per_hour_select_by: str = 'sharpe'
     calibration: Optional[str] = 'sigmoid'
-    pack_id: Optional[str] = 'zeroedge'
+    pack_id: Optional[str] = 'zerosigma'
     momentum_gate: Optional[bool] = None
     momentum_min: Optional[float] = None
     momentum_column: Optional[str] = None
@@ -51,7 +51,7 @@ def backtest_ep(payload: BacktestRequest):
         return {"ok": False, "error": "model_id is required"}
     if run_backtest is None:
         return {"ok": False, "error": "Backtest dep missing"}
-    pack_id = payload.pack_id or 'zeroedge'
+    pack_id = payload.pack_id or 'zerosigma'
     paths = workspace_paths(model_id, pack_id)
     csv = payload.csv or str(paths['matrices'] / 'training_matrix_built.csv')
     started_at = datetime.utcnow()

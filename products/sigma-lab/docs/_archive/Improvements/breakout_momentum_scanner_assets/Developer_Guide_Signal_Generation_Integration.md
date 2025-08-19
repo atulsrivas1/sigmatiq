@@ -22,7 +22,7 @@ The **Custom Model Builder** (wizard) already knows how to: (a) list indicators 
 
 **Artifacts provided (already generated):**
 
-- **Indicator set (pack‑level):** `packs/swingedge/indicator_sets/swing_eq_breakout_scanner.yaml`  
+- **Indicator set (pack‑level):** `packs/swingsigma/indicator_sets/swing_eq_breakout_scanner.yaml`  
   Computes EMA(20/50), RSI(14), ADX(14), returns(5/20/63), LR_R2(126), ATR(14), STDDEV(20), Bollinger(20,2), OBV, CMF(20). (All are built‑ins in your registry.) fileciteturn0file5  
 - **Scanner script (CLI skeleton):** `scripts/scanner_breakout_momentum.py`  
   Calls your builder/API, applies the gates, computes the **BreakoutMomentumScore**, ranks top‑N, and writes CSV.
@@ -70,9 +70,9 @@ Use the same features + a label (e.g., `fwd_ret_10d`) and train/backtest, then e
 - `GET /healthz` — checks Polygon connectivity & entitlements (helpful before large builds). fileciteturn0file5
 
 **Paths & naming:**  
-- **Indicator set:** `packs/swingedge/indicator_sets/swing_eq_breakout_scanner.yaml`  
-- **Optional model config (logical holder for signals):** `packs/swingedge/model_configs/universe_eq_swing_daily_scanner.yaml`  
-- **Policy:** `packs/swingedge/policy_templates/universe_eq_swing_daily_scanner.yaml`  
+- **Indicator set:** `packs/swingsigma/indicator_sets/swing_eq_breakout_scanner.yaml`  
+- **Optional model config (logical holder for signals):** `packs/swingsigma/model_configs/universe_eq_swing_daily_scanner.yaml`  
+- **Policy:** `packs/swingsigma/policy_templates/universe_eq_swing_daily_scanner.yaml`  
 - **Naming format:** `<ticker>_<asset>_<horizon>_<cadence>[_<algo>|_<variant>]` (e.g., `universe_eq_swing_daily_scanner`). fileciteturn0file3  
 - **Matrices/Artifacts/Plots:** standard per‑model folders as in ADRs. fileciteturn0file3
 
@@ -132,7 +132,7 @@ Schedule with cron/K8s; keep logs under the existing structured logging policy n
 
 ## 7) UI integration (Custom Model Builder)
 
-- **Step 3** lists the scanner indicators (grouped); saving writes the set to `packs/swingedge/...`.  
+- **Step 3** lists the scanner indicators (grouped); saving writes the set to `packs/swingsigma/...`.  
 - **Step 5** runs **Preview** (1–2 days) to ensure IV/bars are present and NaN% within thresholds.  
 - **Step 6** persists the model & policy and orchestrates builds/backtests if you go the ML route. fileciteturn0file2
 
@@ -171,7 +171,7 @@ If you convert scan picks to **options trades**, re‑use your existing options 
 
 ## 12) Quick checklist
 
-- [ ] Commit `packs/swingedge/indicator_sets/swing_eq_breakout_scanner.yaml`. fileciteturn0file1  
+- [ ] Commit `packs/swingsigma/indicator_sets/swing_eq_breakout_scanner.yaml`. fileciteturn0file1  
 - [ ] (Optional) Create logical model + policy per §5; validate with `/validate_policy`. fileciteturn0file4  
 - [ ] Add nightly job: `build_matrix` → run scanner script → publish signals. fileciteturn0file0  
 - [ ] (Optional) ML path: add labels → train/backtest → deploy; monitor via leaderboard. fileciteturn0file5

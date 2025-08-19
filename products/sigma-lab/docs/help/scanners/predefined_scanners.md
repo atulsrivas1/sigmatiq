@@ -34,7 +34,7 @@ These scanner templates mirror common discretionary playbooks. Each lists its fe
   - Gates: momentum ranks top decile; ADX >= 20; above EMA20
 
 How to use
-- Each template has a matching indicator set YAML under `products/sigma-lab/packs/swingedge/indicator_sets/`.
+- Each template has a matching indicator set YAML under `products/sigma-lab/packs/swingsigma/indicator_sets/`.
 - Create a logical model via `POST /models` or `scripts/create_model.py` (set labels.kind: none).
 - Run scans via Make targets or the `/scan` endpoint.
 

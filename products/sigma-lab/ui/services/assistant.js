@@ -13,7 +13,7 @@ export function buildContextFromDOM({ view, modelId, packId, riskProfile, extra 
   return {
     route: location.hash || '#/',
     model_id: modelId || (window.currentModelId || null),
-    pack_id: packId || (document.documentElement.getAttribute('data-edge') || 'zeroedge'),
+    pack_id: packId || (document.documentElement.getAttribute('data-edge') || 'zerosigma'),
     risk_profile: riskProfile || (window.currentRiskProfile || 'balanced'),
     view,
     form_values: extra.formValues || {},

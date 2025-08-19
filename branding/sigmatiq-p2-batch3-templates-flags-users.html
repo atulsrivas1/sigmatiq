@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATIQ - P2: Templates, Feature Flags & Users</title>
+    <style>
+        :root {
+            --sigmatiq-dark-teal: #1A2F2F;
+            --sigmatiq-bright-teal: #00C4A7;
+            --sigmatiq-golden: #FFB800;
+            --color-bg: #0A1414;
+            --color-surface-1: #0F1A1A;
+            --color-surface-2: #111827;
+            --color-surface-3: #1A2F2F;
+            --color-border: #1A2F2F;
+            --color-text-1: #F5F5F7;
+            --color-text-2: #8FA5A5;
+            --color-text-3: #6A8080;
+            --status-success: #00C4A7;
+            --status-warning: #FFB800;
+            --status-error: #FF5757;
+            --status-info: #3B82F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-1);
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 48px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            color: var(--sigmatiq-bright-teal);
+            font-size: 24px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* ============================================
+           TEMPLATES MANAGER
+           ============================================ */
+        
+        .templates-manager-container {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .templates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .templates-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .templates-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .templates-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-2);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .templates-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .templates-table tr:hover {
+            background: var(--color-surface-2);
+        }
+
+        .template-name-cell {
+            font-weight: 600;
+            color: var(--sigmatiq-bright-teal);
+            cursor: pointer;
+        }
+
+        .template-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .template-status.published {
+            background: rgba(0,196,167,0.2);
+            color: var(--status-success);
+        }
+
+        .template-status.draft {
+            background: rgba(255,184,0,0.2);
+            color: var(--status-warning);
+        }
+
+        .template-status.archived {
+            background: rgba(134,142,150,0.2);
+            color: var(--color-text-3);
+        }
+
+        /* Template Editor Modal */
+        .template-editor {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .editor-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .editor-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--color-text-2);
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .editor-tab:hover {
+            color: var(--color-text-1);
+        }
+
+        .editor-tab.active {
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .editor-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--sigmatiq-bright-teal);
+        }
+
+        .yaml-editor {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--color-text-1);
+            min-height: 400px;
+            overflow: auto;
+            white-space: pre;
+        }
+
+        .template-metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .metadata-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metadata-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-2);
+        }
+
+        .metadata-input {
+            padding: 10px 14px;
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            outline: none;
+        }
+
+        .metadata-input:focus {
+            border-color: var(--sigmatiq-bright-teal);
+            box-shadow: 0 0 0 3px rgba(0,196,167,0.1);
+        }
+
+        /* ============================================
+           FEATURE FLAGS
+           ============================================ */
+        
+        .feature-flags-container {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .flags-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .flag-card {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flag-info {
+            flex: 1;
+        }
+
+        .flag-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-family: 'Monaco', monospace;
+        }
+
+        .flag-description {
+            font-size: 14px;
+            color: var(--color-text-2);
+            margin-bottom: 8px;
+        }
+
+        .flag-metadata {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--color-text-3);
+        }
+
+        .flag-toggle {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+
+        .toggle-switch {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--color-surface-3);
+            border-radius: 34px;
+            transition: background 0.3s;
+        }
+
+        .toggle-label:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch:checked + .toggle-label {
+            background: var(--sigmatiq-bright-teal);
+        }
+
+        .toggle-switch:checked + .toggle-label:before {
+            transform: translateX(28px);
+        }
+
+        .flag-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(255,184,0,0.1);
+            border: 1px solid var(--status-warning);
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        /* ============================================
+           USERS & ROLES
+           ============================================ */
+        
+        .users-container {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .users-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .user-stat-card {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .user-stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text-1);
+        }
+
+        .user-stat-label {
+            font-size: 11px;
+            color: var(--color-text-3);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-2);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .users-table tr:hover {
+            background: var(--color-surface-2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sigmatiq-bright-teal), var(--sigmatiq-golden));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-email {
+            font-weight: 500;
+            color: var(--color-text-1);
+        }
+
+        .user-id {
+            font-size: 11px;
+            color: var(--color-text-3);
+            font-family: 'Monaco', monospace;
+        }
+
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .role-badge.admin {
+            background: rgba(255,184,0,0.2);
+            color: var(--sigmatiq-golden);
+        }
+
+        .role-badge.editor {
+            background: rgba(0,196,167,0.2);
+            color: var(--status-success);
+        }
+
+        .role-badge.viewer {
+            background: rgba(134,142,150,0.2);
+            color: var(--color-text-2);
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.active {
+            background: var(--status-success);
+        }
+
+        .status-indicator.inactive {
+            background: var(--color-text-3);
+        }
+
+        .status-indicator.suspended {
+            background: var(--status-error);
+        }
+
+        /* Action Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .btn-danger {
+            background: var(--status-error);
+            border-color: var(--status-error);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--status-warning);
+            border-color: var(--status-warning);
+            color: var(--color-bg);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Audit Log */
+        .audit-log {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .audit-entry {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 12px;
+        }
+
+        .audit-entry:last-child {
+            border-bottom: none;
+        }
+
+        .audit-timestamp {
+            color: var(--color-text-3);
+            min-width: 120px;
+        }
+
+        .audit-action {
+            color: var(--sigmatiq-bright-teal);
+            font-weight: 500;
+        }
+
+        .audit-details {
+            color: var(--color-text-2);
+        }
+    </style>
+</head>
+<body>
+    <!-- TEMPLATES MANAGER SECTION -->
+    <section class="section">
+        <h2 class="section-title">Admin - Templates Manager (P2)</h2>
+        
+        <div class="templates-manager-container">
+            <div class="templates-header">
+                <h3 style="font-size: 18px;">Model Templates Registry</h3>
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Create Template
+                </button>
+            </div>
+
+            <!-- Templates Filters -->
+            <div class="templates-filters">
+                <select class="filter-select">
+                    <option>All Packs</option>
+                    <option>zerosigma</option>
+                    <option>swingsigma</option>
+                    <option>gapsigma</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Status</option>
+                    <option>Published</option>
+                    <option>Draft</option>
+                    <option>Archived</option>
+                </select>
+                <input type="text" class="filter-select" placeholder="Search templates..." style="flex: 1; min-width: 200px;">
+            </div>
+
+            <!-- Templates Table -->
+            <table class="templates-table">
+                <thead>
+                    <tr>
+                        <th>Template Name</th>
+                        <th>Pack</th>
+                        <th>Version</th>
+                        <th>Status</th>
+                        <th>Usage</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="template-name-cell" onclick="toggleEditor('template-1')">ZeroSigma Starter</span></td>
+                        <td>zerosigma</td>
+                        <td>v2.1.0</td>
+                        <td><span class="template-status published">Published</span></td>
+                        <td>142 models</td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">2 days ago</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small">Clone</button>
+                                <button class="btn btn-small">Archive</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-name-cell" onclick="toggleEditor('template-2')">Swing Momentum</span></td>
+                        <td>swingsigma</td>
+                        <td>v1.8.2</td>
+                        <td><span class="template-status published">Published</span></td>
+                        <td>87 models</td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">1 week ago</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small">Clone</button>
+                                <button class="btn btn-small">Archive</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-name-cell">Gamma Unwind (Beta)</span></td>
+                        <td>gammasigma</td>
+                        <td>v0.9.5</td>
+                        <td><span class="template-status draft">Draft</span></td>
+                        <td>0 models</td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">3 hours ago</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small btn-primary">Publish</button>
+                                <button class="btn btn-small">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-name-cell">Opening Drive (Legacy)</span></td>
+                        <td>zerosigma</td>
+                        <td>v1.0.0</td>
+                        <td><span class="template-status archived">Archived</span></td>
+                        <td>23 models</td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">2 months ago</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">View</button>
+                                <button class="btn btn-small">Restore</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Template Editor (collapsible) -->
+            <div class="template-editor" id="template-1-editor" style="display: none;">
+                <h4 style="margin-bottom: 16px;">Edit Template: ZeroSigma Starter</h4>
+                
+                <div class="editor-tabs">
+                    <button class="editor-tab active">Metadata</button>
+                    <button class="editor-tab">YAML Config</button>
+                    <button class="editor-tab">Validation</button>
+                    <button class="editor-tab">Preview</button>
+                </div>
+
+                <div class="template-metadata-grid">
+                    <div class="metadata-field">
+                        <label class="metadata-label">Template Name</label>
+                        <input type="text" class="metadata-input" value="ZeroSigma Starter">
+                    </div>
+                    <div class="metadata-field">
+                        <label class="metadata-label">Pack</label>
+                        <select class="metadata-input">
+                            <option selected>zerosigma</option>
+                            <option>swingsigma</option>
+                            <option>gapsigma</option>
+                        </select>
+                    </div>
+                    <div class="metadata-field">
+                        <label class="metadata-label">Horizon</label>
+                        <input type="text" class="metadata-input" value="0DTE">
+                    </div>
+                    <div class="metadata-field">
+                        <label class="metadata-label">Cadence</label>
+                        <input type="text" class="metadata-input" value="hourly">
+                    </div>
+                    <div class="metadata-field">
+                        <label class="metadata-label">Default Risk Profile</label>
+                        <select class="metadata-input">
+                            <option>Conservative</option>
+                            <option selected>Balanced</option>
+                            <option>Aggressive</option>
+                        </select>
+                    </div>
+                    <div class="metadata-field">
+                        <label class="metadata-label">Min Data Days</label>
+                        <input type="number" class="metadata-input" value="30">
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="metadata-label">YAML Configuration</div>
+                    <pre class="yaml-editor">template:
+  name: zerosigma_starter
+  version: 2.1.0
+  pack: zerosigma
+  
+indicators:
+  - pin_drift_v1
+  - headfake_v2
+  - momentum_gate
+  
+policy:
+  execution:
+    momentum_gate: false
+    wait_for_confirmation: true
+    
+  risk:
+    max_position_size: 1000
+    stop_loss_pct: 2.0
+    
+sweeps_defaults:
+  thresholds: [0.50, 0.55, 0.60]
+  allowed_hours: [[13,14], [13,14,15]]
+  top_pct: [0.10, 0.15]</pre>
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn">Save Draft</button>
+                    <button class="btn">Validate</button>
+                    <button class="btn btn-primary">Publish v2.2.0</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURE FLAGS SECTION -->
+    <section class="section">
+        <h2 class="section-title">Admin - Feature Flags (P2)</h2>
+        
+        <div class="feature-flags-container">
+            <div class="templates-header">
+                <h3 style="font-size: 18px;">Feature Toggles</h3>
+                <div style="font-size: 12px; color: var(--color-text-2);">
+                    Changes take effect immediately • All changes are logged
+                </div>
+            </div>
+
+            <div class="flags-grid">
+                <!-- AI Assistant Execute -->
+                <div class="flag-card">
+                    <div class="flag-info">
+                        <div class="flag-name">assistant_execute_enabled</div>
+                        <div class="flag-description">Allow AI Assistant to execute compute operations with user confirmation</div>
+                        <div class="flag-metadata">
+                            <span>Created: 3 months ago</span>
+                            <span>Last modified: 2 days ago</span>
+                            <span>Modified by: admin@example.com</span>
+                        </div>
+                    </div>
+                    <div class="flag-toggle">
+                        <input type="checkbox" id="flag1" class="toggle-switch" checked>
+                        <label for="flag1" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <!-- Ad-hoc Backtest -->
+                <div class="flag-card">
+                    <div class="flag-info">
+                        <div class="flag-name">adhoc_backtest_enabled</div>
+                        <div class="flag-description">Show ad-hoc Backtest tab in Build/Train/Backtest section</div>
+                        <div class="flag-metadata">
+                            <span>Created: 1 month ago</span>
+                            <span>Last modified: 1 week ago</span>
+                            <span>Modified by: admin@example.com</span>
+                        </div>
+                    </div>
+                    <div class="flag-toggle">
+                        <input type="checkbox" id="flag2" class="toggle-switch" checked>
+                        <label for="flag2" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <!-- Signals Leaderboard -->
+                <div class="flag-card">
+                    <div class="flag-info">
+                        <div class="flag-name">signals_leaderboard_visible</div>
+                        <div class="flag-description">Show Signals Leaderboard to all users (not just admins)</div>
+                        <div class="flag-metadata">
+                            <span>Created: 2 weeks ago</span>
+                            <span>Last modified: 3 days ago</span>
+                            <span>Modified by: developer@example.com</span>
+                        </div>
+                    </div>
+                    <div class="flag-toggle">
+                        <input type="checkbox" id="flag3" class="toggle-switch">
+                        <label for="flag3" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <!-- Advanced Research -->
+                <div class="flag-card">
+                    <div class="flag-info">
+                        <div class="flag-name">advanced_research_beta</div>
+                        <div class="flag-description">Enable Advanced Research button for deep analysis (10+ min searches)</div>
+                        <div class="flag-metadata">
+                            <span>Created: 1 week ago</span>
+                            <span>Last modified: Never</span>
+                            <span>Modified by: —</span>
+                        </div>
+                        <div class="flag-warning">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--status-warning)" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                            </svg>
+                            <span>Beta feature - may impact system performance</span>
+                        </div>
+                    </div>
+                    <div class="flag-toggle">
+                        <input type="checkbox" id="flag4" class="toggle-switch">
+                        <label for="flag4" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <!-- Mobile Trading -->
+                <div class="flag-card">
+                    <div class="flag-info">
+                        <div class="flag-name">mobile_trading_enabled</div>
+                        <div class="flag-description">Enable trading actions from mobile devices</div>
+                        <div class="flag-metadata">
+                            <span>Created: 2 months ago</span>
+                            <span>Last modified: 1 month ago</span>
+                            <span>Modified by: security@example.com</span>
+                        </div>
+                    </div>
+                    <div class="flag-toggle">
+                        <input type="checkbox" id="flag5" class="toggle-switch" checked>
+                        <label for="flag5" class="toggle-label"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- USERS & ROLES SECTION -->
+    <section class="section">
+        <h2 class="section-title">Admin - Users & Roles (P2)</h2>
+        
+        <div class="users-container">
+            <div class="templates-header">
+                <h3 style="font-size: 18px;">User Management</h3>
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="20" y1="8" x2="20" y2="14"/>
+                        <line x1="23" y1="11" x2="17" y2="11"/>
+                    </svg>
+                    Add User
+                </button>
+            </div>
+
+            <!-- User Statistics -->
+            <div class="users-stats">
+                <div class="user-stat-card">
+                    <div class="user-stat-value">247</div>
+                    <div class="user-stat-label">Total Users</div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="user-stat-value">18</div>
+                    <div class="user-stat-label">Active Now</div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="user-stat-value">3</div>
+                    <div class="user-stat-label">Admins</div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="user-stat-value">42</div>
+                    <div class="user-stat-label">Editors</div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="user-stat-value">202</div>
+                    <div class="user-stat-label">Viewers</div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="user-stat-value">2</div>
+                    <div class="user-stat-label">Suspended</div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Active</th>
+                        <th>API Token</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">JD</div>
+                                <div class="user-details">
+                                    <span class="user-email">john.doe@example.com</span>
+                                    <span class="user-id">usr_abc123def456</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="filter-select" style="padding: 6px 10px;">
+                                <option>Viewer</option>
+                                <option selected>Editor</option>
+                                <option>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-indicator active"></span>
+                                <span style="font-size: 12px;">Active</span>
+                            </div>
+                        </td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">2 min ago</td>
+                        <td>
+                            <span style="font-family: 'Monaco', monospace; font-size: 11px;">sk_live_***def</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small btn-warning">Rotate Token</button>
+                                <button class="btn btn-small">Suspend</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" style="background: linear-gradient(135deg, var(--sigmatiq-golden), var(--status-warning));">AS</div>
+                                <div class="user-details">
+                                    <span class="user-email">admin@sigmatiq.com</span>
+                                    <span class="user-id">usr_admin001</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge admin">ADMIN</span>
+                        </td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-indicator active"></span>
+                                <span style="font-size: 12px;">Active</span>
+                            </div>
+                        </td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">Now</td>
+                        <td>
+                            <span style="font-family: 'Monaco', monospace; font-size: 11px;">sk_live_***xyz</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small btn-warning">Rotate Token</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" style="background: var(--color-text-3);">TU</div>
+                                <div class="user-details">
+                                    <span class="user-email">test.user@example.com</span>
+                                    <span class="user-id">usr_test789ghi</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge viewer">VIEWER</span>
+                        </td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-indicator inactive"></span>
+                                <span style="font-size: 12px;">Inactive</span>
+                            </div>
+                        </td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">3 days ago</td>
+                        <td>
+                            <span style="font-family: 'Monaco', monospace; font-size: 11px;">sk_test_***abc</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small">Edit</button>
+                                <button class="btn btn-small btn-warning">Rotate Token</button>
+                                <button class="btn btn-small">Suspend</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" style="background: var(--status-error);">SU</div>
+                                <div class="user-details">
+                                    <span class="user-email">suspended@example.com</span>
+                                    <span class="user-id">usr_sus456jkl</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge viewer">VIEWER</span>
+                        </td>
+                        <td>
+                            <div class="user-status">
+                                <span class="status-indicator suspended"></span>
+                                <span style="font-size: 12px; color: var(--status-error);">Suspended</span>
+                            </div>
+                        </td>
+                        <td style="font-size: 12px; color: var(--color-text-2);">2 weeks ago</td>
+                        <td>
+                            <span style="font-family: 'Monaco', monospace; font-size: 11px; color: var(--color-text-3);">Revoked</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-small btn-primary">Restore</button>
+                                <button class="btn btn-small btn-danger">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Audit Log -->
+            <h4 style="margin-top: 32px; margin-bottom: 16px;">Recent Admin Actions</h4>
+            <div class="audit-log">
+                <div class="audit-entry">
+                    <span class="audit-timestamp">2025-08-19 14:45:23</span>
+                    <span class="audit-action">ROLE_CHANGED</span>
+                    <span class="audit-details">admin@sigmatiq.com changed john.doe@example.com from Viewer to Editor</span>
+                </div>
+                <div class="audit-entry">
+                    <span class="audit-timestamp">2025-08-19 14:32:15</span>
+                    <span class="audit-action">TOKEN_ROTATED</span>
+                    <span class="audit-details">admin@sigmatiq.com rotated API token for test.user@example.com</span>
+                </div>
+                <div class="audit-entry">
+                    <span class="audit-timestamp">2025-08-19 13:28:41</span>
+                    <span class="audit-action">USER_SUSPENDED</span>
+                    <span class="audit-details">security@sigmatiq.com suspended suspended@example.com - Reason: Quota violations</span>
+                </div>
+                <div class="audit-entry">
+                    <span class="audit-timestamp">2025-08-19 11:15:02</span>
+                    <span class="audit-action">USER_CREATED</span>
+                    <span class="audit-details">admin@sigmatiq.com created new user newuser@example.com with Editor role</span>
+                </div>
+                <div class="audit-entry">
+                    <span class="audit-timestamp">2025-08-19 09:45:18</span>
+                    <span class="audit-action">QUOTA_MODIFIED</span>
+                    <span class="audit-details">admin@sigmatiq.com increased sweep quota for john.doe@example.com from 5 to 10</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleEditor(templateId) {
+            const editor = document.getElementById(templateId + '-editor');
+            if (editor) {
+                editor.style.display = editor.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Feature flag change handler
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const flagName = this.closest('.flag-card').querySelector('.flag-name').textContent;
+                const enabled = this.checked;
+                console.log(`Feature flag changed: ${flagName} = ${enabled}`);
+                // In production: Send API request to update flag
+                // Log the change to audit log
+            });
+        });
+
+        // Simulate token rotation
+        function rotateToken(userId) {
+            if (confirm('Are you sure you want to rotate this API token? The old token will be immediately invalidated.')) {
+                alert('New token generated: sk_live_' + Math.random().toString(36).substr(2, 9));
+            }
+        }
+    </script>
+</body>
+</html>

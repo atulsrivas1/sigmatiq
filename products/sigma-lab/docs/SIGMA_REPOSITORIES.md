@@ -26,7 +26,7 @@ Note: In this workspace, Sigma Lab is organized as a product under `products/sig
 - **Repos**: lowercase with hyphens (e.g., `sigma-core`, `sigma-apis`, `sigma-ui`).
 - **Python packages**: lowercase with underscores (e.g., `sigma_core`, `sigma_platform`).
 - **Docker images**: `ghcr.io/<org>/<repo>[:tag]`, hyphens preferred (e.g., `ghcr.io/org/sigma-zerosigma-api`).
-- **PyPI vs import**: Project names may use hyphens (e.g., `sigma-sdk`), import uses underscore (`edge_sdk`).
+- **PyPI vs import**: Project names may use hyphens (e.g., `sigma-sdk`), import uses underscore (`sigma_sdk`).
 
 **sigma-core (repo)**
 - **Purpose**: Shareable core logic across products; no API server code.
@@ -56,7 +56,7 @@ Note: In this workspace, Sigma Lab is organized as a product under `products/sig
 **Product API repos (per product)**
 - **Purpose**: Own the API server and product-specific workers for one product.
 - **Top-level (example: sigma-lab-api)**:
-  - `edge_api/`: FastAPI app package
+  - `api/`: FastAPI app package
     - `app.py`: ASGI app entrypoint (or `apps/<product>/app.py`)
     - `routers/`: group by area; may include `common/` (if duplicated) and product-specific modules
     - `services/`: thin wrappers calling `sigma_platform`
@@ -86,7 +86,7 @@ Note: In this workspace, Sigma Lab is organized as a product under `products/sig
 **sigma-sdk-py (repo, optional but recommended)**
 - **Purpose**: Stable SDK for apps and notebooks; enforces API contracts in CI.
 - **Top-level**:
-  - `edge_sdk/`: typed client, paginated iterators, lineage helpers
+  - `sigma_sdk/`: typed client, paginated iterators, lineage helpers
   - `tests/`: contract tests against stub/golden schemas
   - Build files, README
 - **CI/CD**:
@@ -162,28 +162,28 @@ Note: In this workspace, Sigma Lab is organized as a product under `products/sig
 - Sigma Lab:
   - Brand: Sigma Lab
   - Repos: `sigma-lab-api`, `sigma-lab-ui`
-  - Python package: `edge_lab_api`
+  - Python package: `sigma_lab_api`
   - Domain: `sigma-lab.sigmatiq.ai`, API: `api.sigma-lab.sigmatiq.ai`
   - Gateway prefix: `/api/lab`
   - Docker image: `ghcr.io/<org>/sigma-lab-api:<tag>`
 - Sigma Sim:
   - Brand: Sigma Sim
   - Repos: `sigma-sim-api`, `sigma-sim-ui`
-  - Python package: `edge_sim_api`
+  - Python package: `sigma_sim_api`
   - Domain: `sigma-sim.sigmatiq.ai`, API: `api.sigma-sim.sigmatiq.ai`
   - Gateway prefix: `/api/sim`
   - Docker image: `ghcr.io/<org>/sigma-sim-api:<tag>`
 - Sigma Market:
   - Brand: Sigma Market
   - Repos: `sigma-market-api`, `sigma-market-ui`
-  - Python package: `edge_market_api`
+  - Python package: `sigma_market_api`
   - Domain: `sigma-market.sigmatiq.ai`, API: `api.sigma-market.sigmatiq.ai`
   - Gateway prefix: `/api/market`
   - Docker image: `ghcr.io/<org>/sigma-market-api:<tag>`
 - Sigma Pilot:
   - Brand: Sigma Pilot
   - Repos: `sigma-pilot-api`, `sigma-pilot-ui`
-  - Python package: `edge_pilot_api`
+  - Python package: `sigma_pilot_api`
   - Domain: `sigma-pilot.sigmatiq.ai`, API: `api.sigma-pilot.sigmatiq.ai`
   - Gateway prefix: `/api/pilot`
   - Docker image: `ghcr.io/<org>/sigma-pilot-api:<tag>`

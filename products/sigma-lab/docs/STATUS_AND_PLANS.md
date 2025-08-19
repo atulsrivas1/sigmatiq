@@ -68,8 +68,8 @@ Impacts (no breaking changes to vision):
 
 ## In Progress / Next
 - Stocks-only pipeline
-  - Add a stock dataset builder (bars→features→labels) and a stock-focused indicator set under `swingedge`.
-  - Scaffold example equity model configs/policies so `swingedge` shows up in `/models` and runs E2E.
+  - Add a stock dataset builder (bars→features→labels) and a stock-focused indicator set under `swingsigma`.
+  - Scaffold example equity model configs/policies so `swingsigma` shows up in `/models` and runs E2E.
 - Policy-driven calibration
   - Add `/calibrate_thresholds` (global/per-hour) and a Make target to tune thresholds on recent matrices; persist best configs.
 - Ops & UX
@@ -83,7 +83,7 @@ Impacts (no breaking changes to vision):
 - Update `policy_schema.md` to include `risk_profile` and `risk_budget` blocks (align with Risk Profile Schema).
 - Update `specs/Model_Cards_and_Lineage.md` to add `risk_profile` and `risk_sha` fields in lineage examples.
 - Update UI docs (`ui/Sigma_Lab_UI_Requirements_v1.md`, `ui/Sigma_Lab_UI_Wireframes_v1.md`) to mention Risk Profile selector, Gate Badges, and Selection Cart.
-- Update `runbooks/zeroedge_0dte_pipeline.md` to reference sweeps → gate → train flow and Risk Profile presets.
+- Update `runbooks/zerosigma_0dte_pipeline.md` to reference sweeps → gate → train flow and Risk Profile presets.
 - Add a brief “Using the Assistant” section to UI docs/wizard guidance linking to the assistant spec and capabilities.
 
 ### TODOs (no code changes yet)
@@ -132,6 +132,6 @@ Work items:
 - Implement missing indicators above in batches; wire to `/preview_matrix` and UI.
 
 Imported so far:
-- ZeroSigma: `zeroedge_default` (base), `zeroedge_headfake_reversal_v1` (from zeroedge_headfake_reversal_files), `zeroedge_pin_drift_v1`, `zeroedge_pin_drift_v2` (from zeroedge_pin_drift_files).
+- ZeroSigma: `zerosigma_default` (base), `zerosigma_headfake_reversal_v1` (from zerosigma_headfake_reversal_files), `zerosigma_pin_drift_v1`, `zerosigma_pin_drift_v2` (from zerosigma_pin_drift_files).
 Planned next:
-- ZeroSigma: `zeroedge_opening_drive`, `zeroedge_gamma_unwind` (pending indicator coverage for PCR/OI/VIX).
+- ZeroSigma: `zerosigma_opening_drive`, `zerosigma_gamma_unwind` (pending indicator coverage for PCR/OI/VIX).

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATIQ - Batch 1: Dashboard & Models</title>
+    <style>
+        :root {
+            --sigmatiq-dark-teal: #1A2F2F;
+            --sigmatiq-bright-teal: #00C4A7;
+            --sigmatiq-golden: #FFB800;
+            --color-bg: #0A1414;
+            --color-surface-1: #0F1A1A;
+            --color-surface-2: #111827;
+            --color-surface-3: #1A2F2F;
+            --color-border: #1A2F2F;
+            --color-text-1: #F5F5F7;
+            --color-text-2: #8FA5A5;
+            --color-text-3: #6A8080;
+            --status-success: #00C4A7;
+            --status-warning: #FFB800;
+            --status-error: #FF5757;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-1);
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 48px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            color: var(--sigmatiq-bright-teal);
+            font-size: 24px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .dashboard-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-2);
+            margin-bottom: 16px;
+        }
+
+        .recent-models-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recent-model-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: var(--color-surface-2);
+            border-radius: 6px;
+        }
+
+        .recent-model-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .recent-model-id {
+            font-weight: 500;
+            color: var(--color-text-1);
+        }
+
+        .recent-model-meta {
+            font-size: 11px;
+            color: var(--color-text-3);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Health Status */
+        .health-status {
+            display: flex;
+            gap: 16px;
+        }
+
+        .health-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background: var(--color-surface-2);
+            border-radius: 8px;
+        }
+
+        .health-label {
+            font-size: 11px;
+            color: var(--color-text-3);
+            margin-bottom: 4px;
+        }
+
+        .health-value {
+            font-weight: 600;
+        }
+
+        .health-value.ok { color: var(--status-success); }
+        .health-value.warn { color: var(--status-warning); }
+        .health-value.error { color: var(--status-error); }
+
+        /* Models List Container */
+        .models-list-container {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .models-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            outline: none;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            cursor: pointer;
+        }
+
+        /* Models Table */
+        .models-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .models-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-2);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .models-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .models-table tr:hover {
+            background: var(--color-surface-2);
+        }
+
+        .model-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Sparkline */
+        .sparkline {
+            display: inline-block;
+            width: 60px;
+            height: 20px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .pagination-button {
+            padding: 6px 12px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text-2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .pagination-button.active {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Utility Classes */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-teal {
+            background: rgba(0,196,167,0.2);
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .badge-golden {
+            background: rgba(255,184,0,0.2);
+            color: var(--sigmatiq-golden);
+        }
+    </style>
+</head>
+<body>
+    <!-- DASHBOARD SECTION -->
+    <section class="section">
+        <h2 class="section-title">Dashboard</h2>
+        
+        <div class="dashboard-grid">
+            <!-- Recent Models Card -->
+            <div class="dashboard-card">
+                <h3 class="dashboard-card-title">Recent Models</h3>
+                <div class="recent-models-list">
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">spy_opt_0dte_hourly</span>
+                            <span class="recent-model-meta">zerosigma • Updated 2h ago</span>
+                        </div>
+                        <button class="btn btn-small">Open</button>
+                    </div>
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">aapl_eq_swing_daily</span>
+                            <span class="recent-model-meta">swingsigma • Updated 5h ago</span>
+                        </div>
+                        <button class="btn btn-small">Open</button>
+                    </div>
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">tsla_opt_weekly</span>
+                            <span class="recent-model-meta">weeklysigma • Updated 1d ago</span>
+                        </div>
+                        <button class="btn btn-small">Open</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Runs Card -->
+            <div class="dashboard-card">
+                <h3 class="dashboard-card-title">Last Runs</h3>
+                <div class="recent-models-list">
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">Backtest Complete</span>
+                            <span class="recent-model-meta">spy_opt_0dte • 11:50 AM</span>
+                        </div>
+                        <span class="badge badge-teal">Success</span>
+                    </div>
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">Train Running</span>
+                            <span class="recent-model-meta">aapl_eq_swing • 10:30 AM</span>
+                        </div>
+                        <span class="badge badge-golden">Running</span>
+                    </div>
+                    <div class="recent-model-item">
+                        <div class="recent-model-info">
+                            <span class="recent-model-id">Build Failed</span>
+                            <span class="recent-model-meta">tsla_opt_weekly • 9:15 AM</span>
+                        </div>
+                        <span class="badge" style="background: rgba(255,87,87,0.2); color: var(--status-error);">Failed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="dashboard-card">
+                <h3 class="dashboard-card-title">Quick Actions</h3>
+                <div class="quick-actions">
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Create Model
+                    </button>
+                    <button class="btn">Run Backtest</button>
+                    <button class="btn">Open Sweeps</button>
+                    <button class="btn">View Docs</button>
+                </div>
+            </div>
+
+            <!-- Health Status Card -->
+            <div class="dashboard-card">
+                <h3 class="dashboard-card-title">System Health</h3>
+                <div class="health-status">
+                    <div class="health-item">
+                        <span class="health-label">API</span>
+                        <span class="health-value ok">OK</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">DB</span>
+                        <span class="health-value warn">WARN</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Data</span>
+                        <span class="health-value ok">OK</span>
+                    </div>
+                </div>
+                <button class="btn btn-small" style="width: 100%; margin-top: 12px;">View Details →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODELS LIST SECTION -->
+    <section class="section">
+        <h2 class="section-title">Models List</h2>
+        
+        <div class="models-list-container">
+            <div class="models-filters">
+                <input type="text" class="filter-input" placeholder="Search model_id...">
+                <select class="filter-select">
+                    <option>All Packs</option>
+                    <option>zerosigma</option>
+                    <option>swingsigma</option>
+                    <option>weeklysigma</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Risk Profiles</option>
+                    <option>Conservative</option>
+                    <option>Balanced</option>
+                    <option>Aggressive</option>
+                </select>
+                <button class="btn btn-primary" style="margin-left: auto;">Create Model</button>
+            </div>
+
+            <table class="models-table">
+                <thead>
+                    <tr>
+                        <th>Model ID</th>
+                        <th>Pack</th>
+                        <th>Updated</th>
+                        <th>Sharpe</th>
+                        <th>PnL</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 500;">spy_opt_0dte_hourly</td>
+                        <td><span class="badge badge-teal">zerosigma</span></td>
+                        <td style="color: var(--color-text-2);">2h ago</td>
+                        <td>2.41</td>
+                        <td>
+                            <svg class="sparkline" viewBox="0 0 60 20">
+                                <polyline points="0,15 10,10 20,12 30,8 40,6 50,4 60,7" 
+                                         fill="none" stroke="#00C4A7" stroke-width="1.5"/>
+                            </svg>
+                        </td>
+                        <td>
+                            <div class="model-actions">
+                                <button class="btn btn-small">Open</button>
+                                <button class="btn btn-small">Sweeps</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 500;">aapl_eq_swing_daily</td>
+                        <td><span class="badge badge-golden">swingsigma</span></td>
+                        <td style="color: var(--color-text-2);">5h ago</td>
+                        <td>1.85</td>
+                        <td>
+                            <svg class="sparkline" viewBox="0 0 60 20">
+                                <polyline points="0,10 10,8 20,12 30,10 40,8 50,6 60,9" 
+                                         fill="none" stroke="#FFB800" stroke-width="1.5"/>
+                            </svg>
+                        </td>
+                        <td>
+                            <div class="model-actions">
+                                <button class="btn btn-small">Open</button>
+                                <button class="btn btn-small">Sweeps</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 500;">tsla_opt_weekly</td>
+                        <td><span class="badge badge-teal">weeklysigma</span></td>
+                        <td style="color: var(--color-text-2);">1d ago</td>
+                        <td>0.95</td>
+                        <td>
+                            <svg class="sparkline" viewBox="0 0 60 20">
+                                <polyline points="0,12 10,14 20,10 30,12 40,15 50,11 60,13" 
+                                         fill="none" stroke="#FF5757" stroke-width="1.5"/>
+                            </svg>
+                        </td>
+                        <td>
+                            <div class="model-actions">
+                                <button class="btn btn-small">Open</button>
+                                <button class="btn btn-small">Sweeps</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button class="pagination-button" disabled>«</button>
+                <button class="pagination-button active">1</button>
+                <button class="pagination-button">2</button>
+                <button class="pagination-button">3</button>
+                <button class="pagination-button">»</button>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

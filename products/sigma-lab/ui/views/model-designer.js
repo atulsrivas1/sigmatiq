@@ -33,11 +33,11 @@ export function render() {
               <div class="form-field">
                 <label for="model-pack">Pack</label>
                 <select id="model-pack">
-                  <option value="zeroedge" selected>ZeroSigma</option>
-                  <option value="swingedge">SwingSigma</option>
-                  <option value="longedge">LongSigma</option>
-                  <option value="overnightedge">OvernightSigma</option>
-                  <option value="momentumedge">MomentumSigma</option>
+                  <option value="zerosigma" selected>ZeroSigma</option>
+                  <option value="swingsigma">SwingSigma</option>
+                  <option value="longsigma">LongSigma</option>
+                  <option value="overnightsigma">OvernightSigma</option>
+                  <option value="momentumsigma">MomentumSigma</option>
                 </select>
               </div>
               <div class="form-field">

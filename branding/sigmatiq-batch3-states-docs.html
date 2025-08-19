@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATIQ - Batch 3: States & Docs</title>
+    <style>
+        :root {
+            --sigmatiq-dark-teal: #1A2F2F;
+            --sigmatiq-bright-teal: #00C4A7;
+            --sigmatiq-golden: #FFB800;
+            --color-bg: #0A1414;
+            --color-surface-1: #0F1A1A;
+            --color-surface-2: #111827;
+            --color-surface-3: #1A2F2F;
+            --color-border: #1A2F2F;
+            --color-text-1: #F5F5F7;
+            --color-text-2: #8FA5A5;
+            --color-text-3: #6A8080;
+            --status-success: #00C4A7;
+            --status-warning: #FFB800;
+            --status-error: #FF5757;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-1);
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 48px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            color: var(--sigmatiq-bright-teal);
+            font-size: 24px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .demo-container {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .subsection-title {
+            font-size: 16px;
+            color: var(--color-text-1);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           LOADING STATES
+           ============================================ */
+        
+        /* Skeleton Loading */
+        .loading-skeleton {
+            background: linear-gradient(90deg, 
+                var(--color-surface-2) 25%, 
+                var(--color-surface-3) 50%, 
+                var(--color-surface-2) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-row {
+            height: 48px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            width: 60%;
+            margin: 8px 0;
+        }
+
+        .skeleton-text.short {
+            width: 30%;
+        }
+
+        .skeleton-text.long {
+            width: 80%;
+        }
+
+        /* Table Loading */
+        .table-loading {
+            width: 100%;
+        }
+
+        .table-loading td {
+            padding: 12px;
+        }
+
+        /* Card Loading */
+        .card-skeleton {
+            display: grid;
+            gap: 12px;
+        }
+
+        .skeleton-title {
+            height: 20px;
+            width: 40%;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-card-content {
+            height: 80px;
+            border-radius: 8px;
+        }
+
+        /* Spinner Loading */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--sigmatiq-bright-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            margin-top: 16px;
+            color: var(--color-text-2);
+            font-size: 14px;
+        }
+
+        /* Progress Bar Loading */
+        .progress-container {
+            padding: 40px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: var(--color-text-2);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--color-surface-2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--sigmatiq-bright-teal);
+            border-radius: 2px;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* ============================================
+           EMPTY STATES
+           ============================================ */
+        
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            color: var(--color-text-3);
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text-1);
+        }
+
+        .empty-message {
+            color: var(--color-text-2);
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Different empty state variations */
+        .empty-state.no-data .empty-icon {
+            color: var(--color-text-3);
+        }
+
+        .empty-state.no-results .empty-icon {
+            color: var(--sigmatiq-golden);
+        }
+
+        .empty-state.first-time .empty-icon {
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        /* ============================================
+           ERROR STATES
+           ============================================ */
+        
+        .error-state {
+            background: rgba(255,87,87,0.1);
+            border: 1px solid var(--status-error);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .error-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--status-error);
+            margin-bottom: 12px;
+        }
+
+        .error-title {
+            color: var(--status-error);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            color: var(--color-text-1);
+            margin-bottom: 8px;
+        }
+
+        .error-details {
+            font-size: 12px;
+            color: var(--color-text-2);
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--color-surface-1);
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        /* Error Banner */
+        .error-banner {
+            background: var(--status-error);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .error-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-banner-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* ============================================
+           DOCS LAUNCHER
+           ============================================ */
+        
+        .docs-launcher {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .doc-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--color-text-1);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--sigmatiq-bright-teal);
+            transform: translateY(-100%);
+            transition: transform 0.2s;
+        }
+
+        .doc-link:hover {
+            border-color: var(--sigmatiq-bright-teal);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,196,167,0.2);
+        }
+
+        .doc-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .doc-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 12px;
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .doc-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .doc-description {
+            font-size: 11px;
+            color: var(--color-text-2);
+            text-align: center;
+        }
+
+        .doc-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 2px 6px;
+            background: var(--sigmatiq-golden);
+            color: var(--color-bg);
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Grid Layout for Examples */
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .state-card {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .state-card-header {
+            padding: 12px 16px;
+            background: var(--color-surface-3);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-2);
+        }
+
+        .state-card-body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING STATES SECTION -->
+    <section class="section">
+        <h2 class="section-title">Loading States</h2>
+        
+        <div class="states-grid">
+            <!-- Skeleton Loading -->
+            <div class="state-card">
+                <div class="state-card-header">Table Skeleton</div>
+                <div class="state-card-body">
+                    <div class="loading-skeleton skeleton-row"></div>
+                    <div class="loading-skeleton skeleton-row"></div>
+                    <div class="loading-skeleton skeleton-row"></div>
+                </div>
+            </div>
+
+            <!-- Card Skeleton -->
+            <div class="state-card">
+                <div class="state-card-header">Card Skeleton</div>
+                <div class="state-card-body">
+                    <div class="card-skeleton">
+                        <div class="loading-skeleton skeleton-title"></div>
+                        <div class="loading-skeleton skeleton-text"></div>
+                        <div class="loading-skeleton skeleton-text short"></div>
+                        <div class="loading-skeleton skeleton-card-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spinner Loading -->
+            <div class="state-card">
+                <div class="state-card-header">Spinner</div>
+                <div class="state-card-body">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="spinner-text">Loading models...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="state-card">
+                <div class="state-card-header">Progress Bar</div>
+                <div class="state-card-body">
+                    <div class="progress-container">
+                        <div class="progress-label">Building matrix... (65%)</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EMPTY STATES SECTION -->
+    <section class="section">
+        <h2 class="section-title">Empty States</h2>
+        
+        <div class="states-grid">
+            <!-- No Data -->
+            <div class="state-card">
+                <div class="state-card-header">No Data</div>
+                <div class="state-card-body">
+                    <div class="empty-state no-data">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 01-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 01.55-.89l7-3.5a1 1 0 01.9 0l7 3.5A1 1 0 0120 6v7z"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                        <div class="empty-title">No models yet</div>
+                        <div class="empty-message">Create your first model to start building trading strategies</div>
+                        <button class="btn btn-primary">Create First Model</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Results -->
+            <div class="state-card">
+                <div class="state-card-header">No Results</div>
+                <div class="state-card-body">
+                    <div class="empty-state no-results">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <div class="empty-title">No results found</div>
+                        <div class="empty-message">Try adjusting your filters or search terms</div>
+                        <button class="btn">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Time -->
+            <div class="state-card">
+                <div class="state-card-header">First Time User</div>
+                <div class="state-card-body">
+                    <div class="empty-state first-time">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <div class="empty-title">Welcome to SIGMATIQ!</div>
+                        <div class="empty-message">Start with a template or take the product tour</div>
+                        <div style="display: flex; gap: 12px; justify-content: center;">
+                            <button class="btn btn-primary">Start Tour</button>
+                            <button class="btn">Browse Templates</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ERROR STATES SECTION -->
+    <section class="section">
+        <h2 class="section-title">Error States</h2>
+        
+        <div class="demo-container">
+            <div class="subsection-title">Error Banner</div>
+            <div class="error-banner">
+                <div class="error-banner-content">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>Failed to save changes. Please try again.</span>
+                </div>
+                <button class="error-banner-close" onclick="this.parentElement.style.display='none'">×</button>
+            </div>
+        </div>
+
+        <div class="states-grid">
+            <!-- Connection Error -->
+            <div class="state-card">
+                <div class="state-card-header">Connection Error</div>
+                <div class="state-card-body">
+                    <div class="error-state">
+                        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <div class="error-title">Connection Failed</div>
+                        <div class="error-message">Unable to connect to the server</div>
+                        <div class="error-details">
+                            Error: ECONNREFUSED 127.0.0.1:8080
+                            Timestamp: 2025-08-19 14:32:15
+                        </div>
+                        <button class="btn">Retry Connection</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Error -->
+            <div class="state-card">
+                <div class="state-card-header">Validation Error</div>
+                <div class="state-card-body">
+                    <div class="error-state">
+                        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <div class="error-title">Validation Failed</div>
+                        <div class="error-message">Please fix the following errors:</div>
+                        <div class="error-details">
+                            • Model ID is required
+                            • Start date must be before end date
+                            • Threshold must be between 0 and 1
+                        </div>
+                        <button class="btn">Review Form</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Server Error -->
+            <div class="state-card">
+                <div class="state-card-header">Server Error</div>
+                <div class="state-card-body">
+                    <div class="error-state">
+                        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4.93 4.93l14.14 14.14"/>
+                            <path d="M12 2v8M12 14v8M4 12h8M14 12h8"/>
+                        </svg>
+                        <div class="error-title">Server Error (500)</div>
+                        <div class="error-message">Something went wrong on our end</div>
+                        <div class="error-details">
+                            Request ID: abc123-def456
+                            Please contact support if this persists
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn">Retry</button>
+                            <button class="btn">Contact Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOCS LAUNCHER SECTION -->
+    <section class="section">
+        <h2 class="section-title">Docs Launcher</h2>
+        
+        <div class="demo-container">
+            <div class="docs-launcher">
+                <a href="#" class="doc-link" onclick="openDoc('agents')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <div class="doc-title">AGENTS.md</div>
+                    <div class="doc-description">System architecture & design</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('backlog')">
+                    <span class="doc-badge">NEW</span>
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                    </svg>
+                    <div class="doc-title">BACKLOG.md</div>
+                    <div class="doc-description">Roadmap & upcoming features</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('indicators')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11H3v10h6V11z"/>
+                        <path d="M15 3H9v8h6V3z"/>
+                        <path d="M21 7h-6v14h6V7z"/>
+                    </svg>
+                    <div class="doc-title">Indicators Reference</div>
+                    <div class="doc-description">Complete indicators guide</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('policy')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"/>
+                        <polyline points="8 6 2 12 8 18"/>
+                    </svg>
+                    <div class="doc-title">Policy Schema</div>
+                    <div class="doc-description">Configuration specifications</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('runbooks')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6"/>
+                    </svg>
+                    <div class="doc-title">Runbooks</div>
+                    <div class="doc-description">Operations & troubleshooting</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('model-cards')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 2v20M14 2v20M4 7h16M4 17h16"/>
+                    </svg>
+                    <div class="doc-title">Model Cards</div>
+                    <div class="doc-description">Model documentation templates</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('api')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                    <div class="doc-title">API Reference</div>
+                    <div class="doc-description">REST API documentation</div>
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDoc('tutorials')">
+                    <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <div class="doc-title">Video Tutorials</div>
+                    <div class="doc-description">Step-by-step guides</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simulate loading states
+        function simulateLoading() {
+            const progressFill = document.querySelector('.progress-fill');
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 10;
+                if (width > 100) {
+                    width = 0;
+                }
+                progressFill.style.width = width + '%';
+            }, 500);
+        }
+
+        // Open documentation
+        function openDoc(docType) {
+            console.log('Opening documentation:', docType);
+            alert(`Opening ${docType} documentation in new tab...`);
+            // In production: window.open(`/docs/${docType}`, '_blank');
+        }
+
+        // Start animations
+        simulateLoading();
+    </script>
+</body>
+</html>

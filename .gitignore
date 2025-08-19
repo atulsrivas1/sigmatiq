@@ -5,3 +5,13 @@
 /.smoke
 /.vs
 /.claude/settings.local.json
+/products/sigma-core/sigma_core/indicators/builtins/__pycache__
+/products/sigma-core/sigma_core/indicators/__pycache__
+/products/sigma-core/sigma_core/labels/__pycache__
+/products/sigma-core/sigma_core/storage/__pycache__
+/products/sigma-core/sigma_core/registry/__pycache__
+/products/sigma-core/sigma_core/__pycache__
+/products/sigma-lab/api/routers/__pycache__
+/products/sigma-lab/api/services/__pycache__
+/products/sigma-lab/api/tests/__pycache__
+/products/sigma-lab/api/__pycache__

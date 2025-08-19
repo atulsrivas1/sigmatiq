@@ -27,7 +27,7 @@ router = APIRouter()
 
 class OptionsOverlayRequest(BaseModel):
     model_id: str
-    pack_id: Optional[str] = 'swingedge'
+    pack_id: Optional[str] = 'swingsigma'
     date: Optional[str] = None  # YYYY-MM-DD
     expiry: Optional[str] = None  # YYYY-MM-DD; if absent and dte_target provided, use date + dte_target
     dte_target: Optional[int] = None
@@ -64,7 +64,7 @@ def options_overlay_ep(payload: OptionsOverlayRequest):
         if not sig_rows:
             # CSV fallback
             from api.services.io import workspace_paths as _ws
-            ws = _ws(payload.model_id, payload.pack_id or 'swingedge')
+            ws = _ws(payload.model_id, payload.pack_id or 'swingsigma')
             csv_path = ws['live'] / 'signals.csv'
             if not csv_path.exists():
                 return {'ok': False, 'error': f'No signals found in DB or CSV for {payload.model_id} on {d}'}
@@ -193,7 +193,7 @@ def options_overlay_ep(payload: OptionsOverlayRequest):
                     written = db_upsert_option_signals(overlays)
             else:
                 from api.services.io import workspace_paths as _ws2
-                ws2=_ws2(payload.model_id, payload.pack_id or 'swingedge')
+                ws2=_ws2(payload.model_id, payload.pack_id or 'swingsigma')
                 out_csv = ws2['live'] / 'options_signals.csv'
                 pd.DataFrame(overlays).to_csv(out_csv, index=False)
         # Parity summary (next session using underlying brackets)
@@ -360,7 +360,7 @@ def options_overlay_ep(payload: OptionsOverlayRequest):
                     # Optional CSV
                     if bool(payload.write_parity_csv):
                         try:
-                            ws = _ws_paths(payload.model_id, payload.pack_id or 'swingedge')
+                            ws = _ws_paths(payload.model_id, payload.pack_id or 'swingsigma')
                             out_csv2 = ws['reports'] / f"options_parity_{d}_{exp.strftime('%Y-%m-%d')}.csv"
                             import pandas as _pd
                             _pd.DataFrame(rows).to_csv(out_csv2, index=False)

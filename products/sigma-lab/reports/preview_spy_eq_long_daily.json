@@ -1,7 +1,7 @@
 {
   "ok": true,
   "model_id": "spy_eq_long_daily",
-  "pack_id": "longedge",
+  "pack_id": "longsigma",
   "n_rows": 930,
   "nan_stats": [
     {
@@ -89,5 +89,5 @@
       "nan_pct": 100.0
     }
   ],
-  "csv": "C:\\github\\gemini\\Sigmatix-ZeroSigma\\Sigmatix-Sigma\\matrices\\spy_eq_long_daily\\preview_stock.csv"
+  "csv": "C:\\github\\gemini\\Sigmatiq-ZeroSigma\\Sigmatiq-Sigma\\matrices\\spy_eq_long_daily\\preview_stock.csv"
 }

@@ -1,5 +1,5 @@
 
-# Fill models for overnightedge
+# Fill models for overnightsigma
 models:
   next_bar_open: { type: "bar_open", cadence: "5m|daily" }
   next_bar_vwap: { type: "bar_vwap", vp_limit: 0.10 }

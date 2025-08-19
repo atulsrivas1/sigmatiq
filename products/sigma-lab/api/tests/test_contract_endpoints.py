@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 def _get_app():
     import importlib
-    spec = importlib.util.spec_from_file_location("edge_api_app", ROOT / "edge_api" / "app.py")
+    spec = importlib.util.spec_from_file_location("sigma_api_app", ROOT / "api" / "app.py")
     module = importlib.util.module_from_spec(spec)  # type: ignore
     assert spec and spec.loader
     spec.loader.exec_module(module)  # type: ignore
@@ -31,7 +31,7 @@ def test_contract_indicators_shape():
 def test_contract_model_cards_list_shape():
     app = _get_app()
     client = TestClient(app)
-    r = client.get("/model_cards?pack_id=zeroedge&model_id=nonexistent_model&limit=3&offset=0")
+    r = client.get("/model_cards?pack_id=zerosigma&model_id=nonexistent_model&limit=3&offset=0")
     assert r.status_code == 200
     data = r.json()
     assert data.get("ok") is True
@@ -53,7 +53,7 @@ def test_contract_leaderboard_shape():
 def test_contract_policy_explain_shape():
     app = _get_app()
     client = TestClient(app)
-    r = client.get("/policy/explain?model_id=nonexistent_model&pack_id=zeroedge")
+    r = client.get("/policy/explain?model_id=nonexistent_model&pack_id=zerosigma")
     assert r.status_code == 200
     data = r.json()
     assert "ok" in data

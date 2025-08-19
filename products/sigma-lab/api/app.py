@@ -75,7 +75,7 @@ except Exception:
     _compute_lineage = None
 
 
-# Workspace is the repository root (Sigmatix-Sigma)
+# Workspace is the repository root (Sigmatiq-Sigma)
 ROOT_DIR = _Path(__file__).resolve().parent.parent
 WS_DIR = ROOT_DIR
 
@@ -184,14 +184,14 @@ def index():
         ],
     }
 
-def _model_paths(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Path]:
+def _model_paths(model_id: str, pack_id: str = "zerosigma") -> Dict[str, Path]:
     art = WS_DIR / "artifacts" / model_id / "gbm.pkl"
     pol = WS_DIR / "packs" / pack_id / "policy_templates" / f"{model_id}.yaml"
     live = WS_DIR / "live_data" / model_id
     return {"model": art, "policy": pol, "live": live}
 
 
-def _load_config(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Any]:
+def _load_config(model_id: str, pack_id: str = "zerosigma") -> Dict[str, Any]:
     p = WS_DIR / "packs" / pack_id / "model_configs" / f"{model_id}.yaml"
     if p.exists():
         try:
@@ -202,7 +202,7 @@ def _load_config(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Any]:
 
 
 @app.get("/models")
-def list_models(pack_id: str = Query("zeroedge")):
+def list_models(pack_id: str = Query("zerosigma")):
     cfg_dir = WS_DIR / "packs" / pack_id / "model_configs"
     out = []
     for p in sorted(cfg_dir.glob("*.yaml")):
@@ -214,7 +214,7 @@ def list_models(pack_id: str = Query("zeroedge")):
     return {"models": out}
 
 
-def _workspace_paths(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Path]:
+def _workspace_paths(model_id: str, pack_id: str = "zerosigma") -> Dict[str, Path]:
     base = WS_DIR
     return {
         "matrices": base / "matrices" / model_id,
@@ -336,7 +336,7 @@ def _train_model(csv_path: str, *, allowed_hours: Optional[List[int]], target: O
 
 
 @app.get("/model_detail")
-def model_detail(model_id: str = Query(...), pack_id: str = Query("zeroedge")):
+def model_detail(model_id: str = Query(...), pack_id: str = Query("zerosigma")):
     cfg = _load_config(model_id, pack_id)
     pol_path = _workspace_paths(model_id, pack_id)["policy"]
     policy = {}
@@ -411,7 +411,7 @@ def _to_float(x: Any) -> Optional[float]:
 
 
 @app.get("/validate_policy")
-def validate_policy(model_id: str = Query(...), pack_id: str = Query("zeroedge")):
+def validate_policy(model_id: str = Query(...), pack_id: str = Query("zerosigma")):
     pol_path = _workspace_paths(model_id, pack_id)["policy"]
     if not pol_path.exists():
         return JSONResponse({"ok": False, "error": f"Policy file missing: {pol_path}"}, status_code=400)
@@ -423,7 +423,7 @@ def validate_policy(model_id: str = Query(...), pack_id: str = Query("zeroedge")
 
 
 class ScanRequest(BaseModel):
-    pack_id: Optional[str] = 'swingedge'
+    pack_id: Optional[str] = 'swingsigma'
     model_id: Optional[str] = 'universe_eq_swing_daily_scanner'
     indicator_set: Optional[str] = 'swing_eq_breakout_scanner'
     start: str
@@ -498,7 +498,7 @@ def _compute_breakout_momentum_score_inline(
 @app.post("/scan")
 def scan_ep(payload: ScanRequest):
     try:
-        pack_id = payload.pack_id or 'swingedge'
+        pack_id = payload.pack_id or 'swingsigma'
         model_id = payload.model_id or 'universe_eq_swing_daily_scanner'
         ind_path = _resolve_indicator_set_path_api(pack_id, model_id, payload.indicator_set)
         # Resolve universe
@@ -656,14 +656,14 @@ class PreviewMatrixRequest(BaseModel):
     model_id: str
     start: str
     end: str
-    pack_id: str | None = 'zeroedge'
+    pack_id: str | None = 'zerosigma'
     max_rows: int | None = 200
 
 
 @app.post("/preview_matrix")
 def preview_matrix_ep(payload: PreviewMatrixRequest):
     model_id = payload.model_id
-    pack_id = payload.pack_id or 'zeroedge'
+    pack_id = payload.pack_id or 'zerosigma'
     pol_err = _ensure_policy_exists(model_id, pack_id)
     if pol_err:
         return JSONResponse({"ok": False, "error": pol_err}, status_code=400)

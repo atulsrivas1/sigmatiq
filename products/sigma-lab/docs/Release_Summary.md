@@ -64,8 +64,8 @@
 - Overlay stores to DB (when configured) or products/sigma-lab/live_data/<model_id>/options_signals.csv.
 
 ## Code Structure
-- Routers (edge_api/routers): health.py, indicators.py, datasets.py, training.py, backtest.py, models.py, calibration.py, signals.py, options.py
-- Services (edge_api/services): brackets.py (stock brackets), policy.py (load/validate), io.py (paths/config)
+- Routers (api/routers): health.py, indicators.py, datasets.py, training.py, backtest.py, models.py, calibration.py, signals.py, options.py
+- Services (api/services): brackets.py (stock brackets), policy.py (load/validate), io.py (paths/config)
 - Signals Registry: sigma_core/registry/signals_registry.py (upsert/fetch, option upsert)
 - Polygon Adapters: sigma_core/data/sources/polygon.py (bars, chain snapshot, quotes)
 
@@ -76,7 +76,7 @@
   - Predefined templates + examples: docs/help/scanners/predefined_scanners.md
   - Stock brackets guide: docs/help/scanners/stock_bracketed_alerts.md
 - Packs Help:
-  - SwingSigma: docs/help/swingedge/README.md (scan -> signals -> overlay quickstart)
+  - SwingSigma: docs/help/swingsigma/README.md (scan -> signals -> overlay quickstart)
   - Help index: docs/help/README.md (Signals API examples)
 
 ## What's Next (TODOs)

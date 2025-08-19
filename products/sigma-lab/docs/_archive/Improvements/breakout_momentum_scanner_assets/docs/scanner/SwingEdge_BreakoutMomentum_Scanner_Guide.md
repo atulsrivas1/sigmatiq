@@ -5,7 +5,7 @@
 This document specifies a **programmatic scanner** that finds tickers breaking out **with momentum** on daily bars. It plugs directly into your **Sigmatiq Sigma Core** pipeline and **Sigma Packs** structure, and can be run from the CLI or a cron. The same indicator set can be used for training a SwingSigma model later.
 
 - Platform pipeline: Sigma Core `define → build dataset → train → backtest → policy → deploy → live alerts`. fileciteturn0file0  
-- Strategy packaging: ship the scanner as a **pack indicator set** under `swingedge`; reproducible, versioned. fileciteturn0file1  
+- Strategy packaging: ship the scanner as a **pack indicator set** under `swingsigma`; reproducible, versioned. fileciteturn0file1  
 - UI flow: the **Custom Model Builder** already reads indicator sets, writes per‑model overrides, and can run a **Preview** build before a full job. fileciteturn0file2
 
 ---
@@ -67,7 +67,7 @@ Apply **hard gates** (e.g., `Donchian_20` or `BoS_20 ≥ 0.25`, `ADX_14 ≥ 18`,
 
 A pack‑level indicator set is provided (download below) that computes the necessary features. The UI can reference it directly, or you can run a CLI scanner.
 
-- Indicator set YAML: `packs/swingedge/indicator_sets/swing_eq_breakout_scanner.yaml` (included). fileciteturn0file1  
+- Indicator set YAML: `packs/swingsigma/indicator_sets/swing_eq_breakout_scanner.yaml` (included). fileciteturn0file1  
 - The Model Builder wizard will present these indicators in Step 3; it can save per‑model overrides and run a **Preview** build. fileciteturn0file2
 
 ---
@@ -136,7 +136,7 @@ If you want to **train** with these features (e.g., predict `fwd_ret_10d`):
 
 ## 8) Files included (download links below)
 
-- `packs/swingedge/indicator_sets/swing_eq_breakout_scanner.yaml` — indicator set used by both the scanner and SwingSigma training.  
+- `packs/swingsigma/indicator_sets/swing_eq_breakout_scanner.yaml` — indicator set used by both the scanner and SwingSigma training.  
 - `scripts/scanner_breakout_momentum.py` — CLI skeleton (API or local builder).  
 - `scanner_config.json` — tunable thresholds/weights.  
 - Output path suggestion: `scans/breakout_momentum/YYYY-MM-DD.csv`.

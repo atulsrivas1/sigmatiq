@@ -10,7 +10,7 @@ POST /options_overlay
 - Base body:
   {
     "model_id": "spy_0dte_hourly",
-    "pack_id": "zeroedge",
+    "pack_id": "zerosigma",
     "date": "2024-08-15",
     "option_mode": "single"  // or "vertical"
   }
@@ -27,12 +27,12 @@ Examples
 1) Underlying-only parity:
   curl -sS -X POST "http://localhost:8001/options_overlay" \
     -H "Content-Type: application/json" \
-    -d '{"model_id":"spy_0dte_hourly","pack_id":"zeroedge","date":"2024-08-15","include_underlying_parity":true,"include_premium_parity":false}'
+    -d '{"model_id":"spy_0dte_hourly","pack_id":"zerosigma","date":"2024-08-15","include_underlying_parity":true,"include_premium_parity":false}'
 
 2) Premium-only parity (vertical 5-wide) + CSV:
   curl -sS -X POST "http://localhost:8001/options_overlay" \
     -H "Content-Type: application/json" \
-    -d '{"model_id":"spy_0dte_hourly","pack_id":"zeroedge","date":"2024-08-15","option_mode":"vertical","spread_width":5,"include_underlying_parity":false,"include_premium_parity":true,"write_parity_csv":true}'
+    -d '{"model_id":"spy_0dte_hourly","pack_id":"zerosigma","date":"2024-08-15","option_mode":"vertical","spread_width":5,"include_underlying_parity":false,"include_premium_parity":true,"write_parity_csv":true}'
 
 3) List overlays:
   curl -sS "http://localhost:8001/option_signals?model_id=spy_0dte_hourly&limit=20&offset=0"

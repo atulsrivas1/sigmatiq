@@ -11,12 +11,12 @@ sigmatiq/
   svg/sigmatiq_lockup_horizontal.svg
   png/sigmatiq_mark_{2048,1024,512,256,128,64,32}.png
   favicon.ico
-sigmatiq_edge/
+sigmatiq_sigma/
   svg/sigmatiq_edge_mark.svg
   svg/sigmatiq_edge_lockup_horizontal.svg
   png/sigmatiq_edge_mark_{sizes}.png
   favicon.ico
-packs/{zeroedge|swingedge|longedge|overnightedge|customizededge}/
+packs/{zerosigma|swingsigma|longsigma|overnightsigma|customizededge}/
   svg/*_mark.svg, *_lockup_horizontal.svg
   png/*_mark_{sizes}.png
   favicon.ico
@@ -28,13 +28,13 @@ colors.json
 ## Usage
 ```html
 <img src="/sigmatiq/svg/sigmatiq_mark.svg" alt="Sigmatiq" width="128">
-<img src="/sigmatiq_edge/png/sigmatiq_edge_mark_512.png" alt="Sigmatiq Sigma" width="128">
+<img src="/sigmatiq_sigma/png/sigmatiq_edge_mark_512.png" alt="Sigmatiq Sigma" width="128">
 <link rel="stylesheet" href="/sigmatiq-brand.css">
 ```
 
 **Accent theming per pack**
 ```html
-<html data-edge="swing">
+<html data-sigma="swing">
   <button class="accent-bg">Run</button>
 </html>
 ```

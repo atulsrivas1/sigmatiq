@@ -21,9 +21,9 @@ Examples
 
 How to create
 - Makefile (auto):
-  `make init-auto PACK_ID=zeroedge TICKER=SPY ASSET=opt HORIZON=0dte CADENCE=hourly ALGO=xgb`
+  `make init-auto PACK_ID=zerosigma TICKER=SPY ASSET=opt HORIZON=0dte CADENCE=hourly ALGO=xgb`
 - Script (direct):
-  `python scripts/create_model.py --pack_id zeroedge --ticker SPY --asset opt --horizon 0dte --cadence hourly --algo xgb`
+  `python scripts/create_model.py --pack_id zerosigma --ticker SPY --asset opt --horizon 0dte --cadence hourly --algo xgb`
 
 Paths
 - Config: `products/sigma-lab/packs/<pack_id>/model_configs/<model_id>.yaml`

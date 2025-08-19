@@ -1,7 +1,7 @@
 {
   "ok": true,
   "model_id": "spy_opt_intraday_daily",
-  "pack_id": "overnightedge",
+  "pack_id": "overnightsigma",
   "start": "2024-07-01",
   "end": "2024-07-05",
   "n_rows": 26,
@@ -309,5 +309,5 @@
     "warn": [],
     "fail": []
   },
-  "csv": "C:\\github\\gemini\\Sigmatix-ZeroSigma\\Sigmatix-Sigma\\matrices\\spy_opt_intraday_daily\\preview_matrix.csv"
+  "csv": "C:\\github\\gemini\\Sigmatiq-ZeroSigma\\Sigmatiq-Sigma\\matrices\\spy_opt_intraday_daily\\preview_matrix.csv"
 }

@@ -4,7 +4,7 @@ Scope: Sigma Lab (authoring + evaluation). ASCII wireframes for P0 pages with de
 
 Conventions
 - Shell: top bar + collapsible left sidebar + main content.
-- Accent: pack color via `data-edge`/`--accent` token.
+- Accent: pack color via `data-sigma`/`--accent` token.
 - Theming: theme toggle in top bar (light/dark/slate/paper) with `prefers-color-scheme` default.
 - Density: density switch in top bar (compact/cozy/comfortable) that affects table/card spacing.
 - States: [loading], [empty], [error] placeholders on lists and detail panes.
@@ -86,9 +86,9 @@ Filters: [Search model_id…] [Pack ▼]     [Create Model]
 
 +----------------------------------------------------------------------------------------------+
 | model_id                | pack_id   | updated_at        | sharpe | pnl ▶   | actions         |
-| spy_opt_0dte_hourly     | zeroedge  | 2025-08-16 11:50  |  2.41  | ▷▴▴▵▴   | [Open] [Run]    |
-| spy_eq_swing_daily      | swingedge | 2025-08-15 16:10  |  1.12  | ▷▵▵▴▵   | [Open] [Run]    |
-| aapl_eq_intraday_hourly | swingedge | 2025-08-14 10:20  |  0.85  | ▷▵▴▵▵   | [Open] [Run]    |
+| spy_opt_0dte_hourly     | zerosigma  | 2025-08-16 11:50  |  2.41  | ▷▴▴▵▴   | [Open] [Run]    |
+| spy_eq_swing_daily      | swingsigma | 2025-08-15 16:10  |  1.12  | ▷▵▵▴▵   | [Open] [Run]    |
+| aapl_eq_intraday_hourly | swingsigma | 2025-08-14 10:20  |  0.85  | ▷▵▴▵▵   | [Open] [Run]    |
 +----------------------------------------------------------------------------------------------+
 Actions (row): [Open] [Sweeps] [Backtest]
 Pagination: « 1 2 3 »  rows/page: 20 (density switch affects row height)
@@ -129,7 +129,7 @@ Context Bar (visible on Designer & Composer)
 Actions: [Open Designer] [View Performance]
 
 
-- Features: indicator_set: zeroedge_pin_drift_v1
+- Features: indicator_set: zerosigma_pin_drift_v1
 - Policy: execution.momentum_gate=false  [Validate]
 - Latest: Build (2025-08-15), Backtest (2025-08-16)
 
@@ -193,10 +193,10 @@ Details
 
 ## Packs — Overview (P0)
 ```
-Header: zeroedge  [Open Docs]
+Header: zerosigma  [Open Docs]
 
 Presets: [Conservative] [Balanced] [Aggressive] (risk budgets summary)
-Indicator Sets: [ zeroedge_core_v2 ] [ pin_drift_v1 ] [ headfake_v2 ] [view all]
+Indicator Sets: [ zerosigma_core_v2 ] [ pin_drift_v1 ] [ headfake_v2 ] [view all]
 Templates (Gallery): [ ZeroSigma Starter ] [ Opening Drive ] [ Gamma Unwind ]  [View All]
 Recent Models in Pack:  spy_opt_0dte_hourly  [Compose] [Design]
 
@@ -236,7 +236,7 @@ Details
 
 ## Leaderboard (P0)
 ```
-Filters: Model [spy_opt_0dte_hourly]  Pack [zeroedge]  Risk [Balanced]  Pass Gate only [✓]  Tag [demo]  Sort [sharpe ▼]  Density [▾]
+Filters: Model [spy_opt_0dte_hourly]  Pack [zerosigma]  Risk [Balanced]  Pass Gate only [✓]  Tag [demo]  Sort [sharpe ▼]  Density [▾]
 
 +--------------------------------------------------------------------------------+
 | started_at         | model_id            | best_sharpe | best_cum_ret | Gate | tag | act           |
@@ -257,7 +257,7 @@ Tabs: [Leaderboard] [Log] [Analytics]
 
 Leaderboard
 ```
-Filters: Pack [zeroedge]  Risk [Balanced]  Period [Last 30d]  Pass Gate only [ ]
+Filters: Pack [zerosigma]  Risk [Balanced]  Period [Last 30d]  Pass Gate only [ ]
 
 +-----------------------------------------------------------------------------------------------------------+
 | model_id             | risk | period          | Sharpe | CumRet | Win | Trades | Fill | Slip | Capacity | tag |

@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SIGMATIQ - Complete UI System</title>
+    <style>
+        :root {
+            --sigmatiq-dark-teal: #1A2F2F;
+            --sigmatiq-bright-teal: #00C4A7;
+            --sigmatiq-deep-teal: #00D4B8;
+            --sigmatiq-light-teal: #00E5CC;
+            --sigmatiq-golden: #FFB800;
+            --sigmatiq-cream: #E8E3D9;
+            
+            --color-bg: #0A1414;
+            --color-surface-1: #0F1A1A;
+            --color-surface-2: #111827;
+            --color-surface-3: #1A2F2F;
+            --color-border: #1A2F2F;
+            --color-text-1: #F5F5F7;
+            --color-text-2: #8FA5A5;
+            --color-text-3: #6A8080;
+            
+            --status-success: #00C4A7;
+            --status-warning: #FFB800;
+            --status-error: #FF5757;
+            
+            --mobile-safe-area: env(safe-area-inset-bottom, 20px);
+            --header-height: 60px;
+            --sidebar-width: 260px;
+            --mobile-tab-height: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-1);
+            overscroll-behavior: contain;
+        }
+
+        /* ============================================
+           NAVIGATION SHELL
+           ============================================ */
+        
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: var(--header-height);
+            background: var(--color-surface-1);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--color-text-1);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .search-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-2);
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .search-trigger:hover {
+            border-color: var(--sigmatiq-bright-teal);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--color-surface-1);
+            border-right: 1px solid var(--color-border);
+            overflow-y: auto;
+            transition: transform 0.3s;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--color-text-2);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--color-surface-2);
+            color: var(--color-text-1);
+        }
+
+        .nav-item.active {
+            background: rgba(0,196,167,0.1);
+            color: var(--sigmatiq-bright-teal);
+            border-left: 3px solid var(--sigmatiq-bright-teal);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* ============================================
+           COMMAND PALETTE
+           ============================================ */
+        
+        .command-palette {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .command-palette.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10vh;
+        }
+
+        .command-dialog {
+            width: 90%;
+            max-width: 600px;
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideDown 0.2s;
+        }
+
+        .command-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-1);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .command-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .command-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .command-item:hover,
+        .command-item.selected {
+            background: var(--color-surface-2);
+        }
+
+        .command-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .command-shortcut {
+            padding: 2px 6px;
+            background: var(--color-surface-3);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--color-text-2);
+        }
+
+        /* ============================================
+           TEMPLATE PICKER WIZARD
+           ============================================ */
+        
+        .wizard {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .wizard-header {
+            margin-bottom: 32px;
+        }
+
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .wizard-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-border);
+            z-index: 0;
+        }
+
+        .wizard-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wizard-step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-surface-2);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .wizard-step.active .wizard-step-number {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .wizard-step.completed .wizard-step-number {
+            background: var(--status-success);
+            border-color: var(--status-success);
+        }
+
+        .wizard-step-label {
+            font-size: 12px;
+            color: var(--color-text-2);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .template-card {
+            padding: 20px;
+            background: var(--color-surface-1);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .template-card:hover {
+            border-color: var(--sigmatiq-bright-teal);
+            transform: translateY(-2px);
+        }
+
+        .template-card.selected {
+            border-color: var(--sigmatiq-bright-teal);
+            background: rgba(0,196,167,0.1);
+        }
+
+        .template-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        /* ============================================
+           BUILD/TRAIN/BACKTEST TABS
+           ============================================ */
+        
+        .tabs {
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 24px;
+        }
+
+        .tab-list {
+            display: flex;
+            gap: 24px;
+        }
+
+        .tab-button {
+            padding: 12px 0;
+            background: none;
+            border: none;
+            color: var(--color-text-2);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-button:hover {
+            color: var(--color-text-1);
+        }
+
+        .tab-button.active {
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--sigmatiq-bright-teal);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ============================================
+           WHAT-IF SLIDERS
+           ============================================ */
+        
+        .whatif-panel {
+            padding: 20px;
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .slider-group {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--color-text-2);
+        }
+
+        .slider-value {
+            color: var(--sigmatiq-bright-teal);
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-surface-3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--sigmatiq-bright-teal);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,196,167,0.3);
+        }
+
+        .delta-indicators {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .delta-chip {
+            flex: 1;
+            padding: 12px;
+            background: var(--color-surface-2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .delta-label {
+            font-size: 11px;
+            color: var(--color-text-3);
+            margin-bottom: 4px;
+        }
+
+        .delta-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .delta-value.positive {
+            color: var(--status-success);
+        }
+
+        .delta-value.negative {
+            color: var(--status-error);
+        }
+
+        /* ============================================
+           SELECTION CART
+           ============================================ */
+        
+        .selection-cart {
+            position: fixed;
+            right: -400px;
+            top: var(--header-height);
+            bottom: 0;
+            width: 400px;
+            background: var(--color-surface-1);
+            border-left: 1px solid var(--color-border);
+            transition: right 0.3s;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selection-cart.active {
+            right: 0;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+        }
+
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            color: var(--color-text-2);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .cart-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-item {
+            padding: 12px;
+            background: var(--color-surface-2);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-model {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-metrics {
+            font-size: 12px;
+            color: var(--color-text-2);
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        /* ============================================
+           AI ASSISTANT
+           ============================================ */
+        
+        .ai-assistant {
+            position: fixed;
+            right: -400px;
+            top: var(--header-height);
+            bottom: 0;
+            width: 400px;
+            background: var(--color-surface-1);
+            border-left: 1px solid var(--color-border);
+            transition: right 0.3s;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-assistant.active {
+            right: 0;
+        }
+
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .ai-message {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        .ai-message.user {
+            text-align: right;
+        }
+
+        .ai-message-bubble {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .ai-message.system .ai-message-bubble {
+            background: var(--color-surface-2);
+            color: var(--color-text-1);
+        }
+
+        .ai-message.user .ai-message-bubble {
+            background: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .ai-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .ai-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            outline: none;
+        }
+
+        /* ============================================
+           WEBSOCKET ALERTS
+           ============================================ */
+        
+        .alert-toast {
+            position: fixed;
+            top: calc(var(--header-height) + 20px);
+            right: 20px;
+            padding: 16px 20px;
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+
+        .alert-toast.success {
+            border-left: 4px solid var(--status-success);
+        }
+
+        .alert-toast.warning {
+            border-left: 4px solid var(--status-warning);
+        }
+
+        .alert-toast.error {
+            border-left: 4px solid var(--status-error);
+        }
+
+        .alert-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .alert-message {
+            font-size: 12px;
+            color: var(--color-text-2);
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            color: var(--color-text-2);
+            cursor: pointer;
+        }
+
+        /* ============================================
+           DOCUMENTATION & TUTORIALS
+           ============================================ */
+        
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--sigmatiq-bright-teal);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,196,167,0.3);
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+
+        .help-button:hover {
+            transform: scale(1.1);
+        }
+
+        .help-menu {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 100;
+        }
+
+        .help-menu.active {
+            display: block;
+        }
+
+        .help-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .help-menu-item:hover {
+            background: var(--color-surface-2);
+        }
+
+        /* Product Tour Overlay */
+        .tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+        }
+
+        .tour-overlay.active {
+            display: block;
+        }
+
+        .tour-highlight {
+            position: absolute;
+            border: 2px solid var(--sigmatiq-bright-teal);
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+        }
+
+        .tour-tooltip {
+            position: absolute;
+            background: var(--color-surface-1);
+            border: 1px solid var(--sigmatiq-bright-teal);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .tour-tooltip-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--sigmatiq-bright-teal);
+        }
+
+        .tour-tooltip-content {
+            font-size: 14px;
+            color: var(--color-text-1);
+            margin-bottom: 16px;
+        }
+
+        .tour-tooltip-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tour-progress {
+            font-size: 12px;
+            color: var(--color-text-2);
+        }
+
+        /* ============================================
+           MOBILE RESPONSIVE
+           ============================================ */
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .search-trigger {
+                display: none;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: var(--header-height);
+                bottom: 0;
+                left: 0;
+                transform: translateX(-100%);
+                z-index: 300;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .selection-cart,
+            .ai-assistant {
+                width: 100%;
+                right: -100%;
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Mobile Tab Bar */
+            .mobile-tab-bar {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: var(--mobile-tab-height);
+                background: var(--color-surface-1);
+                border-top: 1px solid var(--color-border);
+                padding-bottom: var(--mobile-safe-area);
+                z-index: 100;
+            }
+
+            .mobile-tab {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                color: var(--color-text-2);
+                text-decoration: none;
+                padding: 8px;
+            }
+
+            .mobile-tab.active {
+                color: var(--sigmatiq-bright-teal);
+            }
+
+            .mobile-tab-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .mobile-tab-label {
+                font-size: 10px;
+            }
+
+            .content-area {
+                padding-bottom: calc(var(--mobile-tab-height) + var(--mobile-safe-area));
+            }
+
+            /* Touch-optimized components */
+            .btn {
+                min-height: 44px;
+                padding: 12px 20px;
+            }
+
+            .form-input {
+                min-height: 44px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .nav-item {
+                min-height: 48px;
+            }
+
+            /* Swipeable cards */
+            .swipeable-card {
+                touch-action: pan-y;
+                user-select: none;
+            }
+
+            /* Pull to refresh */
+            .pull-refresh {
+                position: absolute;
+                top: -60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .pull-refresh-spinner {
+                width: 24px;
+                height: 24px;
+                border: 2px solid var(--color-border);
+                border-top-color: var(--sigmatiq-bright-teal);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-tab-bar {
+                display: none;
+            }
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--sigmatiq-bright-teal);
+            border-color: var(--sigmatiq-bright-teal);
+            color: var(--color-bg);
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--color-surface-1);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-2);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-1);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--sigmatiq-bright-teal);
+            box-shadow: 0 0 0 3px rgba(0,196,167,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <a href="/" class="logo">
+                    <svg width="32" height="32" viewBox="0 0 40 40">
+                        <path d="M 8 12 L 18 12 L 13 20 L 18 28 L 8 28 M 18 20 L 26 20 M 24 18 L 26 20 L 24 22" 
+                              stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">SIGMATIQ</span>
+                </a>
+                <div class="search-trigger" id="searchTrigger">
+                    <span>Search...</span>
+                    <span style="margin-left: auto; font-size: 11px;">⌘K</span>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <button class="btn" style="padding: 8px 12px;" onclick="toggleTheme()">◐</button>
+                <button class="btn" style="padding: 8px 12px;" onclick="toggleCart()">
+                    Cart <span style="background: var(--sigmatiq-golden); color: var(--color-bg); padding: 2px 6px; border-radius: 10px; font-size: 10px;">2</span>
+                </button>
+                <button class="btn" style="padding: 8px 12px;" onclick="toggleAssistant()">AI</button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <a href="#dashboard" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#models" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span>Models</span>
+                </a>
+                <a href="#build" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    <span>Build/Train/Backtest</span>
+                </a>
+                <a href="#sweeps" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="7" y1="6" x2="7" y2="18"/>
+                        <line x1="12" y1="6" x2="12" y2="18"/>
+                        <line x1="17" y1="6" x2="17" y2="18"/>
+                    </svg>
+                    <span>Sweeps</span>
+                </a>
+                <a href="#leaderboard" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="8" y="8" width="8" height="13"/>
+                        <rect x="3" y="11" width="5" height="10"/>
+                        <rect x="16" y="14" width="5" height="7"/>
+                    </svg>
+                    <span>Leaderboard</span>
+                </a>
+                <a href="#docs" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <span>Docs</span>
+                </a>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="content-area">
+                <!-- Template Picker Wizard -->
+                <section class="wizard">
+                    <div class="wizard-header">
+                        <h1 style="color: var(--sigmatiq-bright-teal); margin-bottom: 8px;">Create New Model</h1>
+                        <p style="color: var(--color-text-2);">Choose a template to get started quickly</p>
+                    </div>
+
+                    <div class="wizard-steps">
+                        <div class="wizard-step active">
+                            <div class="wizard-step-number">1</div>
+                            <div class="wizard-step-label">Choose Template</div>
+                        </div>
+                        <div class="wizard-step">
+                            <div class="wizard-step-number">2</div>
+                            <div class="wizard-step-label">Configure</div>
+                        </div>
+                        <div class="wizard-step">
+                            <div class="wizard-step-number">3</div>
+                            <div class="wizard-step-label">Create</div>
+                        </div>
+                    </div>
+
+                    <div class="template-grid">
+                        <div class="template-card selected">
+                            <svg class="template-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M7 17l5-5 5 5"/>
+                                <path d="M12 12V3"/>
+                            </svg>
+                            <h3 style="margin-bottom: 4px;">ZeroSigma Starter</h3>
+                            <p style="font-size: 12px; color: var(--color-text-2);">0DTE options, hourly</p>
+                        </div>
+                        <div class="template-card">
+                            <svg class="template-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M3 17l6-6 4 4 8-8"/>
+                            </svg>
+                            <h3 style="margin-bottom: 4px;">Swing Momentum</h3>
+                            <p style="font-size: 12px; color: var(--color-text-2);">2-5 day swings</p>
+                        </div>
+                        <div class="template-card">
+                            <svg class="template-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                            </svg>
+                            <h3 style="margin-bottom: 4px;">Overnight Gap</h3>
+                            <p style="font-size: 12px; color: var(--color-text-2);">Gap trading</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between;">
+                        <button class="btn">Back</button>
+                        <button class="btn btn-primary">Next Step →</button>
+                    </div>
+                </section>
+
+                <!-- Build/Train/Backtest Tabs -->
+                <section style="margin-top: 48px;">
+                    <h2 style="color: var(--sigmatiq-bright-teal); margin-bottom: 24px;">Build / Train / Backtest</h2>
+                    
+                    <div class="tabs">
+                        <div class="tab-list">
+                            <button class="tab-button active" onclick="switchTab('build')">Build</button>
+                            <button class="tab-button" onclick="switchTab('train')">Train</button>
+                            <button class="tab-button" onclick="switchTab('backtest')">Backtest</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel active" id="build-tab">
+                        <div class="card">
+                            <h3 style="margin-bottom: 20px;">Build Configuration</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-input" value="2024-01-01">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" class="form-input" value="2024-12-31">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block">Run Build</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="train-tab">
+                        <div class="card">
+                            <h3>Training Configuration</h3>
+                            <!-- Train form here -->
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="backtest-tab">
+                        <div class="card">
+                            <h3>Backtest Configuration</h3>
+                            <!-- Backtest form here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- What-If Panel -->
+                <section style="margin-top: 48px;">
+                    <h2 style="color: var(--sigmatiq-bright-teal); margin-bottom: 24px;">Sweeps What-If Analysis</h2>
+                    
+                    <div class="whatif-panel">
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <span>Threshold</span>
+                                <span class="slider-value">0.50</span>
+                            </div>
+                            <input type="range" class="slider" min="0.30" max="0.80" step="0.01" value="0.50" oninput="updateSlider(this)">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <span>Top N</span>
+                                <span class="slider-value">20</span>
+                            </div>
+                            <input type="range" class="slider" min="5" max="50" step="1" value="20" oninput="updateSlider(this)">
+                        </div>
+
+                        <div class="delta-indicators">
+                            <div class="delta-chip">
+                                <div class="delta-label">Sharpe Δ</div>
+                                <div class="delta-value positive">+0.18</div>
+                            </div>
+                            <div class="delta-chip">
+                                <div class="delta-label">Trades Δ</div>
+                                <div class="delta-value negative">-22</div>
+                            </div>
+                            <div class="delta-chip">
+                                <div class="delta-label">Return Δ</div>
+                                <div class="delta-value positive">+3.2%</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Mobile Tab Bar -->
+        <nav class="mobile-tab-bar">
+            <a href="#dashboard" class="mobile-tab active">
+                <svg class="mobile-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="12" y1="3" x2="12" y2="21"/>
+                </svg>
+                <span class="mobile-tab-label">Dashboard</span>
+            </a>
+            <a href="#models" class="mobile-tab">
+                <svg class="mobile-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span class="mobile-tab-label">Models</span>
+            </a>
+            <a href="#sweeps" class="mobile-tab">
+                <svg class="mobile-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="7" y1="6" x2="7" y2="18"/>
+                </svg>
+                <span class="mobile-tab-label">Sweeps</span>
+            </a>
+            <a href="#signals" class="mobile-tab">
+                <svg class="mobile-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h2M11 12h2M17 12h2"/>
+                    <path d="M5 12v-2M7 12V7M11 12V2"/>
+                </svg>
+                <span class="mobile-tab-label">Signals</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Command Palette -->
+    <div class="command-palette" id="commandPalette">
+        <div class="command-dialog">
+            <input type="text" class="command-input" placeholder="Type a command or search..." autofocus>
+            <div class="command-list">
+                <div class="command-item selected">
+                    <div class="command-item-left">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Create Model</span>
+                    </div>
+                    <span class="command-shortcut">⌘N</span>
+                </div>
+                <div class="command-item">
+                    <div class="command-item-left">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12a11 11 0 1011-11"/>
+                            <polyline points="1 2 1 12 11 12"/>
+                        </svg>
+                        <span>Run Backtest</span>
+                    </div>
+                    <span class="command-shortcut">⌘B</span>
+                </div>
+                <div class="command-item">
+                    <div class="command-item-left">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        </svg>
+                        <span>Open Sweeps</span>
+                    </div>
+                    <span class="command-shortcut">⌘S</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selection Cart -->
+    <div class="selection-cart" id="selectionCart">
+        <div class="cart-header">
+            <h2 class="cart-title">Selection Cart</h2>
+            <button class="cart-close" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-content">
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-model">spy_opt_0dte_hourly</div>
+                    <div class="cart-item-metrics">Sharpe: 2.41 | Return: 24.5%</div>
+                </div>
+                <button class="btn" style="padding: 6px;">×</button>
+            </div>
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-model">aapl_eq_swing_daily</div>
+                    <div class="cart-item-metrics">Sharpe: 1.85 | Return: 18.2%</div>
+                </div>
+                <button class="btn" style="padding: 6px;">×</button>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <button class="btn btn-primary btn-block">Train Selected (2)</button>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant" id="aiAssistant">
+        <div class="cart-header">
+            <h2 class="cart-title">AI Assistant</h2>
+            <button class="cart-close" onclick="toggleAssistant()">×</button>
+        </div>
+        <div class="ai-messages">
+            <div class="ai-message system">
+                <div class="ai-message-bubble">
+                    Hi! I can help you with:<br>
+                    • Building models<br>
+                    • Understanding metrics<br>
+                    • Analyzing results<br>
+                    What would you like to know?
+                </div>
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" class="ai-input" placeholder="Ask me anything...">
+            <button class="btn btn-primary">Send</button>
+        </div>
+    </div>
+
+    <!-- WebSocket Alert Toast -->
+    <div class="alert-toast success" id="alertToast" style="display: none;">
+        <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="10"/>
+        </svg>
+        <div class="alert-content">
+            <div class="alert-title">New Signal: SPY</div>
+            <div class="alert-message">Buy signal triggered at $447.35</div>
+        </div>
+        <button class="alert-close" onclick="hideAlert()">×</button>
+    </div>
+
+    <!-- Help Button & Menu -->
+    <button class="help-button" onclick="toggleHelp()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+    </button>
+
+    <div class="help-menu" id="helpMenu">
+        <div class="help-menu-item" onclick="startTour()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            </svg>
+            <span>Product Tour</span>
+        </div>
+        <div class="help-menu-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7"/>
+                <rect x="1" y="5" width="15" height="14" rx="2"/>
+            </svg>
+            <span>Video Tutorials</span>
+        </div>
+        <div class="help-menu-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span>Documentation</span>
+        </div>
+    </div>
+
+    <!-- Product Tour Overlay -->
+    <div class="tour-overlay" id="tourOverlay">
+        <div class="tour-highlight" style="top: 60px; left: 20px; width: 200px; height: 40px;"></div>
+        <div class="tour-tooltip" style="top: 110px; left: 20px;">
+            <div class="tour-tooltip-title">Welcome to SIGMATIQ!</div>
+            <div class="tour-tooltip-content">
+                Start by creating a model from our templates. The Build → Sweeps → Train workflow helps you develop profitable trading strategies.
+            </div>
+            <div class="tour-tooltip-actions">
+                <div class="tour-progress">1 of 5</div>
+                <div>
+                    <button class="btn" onclick="skipTour()">Skip</button>
+                    <button class="btn btn-primary" onclick="nextTourStep()">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle functions
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.style.getPropertyValue('--color-bg');
+            if (current === '#0A1414' || !current) {
+                // Switch to light
+                html.style.setProperty('--color-bg', '#F8FAFC');
+                html.style.setProperty('--color-surface-1', '#FFFFFF');
+                html.style.setProperty('--color-surface-2', '#F1F5F9');
+                html.style.setProperty('--color-text-1', '#1A2F2F');
+                html.style.setProperty('--color-text-2', '#475569');
+            } else {
+                // Switch to dark
+                html.style.setProperty('--color-bg', '#0A1414');
+                html.style.setProperty('--color-surface-1', '#0F1A1A');
+                html.style.setProperty('--color-surface-2', '#111827');
+                html.style.setProperty('--color-text-1', '#F5F5F7');
+                html.style.setProperty('--color-text-2', '#8FA5A5');
+            }
+        }
+
+        function toggleCart() {
+            document.getElementById('selectionCart').classList.toggle('active');
+        }
+
+        function toggleAssistant() {
+            document.getElementById('aiAssistant').classList.toggle('active');
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpMenu').classList.toggle('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+
+        function updateSlider(slider) {
+            slider.parentElement.querySelector('.slider-value').textContent = slider.value;
+        }
+
+        function startTour() {
+            document.getElementById('tourOverlay').classList.add('active');
+            document.getElementById('helpMenu').classList.remove('active');
+        }
+
+        function skipTour() {
+            document.getElementById('tourOverlay').classList.remove('active');
+        }
+
+        function nextTourStep() {
+            // Implement tour step logic
+            console.log('Next tour step');
+        }
+
+        // Command Palette
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('commandPalette').classList.toggle('active');
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('commandPalette').classList.remove('active');
+            }
+        });
+
+        // Mobile menu
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Simulate WebSocket alert
+        setTimeout(() => {
+            const toast = document.getElementById('alertToast');
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 5000);
+        }, 3000);
+
+        function hideAlert() {
+            document.getElementById('alertToast').style.display = 'none';
+        }
+
+        // Search trigger
+        document.getElementById('searchTrigger').addEventListener('click', () => {
+            document.getElementById('commandPalette').classList.add('active');
+        });
+    </script>
+</body>
+</html>

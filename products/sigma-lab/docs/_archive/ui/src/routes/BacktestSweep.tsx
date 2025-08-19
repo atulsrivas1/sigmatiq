@@ -3,7 +3,7 @@ import { api } from '../api/client'
 
 export default function BacktestSweep(){
   const [modelId, setModelId] = useState('spy_opt_0dte_hourly')
-  const [packId, setPackId] = useState('zeroedge')
+  const [packId, setPackId] = useState('zerosigma')
   const [start, setStart] = useState('2024-06-01')
   const [end, setEnd] = useState('2024-06-30')
   const [thresholds, setThresholds] = useState('0.50,0.52,0.54;0.55,0.60,0.65')

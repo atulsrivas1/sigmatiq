@@ -1,0 +1,22 @@
+name: zerosigma_gamma_unwind
+version: 1
+description: ZeroSigma — Late-Day Gamma Unwind
+indicators:
+  # Underlying intraday trend / exhaustion
+  - {name: rsi, period: 7}
+  - {name: ema, window: 21}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: atr, period: 14}
+
+  # Options & vol
+  - {name: iv_realized_spread, window: 20}
+  - {name: iv_term_slope, days_fwd: 30}
+  - {name: pcr_volume}
+  - {name: pcr_oi}
+  - {name: oi_change_1d}
+
+  # Regime & time
+  - {name: vix_level}
+  - {name: hour_of_day}
+  - {name: day_of_week}
+

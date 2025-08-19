@@ -40,7 +40,7 @@ def resolve_indicator_set_path(pack_id: str, model_id: str) -> Path|None:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--model_id', required=True)
-    ap.add_argument('--pack_id', default='swingedge')
+    ap.add_argument('--pack_id', default='swingsigma')
     ap.add_argument('--ticker', required=False)
     ap.add_argument('--start', required=True)
     ap.add_argument('--end', required=True)

@@ -4,11 +4,11 @@ Create a new model scaffold that always includes a policy file.
 
 Usage (auto-name preferred):
   python scripts/create_model.py \
-    --pack_id zeroedge --ticker SPY --asset opt --horizon 0dte --cadence hourly \
+    --pack_id zerosigma --ticker SPY --asset opt --horizon 0dte --cadence hourly \
     [--algo xgb] [--variant isv1]
 
 Legacy (explicit name still accepted):
-  python scripts/create_model.py --pack_id zeroedge --model_id spy_opt_0dte_hourly_xgb --ticker SPY
+  python scripts/create_model.py --pack_id zerosigma --model_id spy_opt_0dte_hourly_xgb --ticker SPY
 
 Actions:
   - Generates model_id if not provided: <ticker>_<asset>_<horizon>_<cadence>[_<algo>|_<variant>]
@@ -49,7 +49,7 @@ def _gen_model_id(*, ticker: str, asset: str, horizon: str, cadence: str, algo: 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--pack_id", default="zeroedge")
+    ap.add_argument("--pack_id", default="zerosigma")
     ap.add_argument("--model_id", required=False, help="Explicit name; otherwise auto-generated")
     ap.add_argument("--ticker", required=True)
     ap.add_argument("--asset", choices=["opt","eq"], help="Asset type: opt (options) or eq (equity)")
@@ -101,7 +101,7 @@ def main():
             "model_id": model_id,
             "description": f"{args.ticker} model {model_id}",
             "ticker": args.ticker,
-            "asset_type": (args.asset or ("opt" if args.pack_id == "zeroedge" else None)),
+            "asset_type": (args.asset or ("opt" if args.pack_id == "zerosigma" else None)),
             "features": {
                 "flow": {"per_distance": True, "totals": True, "ratios": True, "atm": False},
                 "dealer": {"mm_profit_dir_simple": True, "divergence_score": True},

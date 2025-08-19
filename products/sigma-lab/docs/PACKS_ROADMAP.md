@@ -3,16 +3,16 @@
 This roadmap tracks pack-scoped work: default indicator sets, dataset/labels, and E2E readiness.
 
 ## ZeroSigma (0DTE, options-only)
-- Status: baseline indicator set in `products/sigma-lab/packs/zeroedge/indicator_sets/zeroedge_default.yaml`.
+- Status: baseline indicator set in `products/sigma-lab/packs/zerosigma/indicator_sets/zerosigma_default.yaml`.
 - Next:
   - Options PCR (`pcr_volume`, `pcr_oi`), `oi_change_1d`, `oi_trend` from Polygon snapshots.
   - IV ranks: `iv_rank_52w`, `iv_percentile_52w`, `atm_iv_zscore` (requires daily ATM IV store).
   - Smile proxy: `iv_smile_wings` from quotes-based IV around ATM.
-  - Import idea sets: `zeroedge_opening_drive`, `zeroedge_gamma_unwind`, `zeroedge_headfake_reversal_v1`, `zeroedge_pin_drift_v1`, `zeroedge_pin_drift_v2`.
+  - Import idea sets: `zerosigma_opening_drive`, `zerosigma_gamma_unwind`, `zerosigma_headfake_reversal_v1`, `zerosigma_pin_drift_v1`, `zerosigma_pin_drift_v2`.
   - Status: imported
-    - `zeroedge_headfake_reversal_v1` → `products/sigma-lab/packs/zeroedge/indicator_sets/zeroedge_headfake_reversal_v1.yaml`
-    - `zeroedge_pin_drift_v1` → `products/sigma-lab/packs/zeroedge/indicator_sets/zeroedge_pin_drift_v1.yaml`
-    - `zeroedge_pin_drift_v2` → `products/sigma-lab/packs/zeroedge/indicator_sets/zeroedge_pin_drift_v2.yaml`
+    - `zerosigma_headfake_reversal_v1` → `products/sigma-lab/packs/zerosigma/indicator_sets/zerosigma_headfake_reversal_v1.yaml`
+    - `zerosigma_pin_drift_v1` → `products/sigma-lab/packs/zerosigma/indicator_sets/zerosigma_pin_drift_v1.yaml`
+    - `zerosigma_pin_drift_v2` → `products/sigma-lab/packs/zerosigma/indicator_sets/zerosigma_pin_drift_v2.yaml`
 
 ## SwingSigma (equities/options)
 - Status: default sets added for eq/opt; stock pipeline helper present.

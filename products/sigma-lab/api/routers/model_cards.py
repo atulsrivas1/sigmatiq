@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get('/model_cards')
-def list_cards(pack_id: str = Query('zeroedge'), model_id: str = Query(...), limit: int = Query(200), offset: int = Query(0)):
+def list_cards(pack_id: str = Query('zerosigma'), model_id: str = Query(...), limit: int = Query(200), offset: int = Query(0)):
     rows = list_model_cards(pack_id=pack_id, model_id=model_id)
     start = max(0, int(offset)); end = start + int(limit)
     page = rows[start:end]
@@ -16,7 +16,7 @@ def list_cards(pack_id: str = Query('zeroedge'), model_id: str = Query(...), lim
 
 
 @router.get('/model_card')
-def get_card(pack_id: str = Query('zeroedge'), model_id: str = Query(...), file: Optional[str] = Query(None)):
+def get_card(pack_id: str = Query('zerosigma'), model_id: str = Query(...), file: Optional[str] = Query(None)):
     try:
         data = load_model_card(pack_id=pack_id, model_id=model_id, file=file)
         return {'ok': True, **data}

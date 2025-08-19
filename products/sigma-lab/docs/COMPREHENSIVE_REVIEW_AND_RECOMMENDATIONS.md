@@ -179,12 +179,12 @@ products/
 
 ```sql
 -- Current Plan (Premature)
-CREATE DATABASE edge_lab;
-CREATE DATABASE edge_sim;
-CREATE DATABASE edge_market;
+CREATE DATABASE sigma_lab;
+CREATE DATABASE sigma_sim;
+CREATE DATABASE sigma_market;
 
 -- Recommended (Practical)
-CREATE DATABASE sigmatiq_edge;
+CREATE DATABASE sigmatiq_sigma;
 CREATE SCHEMA author;
 CREATE SCHEMA execute;
 CREATE SCHEMA shared;

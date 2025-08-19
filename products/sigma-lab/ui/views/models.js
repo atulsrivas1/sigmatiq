@@ -23,10 +23,10 @@ export function render() {
         <\/div>
         <div class="filters-right">
             <div class="filter-chip active" id="filter-all">All<\/div>
-            <div class="filter-chip pack-badge zeroedge" id="filter-zeroedge">ZeroSigma<\/div>
-            <div class="filter-chip pack-badge swingedge" id="filter-swingedge">SwingSigma<\/div>
-            <div class="filter-chip pack-badge momentumedge" id="filter-momentumedge">MomentumSigma<\/div>
-            <div class="filter-chip pack-badge longedge" id="filter-longedge">LongSigma<\/div>
+            <div class="filter-chip pack-badge zerosigma" id="filter-zerosigma">ZeroSigma<\/div>
+            <div class="filter-chip pack-badge swingsigma" id="filter-swingsigma">SwingSigma<\/div>
+            <div class="filter-chip pack-badge momentumsigma" id="filter-momentumsigma">MomentumSigma<\/div>
+            <div class="filter-chip pack-badge longsigma" id="filter-longsigma">LongSigma<\/div>
         <\/div>
     <\/div>
     <div class="models-grid" id="models-grid">

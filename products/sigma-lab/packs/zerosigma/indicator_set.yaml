@@ -1,0 +1,109 @@
+# packs/zerosigma/indicator_set.yaml
+name: zeroedge_v1
+version: 1
+description: "Base indicator set for 0DTE strategies"
+indicators:
+  - name: momentum
+    version: 1
+    window: 1
+    column: close
+  - name: momentum
+    version: 1
+    window: 3
+    column: close
+  - name: volatility
+    version: 1
+    window: 3
+    column: close
+  - name: rolling_std
+    version: 1
+    window: 20
+    column: close
+  - name: rsi
+    version: 1
+    period: 14
+    column: close
+  - name: ema
+    version: 1
+    window: 10
+    column: close
+  - name: ema
+    version: 1
+    window: 20
+    column: close
+  - name: ema_slope
+    version: 1
+    window: 10
+    period: 1
+    column: close
+  - name: dist_to_ema
+    version: 1
+    window: 10
+    column: close
+  - name: ret
+    version: 1
+    window: 1
+    column: close
+  - name: ret
+    version: 1
+    window: 3
+    column: close
+  - name: sold_flow_ratio
+    version: 1
+    window: 5
+  - name: iv_realized_spread
+    version: 1
+    window: 20
+  - name: daily_rsi
+    version: 1
+    period: 14
+  - name: daily_ema
+    version: 1
+    window: 20
+  - name: daily_ret
+    version: 1
+    window: 1
+  - name: daily_ret
+    version: 1
+    window: 5
+  - name: daily_dist_to_ema
+    version: 1
+    window: 20
+  - name: momentum_score_total
+    version: 1
+  - name: daily_vwap
+    version: 1
+  - name: bollinger_bands
+    version: 1
+    window: 20
+    num_std: 2.0
+  - name: stochastic
+    version: 1
+    period_k: 14
+    period_d: 3
+  - name: cci
+    version: 1
+    period: 20
+  - name: williams_r
+    version: 1
+    period: 14
+  - name: intraday_vwap
+    version: 1
+  - name: macd
+    version: 1
+    fast: 12
+    slow: 26
+    signal: 9
+  - name: adx
+    version: 1
+    period: 14
+  - name: iv_skew_25d
+    version: 1
+  - name: iv_term_slope
+    version: 1
+    days_fwd: 30
+  - name: atr
+    version: 1
+    period: 14
+  - name: obv
+    version: 1

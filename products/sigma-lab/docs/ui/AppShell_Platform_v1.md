@@ -5,7 +5,7 @@ Purpose: specify shared UI platform behaviors and tokens for theme, density, acc
 ## Root Attributes
 - `data-theme`: `light | dark | slate | paper` (default respects `prefers-color-scheme`).
 - `data-density`: `compact | cozy | comfortable` (default `cozy`).
-- `data-edge` (optional per-pack accent): e.g., `zeroedge | swingedge | longedge | overnightedge | momentumedge`.
+- `data-sigma` (optional per-pack accent): e.g., `zerosigma | swingsigma | longsigma | overnightsigma | momentumsigma`.
 
 ## Persistence
 - `localStorage['ui.theme']`: one of the themes above. Empty = follow system.
@@ -15,7 +15,7 @@ Purpose: specify shared UI platform behaviors and tokens for theme, density, acc
 - Surfaces: `--surface-1`, `--surface-2`, `--bg-primary`, `--bg-secondary`, `--bg-tertiary`, `--bg-hover`.
 - Text: `--text-primary`, `--text-secondary`, `--text-muted`, `--text-inverse`.
 - Borders & ring: `--border-color`, `--border-strong`, `--ring`.
-- Brand: `--primary-color`, `--primary-dark`, `--accent` (derived from pack via `data-edge`).
+- Brand: `--primary-color`, `--primary-dark`, `--accent` (derived from pack via `data-sigma`).
 - Status: `--status-success`, `--status-warning`, `--status-error`.
 
 ## ThemeToggle (Topbar)
@@ -37,19 +37,19 @@ Purpose: specify shared UI platform behaviors and tokens for theme, density, acc
 - A11y: focus trap within palette; ESC to close; `role="dialog"` and labelled title.
 
 ## Pack Accent (`--accent`)
-- Derive from `data-edge` on the page root or set explicitly per view.
+- Derive from `data-sigma` on the page root or set explicitly per view.
 - Suggested mapping:
-  - `zeroedge` → `--accent: var(--teal)`
-  - `swingedge` → `--accent: #F59E0B`
-  - `longedge` → `--accent: #A3BE3C`
-  - `overnightedge` → `--accent: #6D28D9`
-  - `momentumedge` → `--accent: #3B82F6`
+  - `zerosigma` → `--accent: var(--teal)`
+  - `swingsigma` → `--accent: #F59E0B`
+  - `longsigma` → `--accent: #A3BE3C`
+  - `overnightsigma` → `--accent: #6D28D9`
+  - `momentumsigma` → `--accent: #3B82F6`
 - Use `--accent` for subtle borders, focus outlines, and badges; keep `--primary-color` for brand actions.
 
 ## Minimal Wiring (pseudo-code)
 ```html
 <!-- index.html body tag -->
-<body data-theme="light" data-density="cozy" data-edge="zeroedge">
+<body data-theme="light" data-density="cozy" data-sigma="zerosigma">
   <div id="app"></div>
   <script type="module">
     const root = document.documentElement;
@@ -85,8 +85,8 @@ Purpose: specify shared UI platform behaviors and tokens for theme, density, acc
 [data-density="comfortable"] { --padding: 16px; --font-size: 16px; }
 
 /* Accent per pack */
-[data-edge="zeroedge"] { --accent: var(--teal); }
-[data-edge="swingedge"] { --accent: #F59E0B; }
+[data-sigma="zerosigma"] { --accent: var(--teal); }
+[data-sigma="swingsigma"] { --accent: #F59E0B; }
 /* ... */
 
 /* Focus ring (applied across interactive) */

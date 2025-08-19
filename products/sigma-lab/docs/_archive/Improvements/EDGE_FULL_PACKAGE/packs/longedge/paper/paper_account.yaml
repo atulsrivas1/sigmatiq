@@ -1,5 +1,5 @@
 
-# Default Paper Account for longedge
+# Default Paper Account for longsigma
 name: default_paper
 cash: 100000
 margin_mode: "reg-t"

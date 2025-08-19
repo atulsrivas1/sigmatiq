@@ -100,7 +100,7 @@ Context Packet (summary)
 {
   "route": "#/models/spy_opt_0dte_hourly/designer",
   "model_id": "spy_opt_0dte_hourly",
-  "pack_id": "zeroedge",
+  "pack_id": "zerosigma",
   "risk_profile": "balanced",
   "view": "designer|build|sweeps|leaderboard|backtest|train|signals|overlay|admin",
   "form_values": { ...visible form fields... },

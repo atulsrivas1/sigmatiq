@@ -21,7 +21,7 @@ class BuildMatrixRequest(BaseModel):
     start: str
     end: str
     out_csv: Optional[str] = None
-    pack_id: Optional[str] = 'zeroedge'
+    pack_id: Optional[str] = 'zerosigma'
     k_sigma: float = 0.3
     fixed_bp: Optional[float] = None
     distance_max: int = 7
@@ -36,16 +36,16 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         return {"ok": False, "error": "model_id is required"}
     if build_matrix_range is None:
         return {"ok": False, "error": "Shared core missing: data.datasets"}
-    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zeroedge')
+    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zerosigma')
     if pol_err:
         return {"ok": False, "error": pol_err}
     start = payload.start; end = payload.end
     if not start or not end:
         return {"ok": False, "error": "start and end are required"}
-    paths = workspace_paths(model_id, payload.pack_id or 'zeroedge')
-    cfgm = load_config(model_id, payload.pack_id or 'zeroedge')
+    paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
+    cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
     out_csv = payload.out_csv or str(paths['matrices'] / 'training_matrix_built.csv')
-    indicator_set_path = resolve_indicator_set_path(payload.pack_id or 'zeroedge', model_id)
+    indicator_set_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
     try:
         paths['matrices'].mkdir(parents=True, exist_ok=True)
         build_matrix_range(
@@ -73,7 +73,7 @@ def build_matrix_ep(payload: BuildMatrixRequest):
                 except Exception:
                     cols = []
                 write_model_card(
-                    pack_id=(payload.pack_id or 'zeroedge'),
+                    pack_id=(payload.pack_id or 'zerosigma'),
                     model_id=model_id,
                     event='build',
                     params={
@@ -110,7 +110,7 @@ def build_stock_matrix_ep(payload: BuildStockMatrixRequest):
         ind_path = None
         if payload.pack_id and payload.model_id:
             ind_path = resolve_indicator_set_path(payload.pack_id, payload.model_id)
-        paths = workspace_paths(payload.model_id or payload.ticker.lower(), payload.pack_id or 'swingedge')
+        paths = workspace_paths(payload.model_id or payload.ticker.lower(), payload.pack_id or 'swingsigma')
         out_csv = payload.out_csv or str(paths['matrices'] / 'stock_matrix.csv')
         _Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
         build_stock_matrix_range(

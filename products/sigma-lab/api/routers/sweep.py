@@ -21,7 +21,7 @@ router = APIRouter()
 
 class BacktestSweepRequest(BaseModel):
     model_id: str
-    pack_id: Optional[str] = 'zeroedge'
+    pack_id: Optional[str] = 'zerosigma'
     start: Optional[str] = None  # reserved for future matrix rebuilds
     end: Optional[str] = None
     thresholds_variants: Optional[List[str]] = None  # each item: "0.55,0.60,0.65"
@@ -40,7 +40,7 @@ class BacktestSweepRequest(BaseModel):
 @router.post('/backtest_sweep')
 def backtest_sweep_ep(payload: BacktestSweepRequest):
     model_id = payload.model_id
-    pack_id = payload.pack_id or 'zeroedge'
+    pack_id = payload.pack_id or 'zerosigma'
     paths = workspace_paths(model_id, pack_id)
     csv = str(paths['matrices'] / 'training_matrix_built.csv')
     try:

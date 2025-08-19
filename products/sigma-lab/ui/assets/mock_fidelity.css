@@ -504,10 +504,10 @@
   letter-spacing: 0.5px;
 }
 
-.pack-badge.zeroedge { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
-.pack-badge.swingedge { background: rgba(16, 185, 129, 0.1); color: #059669; }
-.pack-badge.momentumedge { background: rgba(245, 158, 11, 0.1); color: #D97706; }
-.pack-badge.longedge { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
+.pack-badge.zerosigma { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
+.pack-badge.swingsigma { background: rgba(16, 185, 129, 0.1); color: #059669; }
+.pack-badge.momentumsigma { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+.pack-badge.longsigma { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
 
 .tag-list { display: flex; gap: 4px; flex-wrap: wrap; }
 

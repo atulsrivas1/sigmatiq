@@ -73,8 +73,8 @@ This document describes how the UI will let users assemble a custom model by cho
 
 ## Example: Per-Model Indicator Set (YAML)
 ```yaml
-# products/sigma-lab/packs/zeroedge/indicator_sets/spy_opt_0dte_hourly_xgb.yaml
-name: zeroedge_custom
+# products/sigma-lab/packs/zerosigma/indicator_sets/spy_opt_0dte_hourly_xgb.yaml
+name: zerosigma_custom
 version: 1
 indicators:
   - name: ema
@@ -125,7 +125,7 @@ volatility:
 
 ## Example: Policy (Execution + Momentum Gate)
 ```yaml
-name: zeroedge_default_v1
+name: zerosigma_default_v1
 version: 1
 policy:
   risk:

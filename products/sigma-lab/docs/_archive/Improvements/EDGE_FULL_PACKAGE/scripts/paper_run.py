@@ -5,7 +5,7 @@ paper_run.py — submit model signals to Paper Trader and stream alerts.
 
 Usage:
   python scripts/paper_run.py --create-account --account-name default_paper
-  python scripts/paper_run.py --pack-id swingedge --model-id universe_eq_swing_daily_scanner \\
+  python scripts/paper_run.py --pack-id swingsigma --model-id universe_eq_swing_daily_scanner \\
     --signals scans/breakout_momentum/2025-08-15.csv --stream
 """
 
@@ -95,7 +95,7 @@ def parse_brackets(spec: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default="http://localhost:8000")
-    ap.add_argument("--pack-id", default="swingedge")
+    ap.add_argument("--pack-id", default="swingsigma")
     ap.add_argument("--model-id", default="universe_eq_swing_daily_scanner")
     ap.add_argument("--signals", help="CSV: symbol|ticker, side, qty[,score_total,close,notional]")
     ap.add_argument("--account-id")

@@ -165,7 +165,7 @@ Keep names stable so `select_features(df)` is deterministic.
 ## 6) Pack updates (examples)
 
 ### Head‑Fake Reversal (v2)
-`products/sigma-lab/packs/zeroedge/indicator_sets/zeroedge_headfake_reversal_v2.yaml`
+`products/sigma-lab/packs/zerosigma/indicator_sets/zeroedge_headfake_reversal_v2.yaml`
 ```yaml
 name: zeroedge_headfake_reversal_v2
 version: 1
@@ -221,7 +221,7 @@ indicators:
 - **Upsert indicator set:**
 ```json
 {{
-  "pack_id": "zeroedge",
+  "pack_id": "zerosigma",
   "scope": "pack",
   "name": "zeroedge_headfake_reversal_v2",
   "indicators": [
@@ -235,7 +235,7 @@ indicators:
 - **Preview (1–2 days):**
 ```json
 {{
-  "pack_id": "zeroedge",
+  "pack_id": "zerosigma",
   "model_id": "spy_opt_0dte_5m_rev1030",
   "start": "2025-08-04",
   "end": "2025-08-06"

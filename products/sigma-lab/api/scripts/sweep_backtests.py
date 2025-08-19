@@ -13,7 +13,7 @@ def main():
     ap = argparse.ArgumentParser(description='Sweep backtests across parameter combos')
     ap.add_argument('--base-url', default='http://localhost:8001')
     ap.add_argument('--model-id', required=True)
-    ap.add_argument('--pack-id', default='zeroedge')
+    ap.add_argument('--pack-id', default='zerosigma')
     ap.add_argument('--start', required=True)
     ap.add_argument('--end', required=True)
     ap.add_argument('--thresholds', default='')  # semicolon-separated variants, each is comma list

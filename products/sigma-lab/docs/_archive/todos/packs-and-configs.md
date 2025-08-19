@@ -6,4 +6,4 @@ Completed
 - Pack selection is explicit via `pack_id` in API and Makefile.
 
 Pending
-- Scaffold `swingedge`/`longedge` with minimal indicator sets, default policies, and example configs.
+- Scaffold `swingsigma`/`longsigma` with minimal indicator sets, default policies, and example configs.

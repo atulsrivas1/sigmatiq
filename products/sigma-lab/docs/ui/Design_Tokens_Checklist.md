@@ -18,7 +18,7 @@ Themes
 - Component backgrounds and text must rely on theme tokens rather than hardcoded values.
 
 Pack Accent
-- `data-edge="zeroedge|swingedge|longedge|overnightedge|momentumedge"` → sets `--accent` for subtle accents.
+- `data-sigma="zerosigma|swingsigma|longsigma|overnightsigma|momentumsigma"` → sets `--accent` for subtle accents.
 
 Component Mapping
 - Buttons `.btn-primary`/`.btn-secondary`: use `--primary-color`, borders from `--border-color`, hover `--bg-hover`.

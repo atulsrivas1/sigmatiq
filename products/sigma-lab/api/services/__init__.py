@@ -1,1 +1,1 @@
-"""Services subpackage for edge_api."""
+"""Services subpackage for api."""

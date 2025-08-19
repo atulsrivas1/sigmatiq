@@ -447,7 +447,7 @@ def build_matrix(
     except Exception:
         pass
     # Dealer-driven divergence score & orientation (recompute with aggregated totals if available)
-    if indicator_set and (indicator_set.name == 'zeroedge_v1'): # This is a hack, will be removed
+    if indicator_set and (indicator_set.name == 'zerosigma_v1'): # This is a hack, will be removed
         try:
             sign_slope = np.sign(m.get("ret_prev_hour", pd.Series(0.0))).astype(float)
             # If not previously set, derive mm_profit_dir_simple from aggregated totals
@@ -458,7 +458,7 @@ def build_matrix(
         except Exception:
             m["divergence_score"] = 0.0
     # OI-based features (expiry = session date)
-    if indicator_set and (indicator_set.name == 'zeroedge_v1'): # This is a hack, will be removed
+    if indicator_set and (indicator_set.name == 'zerosigma_v1'): # This is a hack, will be removed
         try:
             win = 10
             # Use unique strikes present in raw window around anchor
@@ -498,11 +498,11 @@ def build_matrix(
             kind = str(label_config.get('kind') or label_config.get('type') or '').lower()
             try:
                 if kind == 'headfake_reversal' or kind == 'headfake' or kind == 'reversal_after_window':
-                    from ..labels.zeroedge import label_headfake_reversal
+                    from ..labels.zerosigma import label_headfake_reversal
                     params = label_config.get('params') or {}
                     m = label_headfake_reversal(m, **params)
                 elif kind == 'pin_drift' or kind == 'pin':
-                    from ..labels.zeroedge import label_pin_drift
+                    from ..labels.zerosigma import label_pin_drift
                     params = label_config.get('params') or {}
                     m = label_pin_drift(m, **params)
                 else:

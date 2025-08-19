@@ -12,7 +12,7 @@ Use the template as a starter. It sets `data-theme` and `data-density` on `<html
 
 ```html
 <!doctype html>
-<html lang="en" data-theme="light" data-density="cozy" data-edge="zeroedge">
+<html lang="en" data-theme="light" data-density="cozy" data-sigma="zerosigma">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

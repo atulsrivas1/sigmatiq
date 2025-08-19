@@ -124,11 +124,11 @@ function renderLeaderboardTab() {
             </select>
             <select id="pack-filter">
               <option value="all">All Packs</option>
-              <option value="zeroedge">ZeroSigma</option>
-              <option value="swingedge">SwingSigma</option>
-              <option value="longedge">LongSigma</option>
-              <option value="overnightedge">OvernightSigma</option>
-              <option value="momentumedge">MomentumSigma</option>
+              <option value="zerosigma">ZeroSigma</option>
+              <option value="swingsigma">SwingSigma</option>
+              <option value="longsigma">LongSigma</option>
+              <option value="overnightsigma">OvernightSigma</option>
+              <option value="momentumsigma">MomentumSigma</option>
             </select>
             <label>
               <input type="checkbox" id="pass-gate-only">

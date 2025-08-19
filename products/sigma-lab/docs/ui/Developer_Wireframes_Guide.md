@@ -109,7 +109,7 @@ Actions → Endpoints
 
 Wireframe
 +-----------------------------------------------------------+
-| Pack: zeroedge                 [Risk][Cmd][Asst]          |
+| Pack: zerosigma                 [Risk][Cmd][Asst]          |
 +----------------------+------------------------------------+
 | Meta                 | Tabs: Templates | Indicator Sets   |
 | - Description        |        | Recent Models             |

@@ -7,4 +7,4 @@ Completed
 
 Pending
 - Expose retries/timeouts/backoff via env; structured logging on cache vs API.
-- Add a stocks-only dataset builder (equities pipeline) under `swingedge`.
+- Add a stocks-only dataset builder (equities pipeline) under `swingsigma`.

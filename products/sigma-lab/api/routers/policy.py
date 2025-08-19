@@ -98,7 +98,7 @@ def _guard_checks(exec_eff: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @router.get('/policy/explain')
-def policy_explain(model_id: str = Query(...), pack_id: str = Query('zeroedge')):
+def policy_explain(model_id: str = Query(...), pack_id: str = Query('zerosigma')):
     try:
         pol = load_policy(model_id, pack_id)
         # Validate file-level schema (structure/types)

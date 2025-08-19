@@ -1,5 +1,5 @@
 
-# Default Paper Account for momentumedge
+# Default Paper Account for momentumsigma
 name: default_paper
 cash: 100000
 margin_mode: "reg-t"

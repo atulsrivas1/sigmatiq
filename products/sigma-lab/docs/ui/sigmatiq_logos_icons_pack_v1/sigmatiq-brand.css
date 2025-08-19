@@ -1,40 +1,40 @@
 /* Sigmatiq – Brand & Pack Tokens (logos/icons friendly) */
 :root {
   --sigmatiq-primary: #0A2540;        /* Sigmatiq background */
-  --sigmatiq-edge-accent: #1ABC9C;    /* Sigmatiq Sigma notch */
+  --sigmatiq-sigma-accent: #1ABC9C;    /* Sigmatiq Sigma notch */
 
-  /* Back-compat aliases (old Sigmatix tokens) */
+  /* Back-compat aliases (old Sigmatiq tokens) */
   --sig-primary: var(--sigmatiq-primary);
-  --sig-edge-accent: var(--sigmatiq-edge-accent);
+  --sig-sigma-accent: var(--sigmatiq-sigma-accent);
 
   /* Pack accents */
-  --edge-zero-accent: #3B82F6;
-  --edge-swing-accent: #F97316;
-  --edge-long-accent: #22C55E;
-  --edge-overnight-accent: #8B5CF6;
-  --edge-custom-accent: #14B8A6;
+  --sigma-zero-accent: #3B82F6;
+  --sigma-swing-accent: #F97316;
+  --sigma-long-accent: #22C55E;
+  --sigma-overnight-accent: #8B5CF6;
+  --sigma-custom-accent: #14B8A6;
 }
 
-/* Active accent (scoped by data-edge) */
-:root, [data-edge="zero"] { --edge-accent: var(--edge-zero-accent); }
-[data-edge="swing"]       { --edge-accent: var(--edge-swing-accent); }
-[data-edge="long"]        { --edge-accent: var(--edge-long-accent); }
-[data-edge="overnight"]   { --edge-accent: var(--edge-overnight-accent); }
-[data-edge="custom"]      { --edge-accent: var(--edge-custom-accent); }
+/* Active accent (scoped by data-sigma) */
+:root, [data-sigma="zero"] { --sigma-accent: var(--sigma-zero-accent); }
+[data-sigma="swing"]       { --sigma-accent: var(--sigma-swing-accent); }
+[data-sigma="long"]        { --sigma-accent: var(--sigma-long-accent); }
+[data-sigma="overnight"]   { --sigma-accent: var(--sigma-overnight-accent); }
+[data-sigma="custom"]      { --sigma-accent: var(--sigma-custom-accent); }
 
 /* Optional gradient helpers */
 :root {
-  --edge-grad-start: #1D4ED8; /* default: ZeroSigma */
-  --edge-grad-end:   #60A5FA;
-  --edge-grad: linear-gradient(90deg, var(--edge-grad-start), var(--edge-grad-end));
+  --sigma-grad-start: #1D4ED8; /* default: ZeroSigma */
+  --sigma-grad-end:   #60A5FA;
+  --sigma-grad: linear-gradient(90deg, var(--sigma-grad-start), var(--sigma-grad-end));
 }
-[data-edge="swing"]     { --edge-grad-start:#EA580C; --edge-grad-end:#F59E0B; }
-[data-edge="long"]      { --edge-grad-start:#16A34A; --edge-grad-end:#22C55E; }
-[data-edge="overnight"] { --edge-grad-start:#7C3AED; --edge-grad-end:#A78BFA; }
-[data-edge="custom"]    { --edge-grad-start:#0EA5A5; --edge-grad-end:#22D3EE; }
+[data-sigma="swing"]     { --sigma-grad-start:#EA580C; --sigma-grad-end:#F59E0B; }
+[data-sigma="long"]      { --sigma-grad-start:#16A34A; --sigma-grad-end:#22C55E; }
+[data-sigma="overnight"] { --sigma-grad-start:#7C3AED; --sigma-grad-end:#A78BFA; }
+[data-sigma="custom"]    { --sigma-grad-start:#0EA5A5; --sigma-grad-end:#22D3EE; }
 
 /* Utilities */
-.accent-text { color: var(--edge-accent); }
-.accent-bg   { background: var(--edge-accent); color:#fff; }
+.accent-text { color: var(--sigma-accent); }
+.accent-bg   { background: var(--sigma-accent); color:#fff; }
 .icon { display:inline-block; width:24px; height:24px; line-height:0; }
 .icon svg { width:100%; height:100%; display:block; }

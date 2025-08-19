@@ -30,7 +30,7 @@ Sigma Pilot deploys independently from Sigma Lab; communication occurs via API c
 
 ## Data Model (illustrative)
 
-Database: `edge_pilot` (dev: schema `pilot` in a shared DB is acceptable).
+Database: `sigma_pilot` (dev: schema `pilot` in a shared DB is acceptable).
 
 Tables (snake_case):
 - `playbooks` (id, name, spec_json, enabled, created_at, updated_at)
@@ -58,7 +58,7 @@ Contracts are additive and align with the global response envelope (`ok`, pagina
 
 ## Security
 
-- RBAC per environment; least-privilege DB roles (`edge_pilot_rw`, `edge_pilot_ro`).
+- RBAC per environment; least-privilege DB roles (`sigma_pilot_rw`, `sigma_pilot_ro`).
 - Credentials and broker secrets managed via environment/secret store; no secrets in packs.
 
 ## Consequences

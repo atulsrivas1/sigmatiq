@@ -13,19 +13,19 @@
   function stub(delay, data){ return new Promise(r=>setTimeout(()=>r(data), delay)); }
   var api = {
     request,
-    getModels: () => stub(200, { ok:true, rows:[{ model_id:'spy_opt_0dte_hourly', pack_id:'zeroedge', updated_at:'2025-08-16T11:50:00Z' }] }),
+    getModels: () => stub(200, { ok:true, rows:[{ model_id:'spy_opt_0dte_hourly', pack_id:'zerosigma', updated_at:'2025-08-16T11:50:00Z' }] }),
     getLeaderboard: () => stub(200, { ok:true, rows:[{ model_id:'spy_opt_0dte_hourly', best_sharpe:2.41, best_cum_ret:0.38, started_at:'2025-08-16T11:50:00Z' }] }),
     getHealthz: () => stub(150, { ok:true, checks:{ api:'ok', polygon:'ok' } }),
   };
 
   // ---- Mock data (UI-first, no API wiring) ----
   var MODELS = [
-    { model_id: 'spy_opt_0dte_hourly', pack_id: 'zeroedge', updated_at: '2025-08-16T09:50:00Z', sharpe: 2.41, return: '24.5%', trades: 142, ticker: 'SPY', current_price: 447.82, price_change: 1.25, price_change_pct: 0.28, trust: {integrity: 'ok', parity: 'ok', capacity: 'warn'}, lineage: {pack_sha: 'abc123ef', config_sha: 'def456gh', policy_sha: 'ghi789ij'} },
-    { model_id: 'spy_eq_swing_daily', pack_id: 'swingedge', updated_at: '2025-08-15T16:10:00Z', sharpe: 1.85, return: '18.2%', trades: 89, ticker: 'SPY', current_price: 447.82, price_change: 1.25, price_change_pct: 0.28, trust: {integrity: 'ok', parity: 'warn', capacity: 'ok'}, lineage: {pack_sha: 'bcd234fg', config_sha: 'efg567hi', policy_sha: 'hij890jk'} },
-    { model_id: 'aapl_eq_intraday_hourly', pack_id: 'swingedge', updated_at: '2025-08-14T10:20:00Z', sharpe: 1.92, return: '15.7%', trades: 203, ticker: 'AAPL', current_price: 224.31, price_change: -2.18, price_change_pct: -0.96, trust: {integrity: 'ok', parity: 'ok', capacity: 'ok'}, lineage: {pack_sha: 'cde345gh', config_sha: 'fgh678ij', policy_sha: 'ijk901kl'} },
-    { model_id: 'tsla_opt_0dte_5min', pack_id: 'zeroedge', updated_at: '2025-08-13T14:30:00Z', sharpe: 2.15, return: '31.2%', trades: 276, ticker: 'TSLA', current_price: 358.64, price_change: 4.91, price_change_pct: 1.39, trust: {integrity: 'warn', parity: 'ok', capacity: 'error'}, lineage: {pack_sha: 'def456hi', config_sha: 'ghi789jk', policy_sha: 'jkl012lm'} },
-    { model_id: 'qqq_eq_long_weekly', pack_id: 'swingedge', updated_at: '2025-08-11T08:15:00Z', sharpe: 1.56, return: '12.8%', trades: 42, ticker: 'QQQ', current_price: 481.27, price_change: 0.93, price_change_pct: 0.19, trust: {integrity: 'ok', parity: 'ok', capacity: 'ok'}, lineage: {pack_sha: 'efg567ij', config_sha: 'hij890kl', policy_sha: 'klm123mn'} },
-    { model_id: 'nvda_opt_swing_daily', pack_id: 'zeroedge', updated_at: '2025-08-09T12:45:00Z', sharpe: 1.73, return: '19.4%', trades: 67, ticker: 'NVDA', current_price: 134.85, price_change: -1.42, price_change_pct: -1.04, trust: {integrity: 'error', parity: 'warn', capacity: 'warn'}, lineage: {pack_sha: 'fgh678jk', config_sha: 'ijk901lm', policy_sha: 'lmn234no'} }
+    { model_id: 'spy_opt_0dte_hourly', pack_id: 'zerosigma', updated_at: '2025-08-16T09:50:00Z', sharpe: 2.41, return: '24.5%', trades: 142, ticker: 'SPY', current_price: 447.82, price_change: 1.25, price_change_pct: 0.28, trust: {integrity: 'ok', parity: 'ok', capacity: 'warn'}, lineage: {pack_sha: 'abc123ef', config_sha: 'def456gh', policy_sha: 'ghi789ij'} },
+    { model_id: 'spy_eq_swing_daily', pack_id: 'swingsigma', updated_at: '2025-08-15T16:10:00Z', sharpe: 1.85, return: '18.2%', trades: 89, ticker: 'SPY', current_price: 447.82, price_change: 1.25, price_change_pct: 0.28, trust: {integrity: 'ok', parity: 'warn', capacity: 'ok'}, lineage: {pack_sha: 'bcd234fg', config_sha: 'efg567hi', policy_sha: 'hij890jk'} },
+    { model_id: 'aapl_eq_intraday_hourly', pack_id: 'swingsigma', updated_at: '2025-08-14T10:20:00Z', sharpe: 1.92, return: '15.7%', trades: 203, ticker: 'AAPL', current_price: 224.31, price_change: -2.18, price_change_pct: -0.96, trust: {integrity: 'ok', parity: 'ok', capacity: 'ok'}, lineage: {pack_sha: 'cde345gh', config_sha: 'fgh678ij', policy_sha: 'ijk901kl'} },
+    { model_id: 'tsla_opt_0dte_5min', pack_id: 'zerosigma', updated_at: '2025-08-13T14:30:00Z', sharpe: 2.15, return: '31.2%', trades: 276, ticker: 'TSLA', current_price: 358.64, price_change: 4.91, price_change_pct: 1.39, trust: {integrity: 'warn', parity: 'ok', capacity: 'error'}, lineage: {pack_sha: 'def456hi', config_sha: 'ghi789jk', policy_sha: 'jkl012lm'} },
+    { model_id: 'qqq_eq_long_weekly', pack_id: 'swingsigma', updated_at: '2025-08-11T08:15:00Z', sharpe: 1.56, return: '12.8%', trades: 42, ticker: 'QQQ', current_price: 481.27, price_change: 0.93, price_change_pct: 0.19, trust: {integrity: 'ok', parity: 'ok', capacity: 'ok'}, lineage: {pack_sha: 'efg567ij', config_sha: 'hij890kl', policy_sha: 'klm123mn'} },
+    { model_id: 'nvda_opt_swing_daily', pack_id: 'zerosigma', updated_at: '2025-08-09T12:45:00Z', sharpe: 1.73, return: '19.4%', trades: 67, ticker: 'NVDA', current_price: 134.85, price_change: -1.42, price_change_pct: -1.04, trust: {integrity: 'error', parity: 'warn', capacity: 'warn'}, lineage: {pack_sha: 'fgh678jk', config_sha: 'ijk901lm', policy_sha: 'lmn234no'} }
   ];
 
   var SIGNALS = [
@@ -33,7 +33,7 @@
       date: '2025-08-16', 
       time: '09:30',
       model_id: 'spy_opt_0dte_hourly', 
-      pack_id: 'zeroedge',
+      pack_id: 'zerosigma',
       ticker: 'SPY', 
       side: 'long', 
       entry_mode: 'market', 
@@ -47,7 +47,7 @@
       date: '2025-08-16', 
       time: '10:15',
       model_id: 'spy_eq_swing_daily', 
-      pack_id: 'swingedge',
+      pack_id: 'swingsigma',
       ticker: 'SPY', 
       side: 'long', 
       entry_mode: 'limit', 
@@ -61,7 +61,7 @@
       date: '2025-08-15', 
       time: '15:45',
       model_id: 'aapl_eq_intraday_hourly', 
-      pack_id: 'longedge',
+      pack_id: 'longsigma',
       ticker: 'AAPL', 
       side: 'short', 
       entry_mode: 'stop', 
@@ -75,7 +75,7 @@
       date: '2025-08-15', 
       time: '14:20',
       model_id: 'tsla_opt_0dte_5min', 
-      pack_id: 'zeroedge',
+      pack_id: 'zerosigma',
       ticker: 'TSLA', 
       side: 'long', 
       entry_mode: 'market', 
@@ -89,7 +89,7 @@
       date: '2025-08-14', 
       time: '11:30',
       model_id: 'qqq_eq_long_weekly', 
-      pack_id: 'longedge',
+      pack_id: 'longsigma',
       ticker: 'QQQ', 
       side: 'long', 
       entry_mode: 'limit', 
@@ -372,7 +372,7 @@
         return '<tr class="signal-row">' +
           '<td>' + signal.date + ' ' + (signal.time || '09:30') + '</td>' +
           '<td>' +
-            '<span class="pack-badge ' + (signal.pack_id || 'zeroedge') + '">' + (signal.pack_id || 'zeroedge') + '</span>' +
+            '<span class="pack-badge ' + (signal.pack_id || 'zerosigma') + '">' + (signal.pack_id || 'zerosigma') + '</span>' +
             '<div class="signal-model">' + signal.model_id + '</div>' +
           '</td>' +
           '<td><span class="ticker-symbol">' + signal.ticker + '</span></td>' +
@@ -1065,10 +1065,10 @@
         '</div>' +
         '<div class="filters-right">' +
           '<div class="filter-chip active" id="filter-all">All</div>' +
-          '<div class="filter-chip pack-badge zeroedge" id="filter-zeroedge">ZeroSigma</div>' +
-          '<div class="filter-chip pack-badge swingedge" id="filter-swingedge">SwingSigma</div>' +
-          '<div class="filter-chip pack-badge momentumedge" id="filter-momentumedge">MomentumSigma</div>' +
-          '<div class="filter-chip pack-badge longedge" id="filter-longedge">LongSigma</div>' +
+          '<div class="filter-chip pack-badge zerosigma" id="filter-zerosigma">ZeroSigma</div>' +
+          '<div class="filter-chip pack-badge swingsigma" id="filter-swingsigma">SwingSigma</div>' +
+          '<div class="filter-chip pack-badge momentumsigma" id="filter-momentumsigma">MomentumSigma</div>' +
+          '<div class="filter-chip pack-badge longsigma" id="filter-longsigma">LongSigma</div>' +
         '</div>' +
       '</div>' +
       '<div class="models-grid" id="models-grid"></div>';
@@ -1373,11 +1373,11 @@
                 '<div class="form-group">' +
                   '<label class="form-label">Pack</label>' +
                   '<select class="form-input" id="build-pack">' +
-                    '<option value="zeroedge" selected>ZeroSigma</option>' +
-                    '<option value="swingedge">SwingSigma</option>' +
-                    '<option value="longedge">LongSigma</option>' +
-                    '<option value="overnightedge">OvernightSigma</option>' +
-                    '<option value="momentumedge">MomentumSigma</option>' +
+                    '<option value="zerosigma" selected>ZeroSigma</option>' +
+                    '<option value="swingsigma">SwingSigma</option>' +
+                    '<option value="longsigma">LongSigma</option>' +
+                    '<option value="overnightsigma">OvernightSigma</option>' +
+                    '<option value="momentumsigma">MomentumSigma</option>' +
                   '</select>' +
                 '</div>' +
                 '<div class="form-group">' +

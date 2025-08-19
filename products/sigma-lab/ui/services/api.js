@@ -16,7 +16,7 @@ function stub(delay, data) { return new Promise(resolve => setTimeout(() => reso
 
 export const api = {
   request,
-  getModels: () => stub(200, { ok: true, rows: [ { model_id: 'spy_opt_0dte_hourly', pack_id: 'zeroedge', updated_at: '2025-08-16T11:50:00Z' } ] }),
+  getModels: () => stub(200, { ok: true, rows: [ { model_id: 'spy_opt_0dte_hourly', pack_id: 'zerosigma', updated_at: '2025-08-16T11:50:00Z' } ] }),
   getLeaderboard: () => stub(200, { ok: true, rows: [ { model_id: 'spy_opt_0dte_hourly', best_sharpe: 2.41, best_cum_ret: 0.38, started_at: '2025-08-16T11:50:00Z' } ] }),
   getHealthz: () => stub(150, { ok: true, checks: { api: 'ok', polygon: 'ok' } }),
   // Add more: buildMatrix, train, backtest, backtestSweep, getSignals, optionsOverlay when wiring real API

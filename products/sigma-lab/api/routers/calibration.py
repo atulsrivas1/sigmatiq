@@ -56,7 +56,7 @@ def calibrate_thresholds_ep(payload: CalibrateThresholdsRequest):
 
 class CalibrateBracketsRequest(BaseModel):
     model_id: str
-    pack_id: str | None = 'swingedge'
+    pack_id: str | None = 'swingsigma'
     desired_rr: float | None = 2.0
     k_stop_grid: str | None = '0.8,1.0,1.2,1.4'
     k_target_grid: str | None = '1.6,2.0,2.4,3.0'

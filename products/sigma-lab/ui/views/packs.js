@@ -27,9 +27,9 @@ export function render() {
 
     <div class="page-content">
       <div class="packs-grid">
-        <div class="pack-card" data-pack="zeroedge">
+        <div class="pack-card" data-pack="zerosigma">
           <div class="pack-header">
-            <div class="pack-icon zeroedge">
+            <div class="pack-icon zerosigma">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
                 <circle cx="12" cy="12" r="6"/>
@@ -57,14 +57,14 @@ export function render() {
             </div>
           </div>
           <div class="pack-actions">
-            <a href="#/packs/zeroedge" class="btn btn-primary">Open Pack</a>
+            <a href="#/packs/zerosigma" class="btn btn-primary">Open Pack</a>
             <button class="btn btn-secondary">View Models</button>
           </div>
         </div>
 
-        <div class="pack-card" data-pack="swingedge">
+        <div class="pack-card" data-pack="swingsigma">
           <div class="pack-header">
-            <div class="pack-icon swingedge">
+            <div class="pack-icon swingsigma">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -91,14 +91,14 @@ export function render() {
             </div>
           </div>
           <div class="pack-actions">
-            <a href="#/packs/swingedge" class="btn btn-primary">Open Pack</a>
+            <a href="#/packs/swingsigma" class="btn btn-primary">Open Pack</a>
             <button class="btn btn-secondary">View Models</button>
           </div>
         </div>
 
-        <div class="pack-card" data-pack="longedge">
+        <div class="pack-card" data-pack="longsigma">
           <div class="pack-header">
-            <div class="pack-icon longedge">
+            <div class="pack-icon longsigma">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
               </svg>
@@ -124,14 +124,14 @@ export function render() {
             </div>
           </div>
           <div class="pack-actions">
-            <a href="#/packs/longedge" class="btn btn-primary">Open Pack</a>
+            <a href="#/packs/longsigma" class="btn btn-primary">Open Pack</a>
             <button class="btn btn-secondary">View Models</button>
           </div>
         </div>
 
-        <div class="pack-card" data-pack="overnightedge">
+        <div class="pack-card" data-pack="overnightsigma">
           <div class="pack-header">
-            <div class="pack-icon overnightedge">
+            <div class="pack-icon overnightsigma">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
@@ -157,14 +157,14 @@ export function render() {
             </div>
           </div>
           <div class="pack-actions">
-            <a href="#/packs/overnightedge" class="btn btn-primary">Open Pack</a>
+            <a href="#/packs/overnightsigma" class="btn btn-primary">Open Pack</a>
             <button class="btn btn-secondary">View Models</button>
           </div>
         </div>
 
-        <div class="pack-card" data-pack="momentumedge">
+        <div class="pack-card" data-pack="momentumsigma">
           <div class="pack-header">
-            <div class="pack-icon momentumedge">
+            <div class="pack-icon momentumsigma">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 20V10"/>
                 <path d="M12 20V4"/>
@@ -192,7 +192,7 @@ export function render() {
             </div>
           </div>
           <div class="pack-actions">
-            <a href="#/packs/momentumedge" class="btn btn-primary">Open Pack</a>
+            <a href="#/packs/momentumsigma" class="btn btn-primary">Open Pack</a>
             <button class="btn btn-secondary">View Models</button>
           </div>
         </div>

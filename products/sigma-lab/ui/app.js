@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set pack accent based on current page/context
         // For demo purposes, rotate through pack themes
-        const packRotation = ['zeroedge', 'swingedge', 'longedge', 'overnightedge', 'momentumedge'];
+        const packRotation = ['zerosigma', 'swingsigma', 'longsigma', 'overnightsigma', 'momentumsigma'];
         const currentPack = packRotation[Math.floor(Date.now() / 10000) % packRotation.length];
         root.setAttribute('data-edge', currentPack);
 

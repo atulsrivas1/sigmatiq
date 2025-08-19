@@ -11,7 +11,7 @@ PRODUCT_DIR = Path(__file__).resolve().parents[2]  # products/sigma-lab
 PACKS_DIR = Path(os.environ.get('PACKS_DIR', str(PRODUCT_DIR / 'packs')))
 
 
-def workspace_paths(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Path]:
+def workspace_paths(model_id: str, pack_id: str = "zerosigma") -> Dict[str, Path]:
     return {
         # Product-scoped outputs
         "matrices": PRODUCT_DIR / "matrices" / model_id,
@@ -25,7 +25,7 @@ def workspace_paths(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Path]
     }
 
 
-def load_config(model_id: str, pack_id: str = "zeroedge") -> Dict[str, Any]:
+def load_config(model_id: str, pack_id: str = "zerosigma") -> Dict[str, Any]:
     p = PACKS_DIR / pack_id / "model_configs" / f"{model_id}.yaml"
     if p.exists():
         try:
