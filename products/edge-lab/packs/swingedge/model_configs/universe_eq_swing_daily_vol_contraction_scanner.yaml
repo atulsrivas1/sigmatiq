@@ -1,0 +1,10 @@
+model_id: universe_eq_swing_daily_vol_contraction_scanner
+ticker: universe
+asset_type: eq
+horizon: swing
+cadence: daily
+indicator_set: swing_eq_vol_contraction_scanner
+labels:
+  kind: none
+features: {}
+

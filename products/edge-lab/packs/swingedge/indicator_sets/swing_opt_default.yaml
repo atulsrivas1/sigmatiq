@@ -1,0 +1,35 @@
+name: swing_opt_default
+version: 1
+description: SwingEdge options default indicators
+indicators:
+  - name: rsi
+    period: 14
+    column: close
+  - name: ema
+    window: 20
+    column: close
+  - name: macd
+    fast: 12
+    slow: 26
+    signal: 9
+    column: close
+  - name: atr
+    period: 14
+  - name: bollinger_bands
+    window: 20
+    num_std: 2.0
+    column: close
+  - name: obv
+    price_col: close
+    volume_col: volume
+  - name: cmf
+    period: 20
+  - name: iv_realized_spread
+    window: 20
+  - name: iv_term_slope
+    days_fwd: 90
+  - name: iv_skew_25d
+  - name: iv_rank_52w
+  - name: iv_percentile_52w
+  - name: atm_iv_zscore
+  - name: momentum_score_total

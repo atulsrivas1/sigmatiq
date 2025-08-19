@@ -1,0 +1,25 @@
+name: swing_eq_breakout_scanner
+version: 1
+description: SwingEdge (equities) — Breakout & Momentum scanner (daily-style features; usable on hourly matrix latest row)
+indicators:
+  # Trend/momentum core
+  - {name: ema, window: 20}
+  - {name: ema, window: 50}
+  - {name: rsi, period: 14}
+  - {name: adx, period: 14}
+  - {name: momentum, window: 20}
+  - {name: momentum, window: 63}
+  - {name: lr_r2, window: 126}
+
+  # Volatility / bands
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: roll_std, window: 20}
+  - {name: atr, period: 14}
+
+  # Volume / flow proxies
+  - {name: obv, price_col: close, volume_col: volume}
+  - {name: cmf, period: 20}
+
+  # Breakout context (channel)
+  - {name: donchian, window: 20}
+

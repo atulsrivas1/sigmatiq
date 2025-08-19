@@ -1,0 +1,14 @@
+name: overnight_opt_gap
+version: 1
+description: OvernightEdge (options) — Gap Continuation vs Fill
+indicators:
+  - {name: rsi_last_hour, period: 7}
+  - {name: close_vs_vwap}
+  - {name: atm_iv_eod}
+  - {name: div_eod}
+  - {name: pcr_eod}
+  - {name: oi_change_1d}
+  - {name: iv_realized_spread, window: 20}
+  - {name: vix_delta}
+  - {name: calendar_flags}
+

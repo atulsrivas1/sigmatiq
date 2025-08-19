@@ -1,0 +1,17 @@
+model_id: spy_opt_swing_daily
+ticker: SPY
+asset_type: opt
+horizon: swing
+cadence: daily
+indicator_set: swing_opt_default
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+labels:
+  kind: fwd_ret_20d

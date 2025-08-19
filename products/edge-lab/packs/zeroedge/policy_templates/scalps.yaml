@@ -1,0 +1,13 @@
+policy:
+  risk:
+    max_position_pct: 0.3
+    max_daily_trades: 25
+    stop_loss_bps: 90
+  execution:
+    venue: alpaca
+    order_type: market
+    slippage_bps: 3
+  alerting:
+    min_signal_score: 0.62
+    cooldown_minutes: 12
+

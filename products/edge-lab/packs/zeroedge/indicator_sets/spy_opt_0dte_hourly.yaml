@@ -1,0 +1,22 @@
+name: spy_opt_0dte_hourly_v2
+version: 1
+description: Per-model override using Head-Fake Reversal v2 indicators
+indicators:
+  - {name: open_gap_z, atr_period: 14}
+  - {name: first15m_range_z, window_mins: 15}
+  - {name: atm_iv_open_delta}
+  - {name: rsi, period: 7}
+  - {name: ema, window: 8}
+  - {name: ema, window: 21}
+  - {name: macd, fast: 8, slow: 21, signal: 5}
+  - {name: atr, period: 14}
+  - {name: rolling_std, window: 20}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: iv_realized_spread, window: 20}
+  - {name: pcr_volume}
+  - {name: pcr_oi}
+  - {name: oi_change_1d}
+  - {name: iv_smile_wings, wing_points: 10, sampling: "10:00-11:00"}
+  - {name: vix_level}
+  - {name: hour_of_day}
+  - {name: day_of_week}

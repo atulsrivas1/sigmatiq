@@ -1,0 +1,26 @@
+{
+  "Breadth & Internals": {
+    "general": 26
+  },
+  "Chart Types & Profiles": {
+    "general": 14
+  },
+  "Momentum": {
+    "general": 66
+  },
+  "Options & Volatility Analytics": {
+    "general": 44
+  },
+  "Statistical & Other": {
+    "general": 34
+  },
+  "Trend & Overlays": {
+    "general": 80
+  },
+  "Volatility": {
+    "general": 24
+  },
+  "Volume": {
+    "general": 24
+  }
+}

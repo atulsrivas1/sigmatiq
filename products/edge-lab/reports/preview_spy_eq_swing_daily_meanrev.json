@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "model_id": "spy_eq_swing_daily_meanrev",
+  "pack_id": "swingedge",
+  "n_rows": 930,
+  "nan_stats": [
+    {
+      "column": "date",
+      "nan_pct": 100.0
+    },
+    {
+      "column": "hour_et",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "open",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "high",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "low",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "close",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "volume",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "rsi_2",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "ret_3h",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "bb_mid_20",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "bb_upper_20",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "bb_lower_20",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "roll_std_20",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "atr_14",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "ema_20",
+      "nan_pct": 0.0
+    },
+    {
+      "column": "vix_level",
+      "nan_pct": 100.0
+    },
+    {
+      "column": "ret_fwd_20d",
+      "nan_pct": 32.903
+    },
+    {
+      "column": "y",
+      "nan_pct": 100.0
+    },
+    {
+      "column": "y_syn",
+      "nan_pct": 100.0
+    }
+  ],
+  "csv": "C:\\github\\gemini\\Sigmatix-ZeroEdge\\Sigmatix-Edge\\matrices\\spy_eq_swing_daily_meanrev\\preview_stock.csv"
+}

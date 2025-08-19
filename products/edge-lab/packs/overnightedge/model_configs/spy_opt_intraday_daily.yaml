@@ -1,0 +1,24 @@
+model_id: spy_opt_intraday_daily
+ticker: SPY
+asset_type: opt
+horizon: intraday
+cadence: daily
+indicator_set: overnight_opt_default
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  flow:
+    per_distance: false
+    totals: true
+    ratios: true
+    atm: false
+    distance_max: 3
+  time:
+    day_of_week: true
+labels:
+  kind: regression
+  target: fwd_ret_close_to_open

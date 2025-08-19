@@ -1,0 +1,11 @@
+model_id: universe_eq_swing_daily_scanner
+ticker: universe
+asset_type: eq
+horizon: swing
+cadence: daily
+indicator_set: swing_eq_breakout_scanner
+labels:
+  kind: none  # rule-based signal model (no ML)
+features: {}
+notes: Logical holder for scanner outputs; used for policy validation and live alerts bookkeeping.
+

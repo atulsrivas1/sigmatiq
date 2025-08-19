@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Lab - Build/Train/Backtest</title>
+    <style>
+        :root {
+            /* Brand Core Colors - Exact from Sigmatiq Color System */
+            --navy: #0A2540;
+            --teal: #1ABC9C;
+            --slate: #334155;
+            --gray: #94A3B8;
+            --ivory: #E8E3D9;
+            
+            /* Chart/Visualization Colors */
+            --viz-blue: #334155;
+            --viz-gray: #D1D5DB;
+            --viz-amber: #F59E0B;
+            --viz-olive: #A3BE3C;
+            
+            /* Status Colors */
+            --status-success: #10B981;
+            --status-warning: #F59E0B;
+            --status-error: #EF4444;
+            
+            /* Primary colors based on brand */
+            --primary-color: var(--teal);
+            --primary-dark: #16A085;
+            --primary-light: #48C9B0;
+            --secondary-color: var(--navy);
+            
+            /* Light theme (default) */
+            --text-primary: #0A2540;
+            --text-secondary: #334155;
+            --text-muted: #94A3B8;
+            --bg-primary: #FDFCFA;
+            --bg-secondary: #F8F7F5;
+            --bg-tertiary: #E8E3D9;
+            --bg-hover: rgba(26, 188, 156, 0.05);
+            --border-color: #D1D5DB;
+            
+            --card-bg: #FDFCFA;
+            --input-bg: #FDFCFA;
+            --input-border: #D1D5DB;
+            --input-focus: rgba(26, 188, 156, 0.15);
+            
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            
+            --shadow-sm: 0 1px 3px rgba(10, 37, 64, 0.08);
+            --shadow-md: 0 4px 6px rgba(10, 37, 64, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #F8F7F5;
+            --text-secondary: #D1D5DB;
+            --text-muted: #94A3B8;
+            --bg-primary: #0A2540;
+            --bg-secondary: #061529;
+            --bg-tertiary: #122B45;
+            --bg-hover: rgba(26, 188, 156, 0.08);
+            --border-color: #334155;
+            --card-bg: #122B45;
+            --input-bg: #1E3A5F;
+            --input-border: #334155;
+            --primary-color: #48C9B0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Layout Shell */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--primary-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-hover);
+            border-radius: 4px;
+        }
+
+        /* Logo styles - updated with SVG */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-container:hover {
+            transform: translateY(-2px);
+        }
+
+        /* SVG Logo Mark */
+        .logo-mark {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        /* Text Content */
+        .text-content {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+            width: fit-content;
+        }
+
+        .edge-lab {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--teal);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: right;
+            margin-bottom: -1px;
+        }
+
+        .sigmatiq {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        [data-theme="dark"] .sigmatiq {
+            color: #F8F7F5;
+        }
+
+        .underline {
+            height: 2px;
+            background: var(--primary-color);
+            width: 100%;
+            margin-top: 1px;
+        }
+
+        .tagline {
+            font-size: 7px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-align: right;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        [data-theme="dark"] .tagline {
+            color: #F8F7F5;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-bar-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .top-bar-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: rotate(20deg);
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            transition: margin-left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            margin-left: -240px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, transparent, var(--bg-hover));
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        /* Nav Icons */
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .icon-dashboard::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid currentColor;
+            border-radius: 4px;
+            background: linear-gradient(90deg, transparent 48%, currentColor 48%, currentColor 52%, transparent 52%),
+                        linear-gradient(0deg, transparent 48%, currentColor 48%, currentColor 52%, transparent 52%);
+        }
+
+        .icon-models::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+        }
+
+        .icon-models::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-style: dashed;
+        }
+
+        .icon-build::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 8px;
+            border: 2px solid currentColor;
+            border-radius: 2px;
+            top: 8px;
+        }
+
+        .icon-build::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 10px;
+            background: currentColor;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            top: 2px;
+        }
+
+        .icon-sweeps::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(45deg);
+        }
+
+        .icon-sweeps::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+        }
+
+        .icon-leaderboard::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: currentColor;
+            left: 2px;
+            height: 12px;
+        }
+
+        .icon-leaderboard::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: currentColor;
+            left: 8px;
+            height: 16px;
+        }
+
+        .icon-leaderboard span::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: currentColor;
+            right: 2px;
+            height: 8px;
+        }
+
+        .icon-signals::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 -6px 0 currentColor, 0 6px 0 currentColor;
+        }
+
+        .icon-signals::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-left-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(45deg);
+            right: -3px;
+        }
+
+        .icon-overlay::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 10px;
+            border: 2px solid currentColor;
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .icon-overlay::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 10px;
+            border: 2px solid currentColor;
+            border-radius: 2px;
+            top: 3px;
+            left: 3px;
+        }
+
+        .icon-docs::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 2px;
+            border-top-right-radius: 0;
+        }
+
+        .icon-docs::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 4px solid currentColor;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid currentColor;
+            right: 2px;
+            top: 0;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* Page Container */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .page-description {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: rgba(26, 188, 156, 0.1);
+            color: var(--teal);
+            border: 1px solid var(--teal);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px var(--input-focus);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .chip-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .chip:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .chip.active {
+            background: rgba(26, 188, 156, 0.1);
+            color: var(--teal);
+            border-color: var(--teal);
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: rgba(26, 188, 156, 0.1);
+            color: var(--teal);
+            border: 1px solid var(--teal);
+        }
+
+        .btn-primary:hover {
+            background: rgba(26, 188, 156, 0.15);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Metrics */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Console Output */
+        .console-output {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .console-line {
+            margin-bottom: 5px;
+        }
+
+        .console-success {
+            color: var(--status-success);
+        }
+
+        .console-error {
+            color: var(--status-error);
+        }
+
+        /* Recent Runs Section */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: var(--success-bg);
+            color: var(--status-success);
+        }
+
+        .status-running {
+            background: var(--warning-bg);
+            color: var(--status-warning);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary-color);
+            border-top: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--ivory);
+        }
+        
+        [data-theme="dark"] .footer {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: var(--text-primary);
+            color: var(--bg-primary);
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab-nav {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                z-index: 999;
+                height: calc(100vh - 60px);
+                top: 60px;
+                left: 0;
+                box-shadow: var(--shadow-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Bar with SigmatiQ Logo -->
+        <header class="top-bar">
+            <div class="logo-section">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <a class="logo-container" href="#" aria-label="Sigmatiq home">
+                    <!-- SVG Logo Mark -->
+                    <svg class="logo-mark" viewBox="0 0 45 45" role="img" aria-labelledby="logoTitle logoDesc">
+                        <title id="logoTitle">Sigmatiq Network Mark</title>
+                        <desc id="logoDesc">Teal circle with crosshair and five nodes in slate/gray/ivory</desc>
+                        <!-- Outer circle -->
+                        <circle cx="22.5" cy="22.5" r="22.5" fill="var(--teal)"/>
+                        <!-- Cross bars -->
+                        <rect x="11.5" y="21.5" width="22" height="2" fill="var(--ivory)"/>
+                        <rect x="21.5" y="11.5" width="2" height="22" fill="var(--ivory)"/>
+                        <!-- Center node (Gray fill, Ivory ring) -->
+                        <g transform="translate(22.5,22.5)">
+                            <circle r="6.5" fill="none" stroke="var(--ivory)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle r="4.5" fill="var(--gray)"/>
+                        </g>
+                        <!-- Top node (Slate fill, Ivory ring) -->
+                        <g transform="translate(22.5,13.5)">
+                            <circle r="5.5" fill="none" stroke="var(--ivory)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle r="3.5" fill="var(--slate)"/>
+                        </g>
+                        <!-- Right node -->
+                        <g transform="translate(31.5,22.5)">
+                            <circle r="5.5" fill="none" stroke="var(--ivory)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle r="3.5" fill="var(--slate)"/>
+                        </g>
+                        <!-- Bottom node -->
+                        <g transform="translate(22.5,31.5)">
+                            <circle r="5.5" fill="none" stroke="var(--ivory)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle r="3.5" fill="var(--slate)"/>
+                        </g>
+                        <!-- Left node -->
+                        <g transform="translate(13.5,22.5)">
+                            <circle r="5.5" fill="none" stroke="var(--ivory)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle r="3.5" fill="var(--slate)"/>
+                        </g>
+                    </svg>
+                    <!-- Text Content -->
+                    <div class="text-content">
+                        <div class="edge-lab">EDGE LAB</div>
+                        <div class="sigmatiq">SIGMATIQ</div>
+                        <div class="underline"></div>
+                        <div class="tagline">EVIDENCE TO GOVERNED ACTION</div>
+                    </div>
+                </a>
+            </div>
+            <div class="top-bar-actions">
+                <a href="#docs" class="top-bar-link">Docs</a>
+                <a href="#health" class="top-bar-link">Health</a>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                <div class="tooltip">
+                    <span class="top-bar-link">User</span>
+                    <span class="tooltiptext">admin@sigmatiq.com</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon icon-dashboard"></span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="models.html" class="nav-item">
+                    <span class="nav-icon icon-models"></span>
+                    <span class="nav-text">Models</span>
+                </a>
+                <a href="#build" class="nav-item active">
+                    <span class="nav-icon icon-build"></span>
+                    <span class="nav-text">Build/Train/Backtest</span>
+                </a>
+                <a href="#sweeps" class="nav-item">
+                    <span class="nav-icon icon-sweeps"></span>
+                    <span class="nav-text">Sweeps</span>
+                </a>
+                <a href="leaderboard.html" class="nav-item">
+                    <span class="nav-icon icon-leaderboard"><span></span></span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="#signals" class="nav-item">
+                    <span class="nav-icon icon-signals"></span>
+                    <span class="nav-text">Signals</span>
+                </a>
+                <a href="#overlay" class="nav-item">
+                    <span class="nav-icon icon-overlay"></span>
+                    <span class="nav-text">Options Overlay</span>
+                </a>
+                <a href="#docs" class="nav-item">
+                    <span class="nav-icon icon-docs"></span>
+                    <span class="nav-text">Documentation</span>
+                </a>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <div class="page-container">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1 class="page-title">Build / Train / Backtest</h1>
+                        <p class="page-description">Run and manage model training pipelines</p>
+                    </div>
+
+                    <!-- Tab Navigation -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchTab('build', this)">Build Matrix</button>
+                        <button class="tab-btn" onclick="switchTab('train', this)">Train Model</button>
+                        <button class="tab-btn" onclick="switchTab('backtest', this)">Backtest</button>
+                    </div>
+
+                    <!-- Build Tab Content -->
+                    <div id="build-content" class="tab-content">
+                        <div class="content-grid">
+                            <!-- Configuration Card -->
+                            <div class="card">
+                                <h3 class="card-title">Build Configuration</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Model</label>
+                                    <select class="form-input">
+                                        <option>spy_opt_0dte_hourly</option>
+                                        <option>spy_eq_swing_daily</option>
+                                        <option>aapl_eq_intraday_hourly</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Date</label>
+                                        <input type="date" class="form-input" value="2024-01-01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" class="form-input" value="2024-12-31">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Features</label>
+                                    <div class="chip-group">
+                                        <div class="chip active">RSI</div>
+                                        <div class="chip active">MACD</div>
+                                        <div class="chip active">Volume</div>
+                                        <div class="chip">BB</div>
+                                        <div class="chip">ATR</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    Run Build
+                                </button>
+                            </div>
+
+                            <!-- Info Card -->
+                            <div class="card">
+                                <h3 class="card-title">Build Information</h3>
+                                <div class="metric-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-value">24</div>
+                                        <div class="metric-label">Features</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">15.2k</div>
+                                        <div class="metric-label">Rows</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">0.1%</div>
+                                        <div class="metric-label">NaN %</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">2.3MB</div>
+                                        <div class="metric-label">Size</div>
+                                    </div>
+                                </div>
+                                <div class="console-output">
+                                    <div class="console-line">[2025-01-15 10:30:45] Starting build process...</div>
+                                    <div class="console-line console-success">[2025-01-15 10:30:46] Data loaded successfully</div>
+                                    <div class="console-line">[2025-01-15 10:30:47] Computing features...</div>
+                                    <div class="console-line console-success">[2025-01-15 10:30:52] Build completed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Train Tab Content (hidden by default) -->
+                    <div id="train-content" class="tab-content" style="display: none;">
+                        <div class="content-grid">
+                            <!-- Training Configuration -->
+                            <div class="card">
+                                <h3 class="card-title">Training Configuration</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Model Type</label>
+                                    <select class="form-input">
+                                        <option>Gradient Boosting</option>
+                                        <option>Random Forest</option>
+                                        <option>Neural Network</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Allowed Hours</label>
+                                    <input type="text" class="form-input" value="13, 14, 15" placeholder="e.g., 13, 14, 15">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Split Ratio</label>
+                                        <input type="number" class="form-input" value="0.8" min="0" max="1" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Random Seed</label>
+                                        <input type="number" class="form-input" value="42">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    Start Training
+                                </button>
+                            </div>
+
+                            <!-- Training Metrics -->
+                            <div class="card">
+                                <h3 class="card-title">Training Progress</h3>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%;"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-value">87.3%</div>
+                                        <div class="metric-label">Accuracy</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">0.84</div>
+                                        <div class="metric-label">F1 Score</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">0.91</div>
+                                        <div class="metric-label">Precision</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">12m</div>
+                                        <div class="metric-label">Duration</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backtest Tab Content (hidden by default) -->
+                    <div id="backtest-content" class="tab-content" style="display: none;">
+                        <div class="content-grid">
+                            <!-- Backtest Configuration -->
+                            <div class="card">
+                                <h3 class="card-title">Backtest Configuration</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Mode</label>
+                                    <div class="chip-group">
+                                        <div class="chip active">Thresholds</div>
+                                        <div class="chip">Top %</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Thresholds</label>
+                                    <input type="text" class="form-input" value="0.55, 0.60, 0.65">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Splits</label>
+                                        <input type="number" class="form-input" value="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Size by Confidence</label>
+                                        <select class="form-input">
+                                            <option>No</option>
+                                            <option>Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                    Run Backtest
+                                </button>
+                            </div>
+
+                            <!-- Backtest Results -->
+                            <div class="card">
+                                <h3 class="card-title">Backtest Results</h3>
+                                <div class="metric-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-value" style="color: var(--status-success);">2.41</div>
+                                        <div class="metric-label">Sharpe</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value" style="color: var(--status-success);">24.5%</div>
+                                        <div class="metric-label">Return</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">142</div>
+                                        <div class="metric-label">Trades</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">62%</div>
+                                        <div class="metric-label">Win Rate</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Runs -->
+                    <div class="results-section">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary);">Recent Runs</h2>
+                        
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-title">spy_opt_0dte_hourly - Backtest</div>
+                                <div class="result-status status-success">Completed</div>
+                            </div>
+                            <div class="metric-grid">
+                                <div class="metric-item">
+                                    <div class="metric-value">2.41</div>
+                                    <div class="metric-label">Sharpe</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">24.5%</div>
+                                    <div class="metric-label">Return</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">142</div>
+                                    <div class="metric-label">Trades</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">2m ago</div>
+                                    <div class="metric-label">Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-title">spy_eq_swing_daily - Training</div>
+                                <div class="result-status status-running">Running</div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 45%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div>API: localhost:8000 | ENV: development | Data: 98% coverage</div>
+            <div>© 2025 SigmatiQ Edge Lab | Evidence to Governed Action</div>
+        </footer>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // Toggle Theme
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            
+            const themeBtn = document.querySelector('.theme-toggle');
+            themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            
+            localStorage.setItem('preferred-theme', newTheme);
+        }
+
+        // Tab Switching
+        function switchTab(tabName, element) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + '-content').style.display = 'block';
+
+            // Add active class to selected tab
+            element.classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('preferred-theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.querySelector('.theme-toggle').textContent = '☀️';
+                }
+            } else if (systemPrefersDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+        });
+
+        // Handle chip selection
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

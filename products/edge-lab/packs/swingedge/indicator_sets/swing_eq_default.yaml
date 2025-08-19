@@ -1,0 +1,38 @@
+name: swing_eq_default
+version: 1
+description: SwingEdge equities default indicators
+indicators:
+  - name: rsi
+    period: 14
+    column: close
+  - name: ema
+    window: 20
+    column: close
+  - name: ema
+    window: 50
+    column: close
+  - name: macd
+    fast: 12
+    slow: 26
+    signal: 9
+    column: close
+  - name: adx
+    period: 14
+  - name: atr
+    period: 14
+  - name: keltner
+    window: 20
+    multiplier: 2.0
+  - name: obv
+    price_col: close
+    volume_col: volume
+  - name: cmf
+    period: 20
+  - name: sma
+    window: 200
+    column: close
+  - name: sma
+    window: 50
+    column: close
+  - name: momentum_score_total
+

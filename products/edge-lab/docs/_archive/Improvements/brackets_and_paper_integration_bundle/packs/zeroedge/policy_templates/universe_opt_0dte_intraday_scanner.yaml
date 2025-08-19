@@ -1,0 +1,24 @@
+name: zeroedge_scanner_paper_v1
+version: 1
+policy:
+  risk:
+    max_drawdown: 0.15
+    max_exposure: 100000
+  execution:
+    slippage_bps: 1.0
+    size_by_conf: false
+    conf_cap: 1.0
+    momentum_gate: false
+    momentum_min: 0.0
+    momentum_column: score_total
+    slippage_bps: 2.0
+    brackets:
+      enabled: true
+            mode: premium            # or 'underlying_atr'
+            premium_stop_pct: 0.35   # 35% loss on premium
+            premium_target_pct: 0.75 # 75% gain on premium
+            time_stop_minutes: 120
+            force_flat_time: "15:50" # force flat near close
+  alerting:
+    cooldown_minutes: 5
+    max_trades_per_day: 20

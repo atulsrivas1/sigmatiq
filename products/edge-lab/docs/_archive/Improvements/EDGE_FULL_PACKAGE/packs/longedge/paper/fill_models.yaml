@@ -1,0 +1,8 @@
+
+# Fill models for longedge
+models:
+  next_bar_open: { type: "bar_open", cadence: "5m|daily" }
+  next_bar_vwap: { type: "bar_vwap", vp_limit: 0.10 }
+  moc:           { type: "close" }
+  limit_cross:   { type: "limit", queue: "top_of_book", expire_bars: 3 }
+generated_at: "2025-08-15 20:56 UTC"

@@ -1,0 +1,23 @@
+
+name: swingedge_scanner_paper_v1
+version: 1
+policy:
+  risk:
+    max_drawdown: 0.10
+    max_exposure: 100000
+  execution:
+    slippage_bps: 1.0
+    size_by_conf: false
+    conf_cap: 1.0
+    momentum_gate: false
+    momentum_min: 0.0
+    momentum_column: score_total
+    brackets:
+      enabled: true
+      mode: "atr"
+      atr_mult_stop: 1.2
+      atr_mult_target: 2.0
+      time_stop_minutes: 120
+  alerting:
+    cooldown_minutes: 5
+    max_trades_per_day: 20

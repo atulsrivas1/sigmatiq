@@ -1,0 +1,14 @@
+{
+  "donchian_N": 20,
+  "epsilon": 0.002,
+  "bos_min": 0.25,
+  "rsi_min": 55,
+  "adx_min": 18,
+  "top_n": 50,
+  "weights": {
+    "breakout": 40,
+    "momentum": 30,
+    "trend_quality": 15,
+    "alignment": 15
+  }
+}

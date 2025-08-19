@@ -1,0 +1,12 @@
+name: swing_eq_high_momentum_scanner
+version: 1
+description: SwingEdge (equities) — High momentum burst with trend filter
+indicators:
+  - {name: momentum, window: 10}
+  - {name: momentum, window: 20}
+  - {name: momentum, window: 63}
+  - {name: ema, window: 20}
+  - {name: ema, window: 50}
+  - {name: adx, period: 14}
+  - {name: atr, period: 14}
+

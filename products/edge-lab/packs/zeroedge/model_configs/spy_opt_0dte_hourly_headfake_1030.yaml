@@ -1,0 +1,22 @@
+model_id: spy_opt_0dte_hourly_headfake_1030
+ticker: SPY
+asset_type: opt
+horizon: 0dte
+cadence: hourly
+indicator_set: zeroedge_headfake_reversal_v2
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+labels:
+  kind: headfake_reversal
+  params:
+    open_time: "09:30"
+    window_end: "10:30"
+    min_open_move_atr: 0.5
+    min_reversal_move_atr: 0.5

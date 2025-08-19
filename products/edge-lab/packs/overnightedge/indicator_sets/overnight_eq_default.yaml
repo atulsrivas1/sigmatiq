@@ -1,0 +1,21 @@
+name: overnight_eq_default
+version: 1
+description: OvernightEdge equities default indicators
+indicators:
+  - name: rsi
+    period: 7
+    column: close
+  - name: atr
+    period: 14
+  - name: intraday_vwap
+  - name: dist_to_ema
+    window: 20
+    column: close
+  - name: rolling_std
+    window: 20
+    column: close
+  - name: momentum
+    window: 1
+    column: close
+  - name: vix_delta
+  - name: calendar_flags

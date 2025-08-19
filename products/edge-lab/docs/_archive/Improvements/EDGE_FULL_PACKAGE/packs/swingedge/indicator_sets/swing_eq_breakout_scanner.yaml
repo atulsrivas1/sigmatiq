@@ -1,0 +1,17 @@
+
+name: swing_eq_breakout_scanner
+version: 1
+indicators:
+  - {name: ema, window: 20}
+  - {name: ema, window: 50}
+  - {name: rsi, period: 14}
+  - {name: adx, period: 14}
+  - {name: returns, window: 5}
+  - {name: returns, window: 20}
+  - {name: returns, window: 63}
+  - {name: lr_r2, window: 126}
+  - {name: atr, period: 14}
+  - {name: stddev, window: 20}
+  - {name: bollinger, window: 20, num_std: 2.0}
+  - {name: obv}
+  - {name: cmf, period: 20}

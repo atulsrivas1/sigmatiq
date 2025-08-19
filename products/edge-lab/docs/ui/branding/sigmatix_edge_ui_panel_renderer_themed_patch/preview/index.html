@@ -1,0 +1,27 @@
+
+<!doctype html>
+<html lang="en" data-theme="light" data-edge="zero">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sigmatiq Edge – UI Panel Renderer (Themed Patch)</title>
+  <link rel="stylesheet" href="../tokens/colors.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/edge-pack-themes.css">
+  <style>/* Shared hero header */
+.pack-hero { background: var(--edge-grad); color: #fff; border-bottom: 1px solid var(--color-border); box-shadow: var(--shadow-1); }
+.pack-hero .inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display:flex; align-items:center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.badge { padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.12); color: #fff; }
+.row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+.btn { appearance:none; border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-1); padding: 8px 12px; border-radius: 10px; font-weight: 600; cursor:pointer; box-shadow: var(--shadow-1); }
+.btn:focus-visible { outline:0; box-shadow: var(--focus-ring); }
+.panel { background: var(--color-surface-1); border:1px solid var(--color-border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow-1); }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }</style>
+  <link rel="stylesheet" href="../components/renderer.css">
+</head>
+<body class="font-body">
+  <div id="mount"></div>
+  <script src="../components/ui-patch-renderer.js"></script>
+  <script> SigPatchRenderer.render(document.getElementById('mount'), {}); </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-edge="zero">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sigmatiq Edge – Batch 7: Alerts & Signal Cards</title>
+  <link rel="stylesheet" href="../tokens/colors.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/edge-pack-themes.css">
+  <link rel="stylesheet" href="../components/dashboard.css">
+  <link rel="stylesheet" href="../components/alerts.css">
+  <link rel="stylesheet" href="../components/signal-cards.css">
+</head>
+<body class="font-body">
+  <header class="hero">
+    <div class="inner">
+      <div>
+        <div class="small">Sigmatiq Edge — Dashboard</div>
+        <h1 class="font-display" style="margin:0;">Alerts & Signal Cards</h1>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
+        <select class="btn" id="packSel" onchange="changePack(this.value)">
+          <option value="zero">ZeroEdge</option>
+          <option value="swing">SwingEdge</option>
+          <option value="long">LongEdge</option>
+          <option value="overnight">OvernightEdge</option>
+          <option value="custom">CustomizedEdge</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top: 16px;">
+    <section class="grid">
+      <div class="col-8">
+        <div class="panel">
+          <div class="row" style="justify-content: space-between;">
+            <div class="small">Live Signal Feed</div>
+            <div class="row">
+              <label class="small" for="speed">Speed</label>
+              <select id="speed" class="input" onchange="setSpeed(this.value)">
+                <option value="slow">Slow</option>
+                <option value="normal" selected>Normal</option>
+                <option value="fast">Fast</option>
+              </select>
+            </div>
+          </div>
+          <div id="feed" class="feed" aria-live="polite" aria-relevant="additions"></div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="panel">
+          <div class="small">System Alerts</div>
+          <div class="alert signal" role="status">
+            <img src="../icons/info.svg" class="icon" alt=""/>
+            <div>
+              <div class="title">Signal detected — <span class="mono">$SPY</span></div>
+              <div class="meta">ZeroEdge • Confidence 78%</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline">Details</button>
+              <button class="btn btn-primary">Acknowledge</button>
+            </div>
+          </div>
+
+          <div class="alert success" role="status">
+            <img src="../icons/check.svg" class="icon" alt=""/>
+            <div>
+              <div class="title">Deployment completed</div>
+              <div class="meta">Model ZE-Alpha v1.3.0</div>
+            </div>
+            <div class="actions">
+              <button class="btn">Logs</button>
+            </div>
+          </div>
+
+          <div class="alert warning" role="status">
+            <img src="../icons/warn.svg" class="icon" alt=""/>
+            <div>
+              <div class="title">Data latency increasing</div>
+              <div class="meta">Market data adapter (5m)</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline">Investigate</button>
+            </div>
+          </div>
+
+          <div class="alert danger" role="status">
+            <img src="../icons/danger.svg" class="icon" alt=""/>
+            <div>
+              <div class="title">Policy breach — risk > 2%</div>
+              <div class="meta">SwingEdge policy SW-P1</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary">Pause</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 16px;">
+          <div class="small">KPIs</div>
+          <div class="kpi" style="margin-top:10px;">
+            <div class="label">Signals (24h)</div>
+            <div class="value">128</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Win Rate (7d)</div>
+            <div class="value">56%</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Latency (p95)</div>
+            <div class="value">220ms</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top: 16px;">
+      <div class="small">Signal Card Variants</div>
+      <div class="grid" style="margin-top:10px;">
+        <div class="col-4">
+          <article class="signal-card positive" data-edge="zero" aria-labelledby="sig1-title">
+            <div class="header">
+              <div class="ticker" id="sig1-title">SPY</div>
+              <div class="badge">Long</div>
+              <div class="model">ZeroEdge • ZE-Alpha</div>
+              <div class="time small">Now</div>
+            </div>
+            <div class="body">
+              <canvas class="spark" width="240" height="44"></canvas>
+              <div>
+                <div class="small">Confidence</div>
+                <div class="confidence"><span style="width:76%"></span></div>
+                <div class="tags" style="margin-top:8px;">
+                  <span class="tag">0DTE</span>
+                  <span class="tag">microstructure</span>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline">Details</button>
+              <button class="btn btn-primary">Route</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="col-4">
+          <article class="signal-card negative" data-edge="swing" aria-labelledby="sig2-title">
+            <div class="header">
+              <div class="ticker" id="sig2-title">AAPL</div>
+              <div class="badge">Short</div>
+              <div class="model">SwingEdge • SW-Reversal</div>
+              <div class="time small">1m</div>
+            </div>
+            <div class="body">
+              <canvas class="spark" width="240" height="44"></canvas>
+              <div>
+                <div class="small">Confidence</div>
+                <div class="confidence"><span style="width:52%"></span></div>
+                <div class="tags" style="margin-top:8px;">
+                  <span class="tag">regime</span>
+                  <span class="tag">breadth</span>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline">Details</button>
+              <button class="btn btn-primary">Route</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="col-4">
+          <article class="signal-card positive" data-edge="overnight" aria-labelledby="sig3-title">
+            <div class="header">
+              <div class="ticker" id="sig3-title">TSLA</div>
+              <div class="badge">Long</div>
+              <div class="model">OvernightEdge • ON-Gap</div>
+              <div class="time small">5m</div>
+            </div>
+            <div class="body">
+              <canvas class="spark" width="240" height="44"></canvas>
+              <div>
+                <div class="small">Confidence</div>
+                <div class="confidence"><span style="width:64%"></span></div>
+                <div class="tags" style="margin-top:8px;">
+                  <span class="tag">gap</span>
+                  <span class="tag">imbalance</span>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline">Details</button>
+              <button class="btn btn-primary">Route</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="row" style="justify-content:flex-end; margin-top: 16px;">
+      <a class="btn" href="../components/alerts.css" download>Download alerts.css</a>
+      <a class="btn" href="../components/signal-cards.css" download>Download signal-cards.css</a>
+      <a class="btn" href="../components/dashboard.css" download>Download dashboard.css</a>
+      <a class="btn" href="../data/signal-feed.sample.json" download>Download signal-feed.sample.json</a>
+    </footer>
+  </main>
+
+  <script>
+    function toggleTheme(){
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+    function changePack(key){
+      document.documentElement.setAttribute('data-edge', key);
+    }
+
+    // Live feed generation
+    const FEED = document.getElementById('feed');
+    const pool = [
+      {edge:'zero', side:'Long',  symbol:'SPY',  model:'ZE-Alpha', conf: 0.78, tags:['0DTE','microstructure']},
+      {edge:'zero', side:'Short', symbol:'QQQ',  model:'ZE-Gamma', conf: 0.61, tags:['orderflow']},
+      {edge:'swing', side:'Long', symbol:'AAPL', model:'SW-Momo',   conf: 0.55, tags:['momentum','regime']},
+      {edge:'long', side:'Long',  symbol:'XLP',  model:'LN-Factor', conf: 0.69, tags:['macro','carry']},
+      {edge:'overnight', side:'Short', symbol:'TSLA', model:'ON-Gap', conf: 0.66, tags:['gap','imbalance']},
+    ];
+    let timer = null;
+    function drawSpark(canvas){
+      const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+      ctx.clearRect(0,0,w,h);
+      // grid
+      ctx.strokeStyle = 'rgba(148,163,184,0.3)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+      // line (accent)
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--edge-accent') || '#3B82F6';
+      ctx.strokeStyle = color.trim(); ctx.lineWidth = 2;
+      const n=40; const arr = Array.from({length:n}, (_,i) => 100 + Math.sin(i/5)*2 + (Math.random()-0.5)*2);
+      const min = Math.min(...arr), max = Math.max(...arr);
+      const sx = (w-10)/(n-1), sy = (h-10)/((max-min)||1);
+      ctx.beginPath();
+      arr.forEach((v,i) => { const x=5+i*sx, y=h-5-(v-min)*sy; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+      ctx.stroke();
+    }
+    function signalCard(sig){
+      const wrap = document.createElement('article');
+      wrap.className = 'signal-card ' + (sig.side === 'Long' ? 'positive' : 'negative');
+      wrap.setAttribute('data-edge', sig.edge);
+      wrap.innerHTML = `
+        <div class="header">
+          <div class="ticker">${sig.symbol}</div>
+          <div class="badge">${sig.side}</div>
+          <div class="model">${sig.model}</div>
+          <div class="time small">Now</div>
+        </div>
+        <div class="body">
+          <canvas class="spark" width="320" height="44"></canvas>
+          <div>
+            <div class="small">Confidence</div>
+            <div class="confidence"><span style="width:${Math.round(sig.conf*100)}%"></span></div>
+            <div class="tags" style="margin-top:8px;">${
+              (sig.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')
+            }</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline">Details</button>
+          <button class="btn btn-primary">Route</button>
+        </div>
+      `;
+      setTimeout(() => drawSpark(wrap.querySelector('.spark')), 0);
+      return wrap;
+    }
+    function pushSignal(){
+      const i = Math.floor(Math.random()*pool.length);
+      const sig = pool[i];
+      FEED.prepend(signalCard(sig));
+      // Keep last 12
+      while (FEED.children.length > 12) FEED.lastChild.remove();
+    }
+    function setSpeed(s){
+      if (timer) clearInterval(timer);
+      const ms = s==='fast' ? 1200 : s==='slow' ? 4000 : 2200;
+      timer = setInterval(pushSignal, ms);
+    }
+    setSpeed('normal');
+  </script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+{
+  "runs": [
+    {
+      "kind": "thresholds",
+      "thresholds": "0.50,0.52,0.54",
+      "allowed_hours": "13,14,15",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 1,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 2,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 3,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 4,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            }
+          ],
+          "top_pct_result": {
+            "fold": 0.0,
+            "thr": 0.5,
+            "cum_ret": 0.0,
+            "sharpe_hourly": 0.0,
+            "trades": 0.0
+          }
+        },
+        "best_sharpe_hourly": 0.0,
+        "best_cum_ret": 0.0,
+        "parity": null
+      }
+    },
+    {
+      "kind": "thresholds",
+      "thresholds": "0.50,0.52,0.54",
+      "allowed_hours": "13,14",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 1,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 2,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 3,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 4,
+              "thr": 0.5,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            }
+          ],
+          "top_pct_result": {
+            "fold": 0.0,
+            "thr": 0.5,
+            "cum_ret": 0.0,
+            "sharpe_hourly": 0.0,
+            "trades": 0.0
+          }
+        },
+        "best_sharpe_hourly": 0.0,
+        "best_cum_ret": 0.0,
+        "parity": null
+      }
+    },
+    {
+      "kind": "thresholds",
+      "thresholds": "0.55,0.60,0.65",
+      "allowed_hours": "13,14,15",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 1,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 2,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 3,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 4,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            }
+          ],
+          "top_pct_result": {
+            "fold": 0.0,
+            "thr": 0.55,
+            "cum_ret": 0.0,
+            "sharpe_hourly": 0.0,
+            "trades": 0.0
+          }
+        },
+        "best_sharpe_hourly": 0.0,
+        "best_cum_ret": 0.0,
+        "parity": null
+      }
+    },
+    {
+      "kind": "thresholds",
+      "thresholds": "0.55,0.60,0.65",
+      "allowed_hours": "13,14",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 1,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 2,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 3,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            },
+            {
+              "fold": 4,
+              "thr": 0.55,
+              "cum_ret": 0.0,
+              "sharpe_hourly": 0.0,
+              "trades": 0
+            }
+          ],
+          "top_pct_result": {
+            "fold": 0.0,
+            "thr": 0.55,
+            "cum_ret": 0.0,
+            "sharpe_hourly": 0.0,
+            "trades": 0.0
+          }
+        },
+        "best_sharpe_hourly": 0.0,
+        "best_cum_ret": 0.0,
+        "parity": null
+      }
+    },
+    {
+      "kind": "top_pct",
+      "top_pct": 0.1,
+      "allowed_hours": "13,14,15",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3015113434867454,
+              "trades": 1
+            },
+            {
+              "fold": 1,
+              "thr": null,
+              "cum_ret": -1.0001,
+              "sharpe_hourly": -0.3015113434869636,
+              "trades": 1
+            },
+            {
+              "fold": 2,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            },
+            {
+              "fold": 3,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            },
+            {
+              "fold": 4,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            }
+          ],
+          "top_pct_result": {
+            "fold": 2,
+            "thr": null,
+            "cum_ret": 0.9999,
+            "sharpe_hourly": 0.3162277649167279,
+            "trades": 1
+          }
+        },
+        "best_sharpe_hourly": 0.3162277649167279,
+        "best_cum_ret": 0.9999,
+        "parity": null
+      }
+    },
+    {
+      "kind": "top_pct",
+      "top_pct": 0.1,
+      "allowed_hours": "13,14",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3779644718662557,
+              "trades": 1
+            },
+            {
+              "fold": 1,
+              "thr": null,
+              "cum_ret": -1.0001,
+              "sharpe_hourly": -0.37796447186648435,
+              "trades": 1
+            },
+            {
+              "fold": 2,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3779644718662557,
+              "trades": 1
+            },
+            {
+              "fold": 3,
+              "thr": null,
+              "cum_ret": -0.0001,
+              "sharpe_hourly": -0.4082366241305896,
+              "trades": 1
+            },
+            {
+              "fold": 4,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.4082482892970796,
+              "trades": 1
+            }
+          ],
+          "top_pct_result": {
+            "fold": 4,
+            "thr": null,
+            "cum_ret": 0.9999,
+            "sharpe_hourly": 0.4082482892970796,
+            "trades": 1
+          }
+        },
+        "best_sharpe_hourly": 0.4082482892970796,
+        "best_cum_ret": 0.9999,
+        "parity": null
+      }
+    },
+    {
+      "kind": "top_pct",
+      "top_pct": 0.15,
+      "allowed_hours": "13,14,15",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3015113434867454,
+              "trades": 1
+            },
+            {
+              "fold": 1,
+              "thr": null,
+              "cum_ret": -1.0001,
+              "sharpe_hourly": -0.3015113434869636,
+              "trades": 1
+            },
+            {
+              "fold": 2,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            },
+            {
+              "fold": 3,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            },
+            {
+              "fold": 4,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3162277649167279,
+              "trades": 1
+            }
+          ],
+          "top_pct_result": {
+            "fold": 2,
+            "thr": null,
+            "cum_ret": 0.9999,
+            "sharpe_hourly": 0.3162277649167279,
+            "trades": 1
+          }
+        },
+        "best_sharpe_hourly": 0.3162277649167279,
+        "best_cum_ret": 0.9999,
+        "parity": null
+      }
+    },
+    {
+      "kind": "top_pct",
+      "top_pct": 0.15,
+      "allowed_hours": "13,14",
+      "res": {
+        "ok": true,
+        "result": {
+          "threshold_results": [
+            {
+              "fold": 0,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3779644718662557,
+              "trades": 1
+            },
+            {
+              "fold": 1,
+              "thr": null,
+              "cum_ret": -1.0001,
+              "sharpe_hourly": -0.37796447186648435,
+              "trades": 1
+            },
+            {
+              "fold": 2,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.3779644718662557,
+              "trades": 1
+            },
+            {
+              "fold": 3,
+              "thr": null,
+              "cum_ret": -0.0001,
+              "sharpe_hourly": -0.4082366241305896,
+              "trades": 1
+            },
+            {
+              "fold": 4,
+              "thr": null,
+              "cum_ret": 0.9999,
+              "sharpe_hourly": 0.4082482892970796,
+              "trades": 1
+            }
+          ],
+          "top_pct_result": {
+            "fold": 4,
+            "thr": null,
+            "cum_ret": 0.9999,
+            "sharpe_hourly": 0.4082482892970796,
+            "trades": 1
+          }
+        },
+        "best_sharpe_hourly": 0.4082482892970796,
+        "best_cum_ret": 0.9999,
+        "parity": null
+      }
+    }
+  ]
+}

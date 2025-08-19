@@ -1,0 +1,19 @@
+model_id: aapl_stock_hourly
+ticker: AAPL
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  - rsi__period=14
+  - bollinger_bands__window=20__num_std=2.0
+  - macd__fast=12__slow=26__signal=9
+label:
+  type: next_bar_updown
+  horizon: 1
+train_window:
+  start: "2023-01-01"
+  end: "2024-12-31"
+

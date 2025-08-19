@@ -1,0 +1,21 @@
+name: momo_eq_default
+version: 1
+description: MomentumEdge equities default indicators
+indicators:
+  - name: ret
+    window: 1
+    column: close
+  - name: ret
+    window: 3
+    column: close
+  - name: rsi
+    period: 14
+    column: close
+  - name: ema_slope
+    window: 20
+    period: 1
+    column: close
+  - name: adx
+    period: 14
+  - name: momentum_score_total
+

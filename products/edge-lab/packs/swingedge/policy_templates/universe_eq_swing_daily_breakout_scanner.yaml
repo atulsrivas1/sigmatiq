@@ -1,0 +1,17 @@
+name: swingedge_default_v1
+version: 1
+policy:
+  risk:
+    max_drawdown: 0.10
+    max_exposure: 100000
+  execution:
+    slippage_bps: 1.0
+    size_by_conf: false
+    conf_cap: 1.0
+    momentum_gate: false
+    momentum_min: 0.0
+    momentum_column: score_total
+  alerting:
+    cooldown_minutes: 5
+    max_trades_per_day: 10
+

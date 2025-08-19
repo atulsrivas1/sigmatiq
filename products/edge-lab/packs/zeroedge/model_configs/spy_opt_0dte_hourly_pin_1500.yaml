@@ -1,0 +1,20 @@
+model_id: spy_opt_0dte_hourly_pin_1500
+ticker: SPY
+asset_type: opt
+horizon: 0dte
+cadence: hourly
+indicator_set: zeroedge_pin_drift_v2
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+labels:
+  kind: pin_drift
+  params:
+    drift_start_time: "15:00"
+    min_pull_atr: 0.2

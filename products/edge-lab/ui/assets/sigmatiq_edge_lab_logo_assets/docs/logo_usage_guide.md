@@ -1,0 +1,1 @@
+Placeholder for docs/logo_usage_guide.md

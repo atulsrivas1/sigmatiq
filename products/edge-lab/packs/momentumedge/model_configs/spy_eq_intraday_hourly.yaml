@@ -1,0 +1,18 @@
+model_id: spy_eq_intraday_hourly
+ticker: SPY
+asset_type: eq
+horizon: intraday
+cadence: hourly
+indicator_set: momo_eq_default
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+    hour_of_day: true
+labels:
+  kind: next_bar_updown

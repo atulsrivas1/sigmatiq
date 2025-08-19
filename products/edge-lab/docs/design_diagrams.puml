@@ -1,0 +1,78 @@
+@startuml
+skinparam componentStyle rectangle
+
+actor User
+boundary "External Data Providers" as EDP
+database "PostgreSQL DB" as DB
+cloud "Object Storage (S3/MinIO)" as OS
+
+package "Sigmatiq Edge Platform" {
+  [Edge UI] as UI
+  [Edge API] as API
+  [Edge Workers] as Workers
+  [Edge Core] as Core
+}
+
+User --> UI : Interacts with
+UI --> API : API Calls (HTTP/S)
+
+API --> Core : Uses Core Modules
+Workers --> Core : Uses Core Modules
+Core --> DB : Stores/Retrieves Metadata
+Core --> OS : Stores/Retrieves Artifacts
+
+EDP --> Core : Market Data Feeds
+
+API --> DB : Stores/Retrieves Metadata
+API --> OS : Stores/Retrieves Artifacts
+
+Workers --> DB : Stores/Retrieves Metadata
+Workers --> OS : Stores/Retrieves Artifacts
+
+@enduml
+
+@startuml
+skinparam componentStyle rectangle
+
+package "Edge Core" {
+  [Indicators] as Indicators
+  [Features] as Features
+  [Data] as Data
+  [CV] as CV
+  [Models] as Models
+  [Evaluation] as Evaluation
+  [Backtest] as Backtest
+  [Policies] as Policies
+  [Live] as Live
+  [Orchestration] as Orchestration
+  [Registry] as Registry
+  [Storage] as Storage
+  [Common] as Common
+}
+
+Indicators ..> Common : Uses Types
+Features ..> Indicators : Uses Registry
+Features ..> Common : Uses Types
+Data ..> Common : Uses Types
+Data ..> Features : Uses Builder
+CV ..> Common : Uses Types
+Models ..> Common : Uses Types
+Models ..> Features : Uses Select Features
+Evaluation ..> Common : Uses Types
+Backtest ..> Common : Uses Types
+Backtest ..> Models : Uses Models
+Backtest ..> CV : Uses Splits
+Backtest ..> Policies : Uses Policies
+Policies ..> Common : Uses Types
+Live ..> Common : Uses Types
+Live ..> Models : Uses Models
+Live ..> Policies : Uses Policies
+Orchestration ..> Common : Uses Types
+Orchestration ..> Data : Triggers Dataset Builds
+Orchestration ..> Models : Triggers Training
+Orchestration ..> Backtest : Triggers Backtests
+Registry ..> Common : Uses Types
+Registry ..> Storage : Uses DB/Object Store
+Storage ..> Common : Uses Types
+
+@enduml

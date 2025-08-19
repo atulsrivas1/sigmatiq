@@ -1,0 +1,17 @@
+model_id: spy_opt_0dte_hourly_gamma
+ticker: SPY
+asset_type: opt
+horizon: 0dte
+cadence: hourly
+indicator_set: zeroedge_gamma_unwind
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+labels:
+  kind: next_bar_updown

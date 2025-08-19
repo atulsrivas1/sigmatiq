@@ -1,0 +1,18 @@
+model_id: spy_eq_intraday_daily
+ticker: SPY
+asset_type: eq
+horizon: intraday
+cadence: daily
+indicator_set: overnight_eq_default
+model: gbm
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+  time:
+    day_of_week: true
+labels:
+  kind: regression
+  target: fwd_ret_close_to_open

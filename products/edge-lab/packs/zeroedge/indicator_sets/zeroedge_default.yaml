@@ -1,0 +1,46 @@
+name: zeroedge_default
+version: 1
+description: Base indicator set for 0DTE options
+indicators:
+  - name: rsi
+    period: 14
+    column: close
+  - name: ema
+    window: 10
+    column: close
+  - name: ema
+    window: 20
+    column: close
+  - name: macd
+    fast: 12
+    slow: 26
+    signal: 9
+    column: close
+  - name: atr
+    period: 14
+  - name: rolling_std
+    window: 20
+    column: close
+  - name: bollinger_bands
+    window: 20
+    num_std: 2.0
+    column: close
+  - name: obv
+    price_col: close
+    volume_col: volume
+  - name: cmf
+    period: 20
+  - name: intraday_vwap
+  - name: daily_vwap
+  - name: daily_rsi
+    period: 14
+  - name: daily_ema
+    window: 20
+  - name: iv_realized_spread
+    window: 20
+    iv_source: snapshot
+  - name: iv_skew_25d
+  - name: iv_term_slope
+    days_fwd: 30
+  - name: momentum_score_total
+

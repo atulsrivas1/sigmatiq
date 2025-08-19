@@ -1,0 +1,12 @@
+name: swing_eq_rel_strength_scanner
+version: 1
+description: SwingEdge (equities) — Relative strength and leadership momentum
+indicators:
+  - {name: momentum, window: 20}
+  - {name: momentum, window: 63}
+  - {name: ema, window: 20}
+  - {name: ema, window: 50}
+  - {name: rsi, period: 14}
+  - {name: lr_r2, window: 126}
+  - {name: cmf, period: 20}
+

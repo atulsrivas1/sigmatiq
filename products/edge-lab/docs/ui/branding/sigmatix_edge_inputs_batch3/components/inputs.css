@@ -1,0 +1,132 @@
+/* Sigmatiq Edge – Inputs (text, select, textarea, search, toggles, checks, radios) */
+.field { display: grid; gap: 6px; }
+.field.inline { align-items: center; grid-template-columns: 160px 1fr; }
+.field .label { color: var(--color-text-2); }
+.help { font-size: 12px; color: var(--color-text-2); }
+.error { font-size: 12px; color: var(--danger-fg); }
+.success { font-size: 12px; color: var(--success-fg); }
+
+.input-wrap {
+  position: relative;
+  display: grid;
+  align-items: center;
+}
+.input {
+  -webkit-appearance: none; appearance: none;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-1);
+  color: var(--color-text-1);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: var(--fs-16);
+  line-height: 1.4;
+  box-shadow: var(--shadow-1);
+  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.input::placeholder { color: var(--color-text-2); opacity: .75; }
+.input:hover { background: var(--color-surface-2); }
+.input:focus-visible { outline: 0; box-shadow: var(--focus-ring); }
+
+/* Sizes */
+.input-sm { padding: 8px 10px; font-size: var(--fs-14); border-radius: var(--radius-sm); }
+.input-md { padding: 10px 12px; }
+.input-lg { padding: 12px 14px; font-size: var(--fs-18); border-radius: var(--radius-lg); }
+
+/* Icons (leading/trailing) */
+.input-wrap .icon {
+  position: absolute; width: 18px; height: 18px; color: var(--color-text-2);
+}
+.input-wrap .icon.leading { left: 12px; }
+.input-wrap .icon.trailing { right: 12px; }
+.input.has-leading { padding-left: 38px; }
+.input.has-trailing { padding-right: 38px; }
+
+/* Adornments */
+.adornment {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--color-text-2); font-size: 12px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.input.has-adornment { padding-right: 56px; }
+
+/* Textarea */
+.textarea { resize: vertical; min-height: 90px; }
+
+/* Select (custom arrow) */
+.select {
+  -webkit-appearance: none; appearance: none;
+  background-image: none;
+  padding-right: 36px;
+}
+.select-arrow {
+  position: absolute; right: 12px; pointer-events:none; width: 18px; height: 18px; color: var(--color-text-2);
+}
+
+/* Number input - keep native controls for accessibility */
+
+/* Validation states */
+.input[aria-invalid="true"], .input[data-invalid="true"] { border-color: var(--danger-border); box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+.input[aria-invalid="true"]:focus-visible { box-shadow: 0 0 0 3px rgba(239,68,68,0.35); }
+.input.valid { border-color: var(--success-border); box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+
+/* Disabled & read-only */
+.input[disabled], .input[aria-disabled="true"] { opacity: .6; cursor: not-allowed; background: var(--color-surface-2); }
+.input[readonly] { background: var(--color-surface-2); }
+
+/* Switch (toggle) */
+.switch {
+  --track-bg: var(--color-surface-2);
+  --track-border: var(--color-border);
+  --thumb-bg: #fff;
+  position: relative; width: 44px; height: 26px;
+}
+.switch input { position: absolute; inset: 0; opacity: 0; }
+.switch .track {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: var(--track-bg); border:1px solid var(--track-border);
+  box-shadow: var(--shadow-1);
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.switch .thumb {
+  position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: var(--thumb-bg); box-shadow: var(--shadow-1);
+  transition: transform .15s ease;
+}
+.switch input:checked + .track {
+  background: color-mix(in srgb, var(--edge-accent) 16%, transparent);
+  border-color: var(--edge-accent);
+}
+.switch input:checked + .track + .thumb {
+  transform: translateX(18px);
+  background: var(--edge-accent);
+}
+.switch input:focus-visible + .track { outline: 0; box-shadow: var(--focus-ring); }
+.switch input[disabled] + .track, .switch input[disabled] + .track + .thumb { opacity: .55; cursor: not-allowed; }
+
+/* Checkbox / Radio */
+.control { display: inline-flex; align-items: center; gap: 8px; }
+.control input { width: 18px; height: 18px; }
+.checkbox, .radio {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border:1px solid var(--color-border); background: var(--color-surface-1); border-radius: 6px; display: inline-grid; place-content: center;
+  box-shadow: var(--shadow-1);
+}
+.checkbox:focus-visible, .radio:focus-visible { outline: 0; box-shadow: var(--focus-ring); }
+.checkbox:checked { background: var(--edge-accent); border-color: var(--edge-accent); }
+.checkbox:checked::after {
+  content: ""; width: 10px; height: 10px; display: block; mask: url('../icons/check.svg') no-repeat center / contain; background: white;
+}
+.radio { border-radius: 999px; }
+.radio:checked { border-color: var(--edge-accent); }
+.radio:checked::after { content:""; width:10px; height:10px; border-radius:999px; background: var(--edge-accent); display:block; }
+
+/* Layout helpers for preview */
+.grid { display:grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.col-6 { grid-column: span 6; } .col-12 { grid-column: 1 / -1; }
+.panel { background: var(--color-surface-1); border:1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-1); padding: 16px; }
+.row { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; }
+.muted { color: var(--color-text-2); }

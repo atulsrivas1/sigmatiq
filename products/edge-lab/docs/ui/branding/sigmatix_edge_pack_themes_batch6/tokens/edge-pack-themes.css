@@ -1,0 +1,51 @@
+/* Sigmatiq Edge – Pack Themes (accent + gradient tokens per pack) */
+:root {
+  --edge-zero-accent: #3B82F6;      /* Electric Blue */
+  --edge-swing-accent: #F97316;     /* Swing Orange */
+  --edge-long-accent: #22C55E;      /* Long Green */
+  --edge-overnight-accent: #8B5CF6; /* Overnight Violet */
+  --edge-custom-accent: #14B8A6;    /* Custom Teal */
+}
+
+/* Defaults (ZeroEdge) */
+:root, [data-edge="zero"] {
+  --edge-accent: var(--edge-zero-accent);
+  --edge-grad-start: #1D4ED8; /* blue-700 */
+  --edge-grad-end:   #60A5FA; /* blue-400 */
+}
+
+/* SwingEdge */
+[data-edge="swing"] {
+  --edge-accent: var(--edge-swing-accent);
+  --edge-grad-start: #EA580C; /* orange-600 */
+  --edge-grad-end:   #F59E0B; /* amber-500 */
+}
+
+/* LongEdge */
+[data-edge="long"] {
+  --edge-accent: var(--edge-long-accent);
+  --edge-grad-start: #16A34A; /* green-600 */
+  --edge-grad-end:   #22C55E; /* green-500 */
+}
+
+/* OvernightEdge */
+[data-edge="overnight"] {
+  --edge-accent: var(--edge-overnight-accent);
+  --edge-grad-start: #7C3AED; /* violet-600 */
+  --edge-grad-end:   #A78BFA; /* violet-300 */
+}
+
+/* CustomizedEdge (reserved) */
+[data-edge="custom"] {
+  --edge-accent: var(--edge-custom-accent);
+  --edge-grad-start: #0EA5A5; /* teal-600 */
+  --edge-grad-end:   #22D3EE; /* cyan-400 */
+}
+
+/* Derived helpers */
+:root {
+  --edge-grad: linear-gradient(90deg, var(--edge-grad-start), var(--edge-grad-end));
+  --edge-tint-12: color-mix(in srgb, var(--edge-accent) 12%, transparent);
+  --edge-tint-24: color-mix(in srgb, var(--edge-accent) 24%, transparent);
+  --edge-tint-36: color-mix(in srgb, var(--edge-accent) 36%, transparent);
+}

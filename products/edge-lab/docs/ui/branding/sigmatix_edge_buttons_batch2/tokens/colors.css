@@ -1,0 +1,96 @@
+/* Sigmatiq Edge – Color Tokens (Light/Dark via [data-theme]) */
+:root {
+  /* Brand */
+  --brand-primary: #0A2540;
+  --brand-teal: #1ABC9C;
+  --brand-green: #2ECC71;
+  --brand-blue: #2D9CDB;
+  --brand-yellow: #F2C94C;
+  --brand-red: #EB5757;
+
+  /* Edge Pack accents (sub-brand hooks) */
+  --edge-zero-accent: #3B82F6;      /* ZeroEdge */
+  --edge-swing-accent: #F97316;     /* SwingEdge */
+  --edge-long-accent: #22C55E;      /* LongEdge */
+  --edge-overnight-accent: #8B5CF6; /* OvernightEdge (reserved) */
+  --edge-custom-accent: #14B8A6;    /* CustomizedEdge (reserved) */
+
+  /* Light theme (default) */
+  --color-bg: #F8FAFC;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #F1F5F9;
+  --color-border: #E2E8F0;
+
+  --color-text-1: #0A2540;
+  --color-text-2: #475569;
+
+  /* Status */
+  --success-bg: #ECFDF5;
+  --success-fg: #065F46;
+  --success-border: #A7F3D0;
+
+  --info-bg: #EFF6FF;
+  --info-fg: #1E40AF;
+  --info-border: #BFDBFE;
+
+  --warning-bg: #FFFBEB;
+  --warning-fg: #92400E;
+  --warning-border: #FDE68A;
+
+  --danger-bg: #FEF2F2;
+  --danger-fg: #991B1B;
+  --danger-border: #FCA5A5;
+
+  /* Elevation & Focus */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 1px rgba(0,0,0,0.04);
+  --shadow-2: 0 4px 10px rgba(2, 6, 23, 0.08), 0 2px 4px rgba(2, 6, 23, 0.06);
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.5); /* blue-600 */
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+
+  /* Spacing */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+}
+
+/* Dark theme overrides */
+html[data-theme="dark"] {
+  --color-bg: #0B1220;
+  --color-surface-1: #0F172A;
+  --color-surface-2: #111827;
+  --color-border: #1F2937;
+
+  --color-text-1: #E5E7EB;
+  --color-text-2: #94A3B8;
+
+  --success-bg: rgba(16,185,129,0.12);
+  --success-fg: #34D399;
+  --success-border: rgba(16,185,129,0.35);
+
+  --info-bg: rgba(59,130,246,0.12);
+  --info-fg: #60A5FA;
+  --info-border: rgba(59,130,246,0.35);
+
+  --warning-bg: rgba(245,158,11,0.12);
+  --warning-fg: #FBBF24;
+  --warning-border: rgba(245,158,11,0.35);
+
+  --danger-bg: rgba(239,68,68,0.12);
+  --danger-fg: #F87171;
+  --danger-border: rgba(239,68,68,0.35);
+
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.75), 0 1px 1px rgba(0,0,0,0.35);
+  --shadow-2: 0 8px 18px rgba(2,6,23,0.6), 0 3px 6px rgba(0,0,0,0.5);
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.45); /* cyan-400 */
+}
+
+/* Edge pack data hooks */
+[data-edge="zero"]  { --edge-accent: var(--edge-zero-accent); }
+[data-edge="swing"] { --edge-accent: var(--edge-swing-accent); }
+[data-edge="long"]  { --edge-accent: var(--edge-long-accent); }
+[data-edge="overnight"] { --edge-accent: var(--edge-overnight-accent); }
+[data-edge="custom"]    { --edge-accent: var(--edge-custom-accent); }

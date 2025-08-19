@@ -1,0 +1,16 @@
+name: swing_eq_breakout
+version: 1
+description: SwingEdge (equities) — Trend Breakout with Squeeze
+indicators:
+  - {name: rsi, period: 14}
+  - {name: ema, window: 20}
+  - {name: ema, window: 50}
+  - {name: macd, fast: 12, slow: 26, signal: 9}
+  - {name: adx, period: 14}
+  - {name: bollinger_bands, window: 20, num_std: 2.0}
+  - {name: rolling_std, window: 20}
+  - {name: obv, price_col: close, volume_col: volume}
+  - {name: cmf, period: 20}
+  - {name: atr, period: 14}
+  - {name: vix_level}
+

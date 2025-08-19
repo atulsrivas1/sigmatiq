@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="20" y="20" width="220" height="80" rx="8" fill="#F8FAFC" stroke="#E2E8F0" />
+<text x="32" y="48" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">BG</text>
+<text x="32" y="74" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#F8FAFC</text>
+<rect x="260" y="20" width="220" height="80" rx="8" fill="#FFFFFF" stroke="#E2E8F0" />
+<text x="272" y="48" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Surface-1</text>
+<text x="272" y="74" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#FFFFFF</text>
+<rect x="500" y="20" width="220" height="80" rx="8" fill="#F1F5F9" stroke="#E2E8F0" />
+<text x="512" y="48" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Surface-2</text>
+<text x="512" y="74" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#F1F5F9</text>
+<rect x="740" y="20" width="220" height="80" rx="8" fill="#E2E8F0" stroke="#E2E8F0" />
+<text x="752" y="48" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Border</text>
+<text x="752" y="74" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#E2E8F0</text>
+<rect x="20" y="120" width="220" height="80" rx="8" fill="#0A2540" stroke="#E2E8F0" />
+<text x="32" y="148" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Text-1</text>
+<text x="32" y="174" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#0A2540</text>
+<rect x="260" y="120" width="220" height="80" rx="8" fill="#475569" stroke="#E2E8F0" />
+<text x="272" y="148" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Text-2</text>
+<text x="272" y="174" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#475569</text>
+<rect x="500" y="120" width="220" height="80" rx="8" fill="#065F46" stroke="#E2E8F0" />
+<text x="512" y="148" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Success</text>
+<text x="512" y="174" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#065F46</text>
+<rect x="740" y="120" width="220" height="80" rx="8" fill="#1E40AF" stroke="#E2E8F0" />
+<text x="752" y="148" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Info</text>
+<text x="752" y="174" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#1E40AF</text>
+<rect x="20" y="220" width="220" height="80" rx="8" fill="#92400E" stroke="#E2E8F0" />
+<text x="32" y="248" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Warning</text>
+<text x="32" y="274" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#92400E</text>
+<rect x="260" y="220" width="220" height="80" rx="8" fill="#991B1B" stroke="#E2E8F0" />
+<text x="272" y="248" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Danger</text>
+<text x="272" y="274" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#991B1B</text>
+<rect x="500" y="220" width="220" height="80" rx="8" fill="#3B82F6" stroke="#E2E8F0" />
+<text x="512" y="248" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Edge Zero</text>
+<text x="512" y="274" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#3B82F6</text>
+<rect x="740" y="220" width="220" height="80" rx="8" fill="#F97316" stroke="#E2E8F0" />
+<text x="752" y="248" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Edge Swing</text>
+<text x="752" y="274" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#F97316</text>
+<rect x="20" y="320" width="220" height="80" rx="8" fill="#22C55E" stroke="#E2E8F0" />
+<text x="32" y="348" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0A2540">Edge Long</text>
+<text x="32" y="374" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#0A2540">#22C55E</text>
+</svg>
