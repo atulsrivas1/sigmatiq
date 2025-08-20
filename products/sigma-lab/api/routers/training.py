@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, List, Any, Dict
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pathlib import Path as _Path
 import pandas as pd
 import joblib
@@ -10,15 +10,15 @@ from sigma_core.features.builder import select_features as select_features_train
 from xgboost import XGBClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
-from api.services.io import workspace_paths, load_config
-from api.services.policy import ensure_policy_exists
-from api.services.io import resolve_indicator_set_path, PACKS_DIR
+from sigma_core.services.io import workspace_paths, load_config, sanitize_out_path
+from sigma_core.services.policy import ensure_policy_exists
+from sigma_core.services.io import resolve_indicator_set_path, PACKS_DIR
 try:
-    from api.services.lineage import compute_lineage as _compute_lineage
+    from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
 try:
-    from api.services.model_cards import write_model_card
+    from sigma_core.services.model_cards import write_model_card
 except Exception:
     write_model_card = None
 
@@ -63,6 +63,23 @@ class TrainRequest(BaseModel):
     target: Optional[str] = None
     pack_id: Optional[str] = 'zerosigma'
 
+    @validator('allowed_hours', pre=True)
+    def _coerce_hours(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [int(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('allowed_hours must be a list of ints or comma-separated ints')
+        return None
+
+    @validator('calibration', pre=True)
+    def _check_calibration(cls, v):  # type: ignore
+        if v in (None, 'none', 'sigmoid', 'isotonic'):
+            return v
+        raise ValueError("calibration must be one of: none, sigmoid, isotonic")
+
 @router.post('/train')
 def train_ep(payload: TrainRequest):
     model_id = payload.model_id
@@ -79,7 +96,11 @@ def train_ep(payload: TrainRequest):
     if isinstance(allowed_hours, str) and allowed_hours:
         allowed_hours = [int(x) for x in allowed_hours.split(',')]
     calib = payload.calibration or 'sigmoid'
-    out_path = _Path(payload.model_out or (paths['artifacts'] / 'gbm.pkl'))
+    # Sanitize output path to remain within product workspace
+    try:
+        out_path = _Path(sanitize_out_path(payload.model_out, paths['artifacts'] / 'gbm.pkl'))
+    except ValueError as ve:
+        return {'ok': False, 'error': str(ve)}
     cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
     fcfg = cfgm.get('features') or {}
     try:

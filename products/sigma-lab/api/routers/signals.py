@@ -50,7 +50,7 @@ def signals_summary(
 ):
     """Live summary over a period (cost-adjusted metrics). Falls back to CSV if DB not configured."""
     try:
-        from api.services.signals_live import load_signals_csv, compute_live_metrics
+        from sigma_platform.signals_live import load_signals_csv, compute_live_metrics
         from pathlib import Path as _Path
         root = _Path(__file__).resolve().parents[2]
         # Prefer DB if available; fallback to CSV
@@ -105,7 +105,7 @@ def signals_leaderboard(
 ):
     """Aggregate live metrics across models. CSV-based fallback when DB is not configured."""
     try:
-        from api.services.signals_live import leaderboard_from_csv
+        from sigma_core.services.signals_live import leaderboard_from_csv
         from pathlib import Path as _Path
         root = _Path(__file__).resolve().parents[2]
         # If DB is available, compute over models discovered in packs and aggregate in-memory
@@ -168,7 +168,7 @@ def model_performance(model_id: str, risk_profile: Optional[str] = Query(None), 
     Backtest snapshot is best-effort (reads leaderboard DB if configured, else omitted).
     """
     try:
-        from api.services.signals_live import load_signals_csv, compute_live_metrics
+        from sigma_platform.signals_live import load_signals_csv, compute_live_metrics
         from pathlib import Path as _Path
         root = _Path(__file__).resolve().parents[2]
         df = load_signals_csv(root, model_id)

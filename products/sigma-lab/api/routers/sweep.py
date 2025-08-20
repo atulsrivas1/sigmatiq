@@ -5,14 +5,14 @@ from pydantic import BaseModel
 import pandas as pd
 from datetime import datetime
 
-from api.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
-from api.services.policy import load_policy
+from sigma_core.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
+from sigma_core.services.policy import load_policy
 from api.routers.backtest import _parity_bracket_next_session_open
 from sigma_core.backtest.engine import run_backtest
 from sigma_core.registry.backtest_registry import create_backtest_run, create_backtest_folds
 
 try:
-    from api.services.lineage import compute_lineage as _compute_lineage
+    from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
 

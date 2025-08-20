@@ -6,6 +6,7 @@ import time
 import inspect
 
 from sigma_core.indicators.registry import registry as indicator_registry
+from sigma_core.indicators.registry import get_load_errors as _get_indicator_load_errors
 
 router = APIRouter()
 
@@ -51,3 +52,16 @@ def indicators_api(group: bool = Query(False), bypass_cache: bool = Query(False)
     resp = {'ok': True, 'groups': grouped}
     _cache_data['grouped'] = {'ts': now, 'value': resp}
     return resp
+
+
+@router.get('/indicators/status')
+def indicators_status():
+    try:
+        errors = _get_indicator_load_errors()
+    except Exception:
+        errors = []
+    return {
+        'ok': True,
+        'count': len(indicator_registry.indicators),
+        'load_errors': errors,
+    }

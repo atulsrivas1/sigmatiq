@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Query
 
 try:
-    from api.services.audit import fetch_audit as _fetch_audit
+    from sigma_platform.audit import fetch_audit as _fetch_audit
 except Exception:
     _fetch_audit = None
 

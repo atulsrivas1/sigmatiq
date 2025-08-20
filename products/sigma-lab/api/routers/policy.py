@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Query
 
-from api.services.policy import load_policy, validate_policy_file
-from api.services.io import workspace_paths
+from sigma_core.services.policy import load_policy, validate_policy_file
+from sigma_core.services.io import workspace_paths
 
 router = APIRouter()
 
@@ -115,4 +115,3 @@ def policy_explain(model_id: str = Query(...), pack_id: str = Query('zerosigma')
         }
     except Exception as e:
         return {'ok': False, 'error': str(e)}
-

@@ -1,20 +1,20 @@
 from __future__ import annotations
 from typing import Optional, List, Any, Dict
 from fastapi import APIRouter, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from datetime import datetime
 import pandas as pd
 
 from sigma_core.backtest.engine import run_backtest
 from sigma_core.registry.backtest_registry import create_backtest_run, leaderboard as db_leaderboard, create_backtest_folds
-from api.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
-from api.services.policy import load_policy
+from sigma_core.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
+from sigma_core.services.policy import load_policy
 try:
-    from api.services.lineage import compute_lineage as _compute_lineage
+    from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
 try:
-    from api.services.model_cards import write_model_card
+    from sigma_core.services.model_cards import write_model_card
 except Exception:
     write_model_card = None
 
@@ -42,6 +42,41 @@ class BacktestRequest(BaseModel):
     momentum_column: Optional[str] = None
     save: Optional[bool] = True
     tag: Optional[str] = None
+
+    @validator('allowed_hours', pre=True)
+    def _coerce_hours(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [int(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('allowed_hours must be a list of ints or comma-separated ints')
+        return None
+
+    @validator('thresholds', pre=True)
+    def _coerce_thresholds(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [float(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('thresholds must be a list of floats or comma-separated floats')
+        return None
+
+    @validator('per_hour_select_by', pre=True)
+    def _validate_select_by(cls, v):  # type: ignore
+        v = str(v or 'sharpe')
+        if v not in ('sharpe','cum_ret','trades'):
+            raise ValueError("per_hour_select_by must be one of: sharpe, cum_ret, trades")
+        return v
+
+    @validator('calibration', pre=True)
+    def _check_calibration(cls, v):  # type: ignore
+        if v in (None, 'none', 'sigmoid', 'isotonic'):
+            return v
+        raise ValueError("calibration must be one of: none, sigmoid, isotonic")
 
 
 @router.post('/backtest')
@@ -273,13 +308,6 @@ def _parity_bracket_next_session_open(df: pd.DataFrame, br: Dict[str, Any]) -> D
         hits = 0
         pnl_sum = 0.0
         rr_sum = 0.0
-        for i in last_idx:
-            # next session
-            cur_date = d.loc[i, '_date']
-            # find next date key
-            # use the sorted unique dates list
-            # build once
-            pass
         # Build dates once
         dates = sorted(d['_date'].unique())
         date_to_pos = {dt: k for k, dt in enumerate(dates)}

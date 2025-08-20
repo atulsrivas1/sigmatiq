@@ -1,1 +1,1 @@
-from api.services.io import *  # re-export for stable platform import
+from sigma_core.services.io import *  # re-export from core services

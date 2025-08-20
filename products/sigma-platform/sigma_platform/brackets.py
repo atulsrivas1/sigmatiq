@@ -1,1 +1,1 @@
-from api.services.brackets import *  # re-export for stable platform import
+from sigma_core.services.brackets import *
