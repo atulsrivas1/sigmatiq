@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATIQ - Multi-Level Sidebar Navigation Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0A1414;
+            color: #F5F5F7;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #2A3F3F;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #00C4A7;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #8FA5A5;
+            font-size: 1.1em;
+        }
+        
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .option-wrapper {
+            background: #0F1A1A;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #1A2F2F;
+        }
+        
+        .option-label {
+            font-size: 16px;
+            color: #00C4A7;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .option-description {
+            font-size: 12px;
+            color: #6A8080;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-container {
+            height: 650px;
+            background: #050808;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+        }
+        
+        /* Option 1: Accordion Style */
+        .sidebar-option1 {
+            width: 260px;
+            height: 100%;
+            background: #0A1414;
+            border-right: 1px solid #1A2F2F;
+            overflow-y: auto;
+        }
+        
+        .sidebar-option1 .sidebar-logo {
+            padding: 24px;
+            border-bottom: 1px solid #1A2F2F;
+        }
+        
+        .sidebar-option1 .logo-text {
+            font-size: 20px;
+            color: #00C4A7;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .sidebar-option1 .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .sidebar-option1 .nav-item:hover {
+            color: #F5F5F7;
+            background: rgba(0, 196, 167, 0.05);
+        }
+        
+        .sidebar-option1 .nav-item.active {
+            color: #00C4A7;
+            background: rgba(0, 196, 167, 0.1);
+        }
+        
+        .sidebar-option1 .nav-item.has-children::after {
+            content: '▼';
+            position: absolute;
+            right: 24px;
+            font-size: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-option1 .nav-item.has-children.expanded::after {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-option1 .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .sidebar-option1 .submenu.open {
+            max-height: 200px;
+        }
+        
+        .sidebar-option1 .submenu .nav-item {
+            padding-left: 56px;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .sidebar-option1 .submenu .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 36px;
+            top: 50%;
+            width: 12px;
+            height: 1px;
+            background: #2A3F3F;
+        }
+        
+        /* Option 2: Indent with Lines */
+        .sidebar-option2 {
+            width: 280px;
+            height: 100%;
+            background: #0A1414;
+            border-right: 1px solid #1A2F2F;
+            overflow-y: auto;
+        }
+        
+        .sidebar-option2 .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-option2 .nav-item:hover {
+            color: #F5F5F7;
+            background: rgba(0, 196, 167, 0.05);
+        }
+        
+        .sidebar-option2 .nav-item.parent {
+            font-weight: 500;
+        }
+        
+        .sidebar-option2 .nav-item.parent .expand-icon {
+            margin-left: auto;
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+        
+        .sidebar-option2 .nav-item.parent.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+        
+        .sidebar-option2 .submenu {
+            display: none;
+            position: relative;
+            margin-left: 24px;
+            border-left: 1px solid #1A2F2F;
+        }
+        
+        .sidebar-option2 .submenu.open {
+            display: block;
+        }
+        
+        .sidebar-option2 .submenu .nav-item {
+            padding-left: 36px;
+            font-size: 14px;
+        }
+        
+        .sidebar-option2 .submenu .nav-item.active {
+            background: rgba(0, 196, 167, 0.1);
+            color: #00C4A7;
+        }
+        
+        /* Option 3: Flyout Menu */
+        .sidebar-option3 {
+            width: 240px;
+            height: 100%;
+            background: #0A1414;
+            border-right: 1px solid #1A2F2F;
+            position: relative;
+        }
+        
+        .sidebar-option3 .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .sidebar-option3 .nav-item:hover {
+            color: #F5F5F7;
+            background: rgba(0, 196, 167, 0.05);
+        }
+        
+        .sidebar-option3 .nav-item.has-children::after {
+            content: '›';
+            position: absolute;
+            right: 24px;
+            font-size: 16px;
+        }
+        
+        .sidebar-option3 .flyout-menu {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            width: 200px;
+            background: #0F1A1A;
+            border: 1px solid #2A3F3F;
+            border-radius: 8px;
+            padding: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sidebar-option3 .nav-item:hover .flyout-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        .sidebar-option3 .flyout-menu .submenu-item {
+            padding: 10px 16px;
+            border-radius: 6px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-option3 .flyout-menu .submenu-item:hover {
+            background: rgba(0, 196, 167, 0.1);
+            color: #00C4A7;
+        }
+        
+        /* Option 4: Tab Switch */
+        .sidebar-option4 {
+            width: 280px;
+            height: 100%;
+            background: #0A1414;
+            border-right: 1px solid #1A2F2F;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-option4 .nav-tabs {
+            display: flex;
+            background: #0F1A1A;
+            border-bottom: 1px solid #1A2F2F;
+        }
+        
+        .sidebar-option4 .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #6A8080;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .sidebar-option4 .tab:hover {
+            color: #8FA5A5;
+        }
+        
+        .sidebar-option4 .tab.active {
+            color: #00C4A7;
+            border-bottom-color: #00C4A7;
+        }
+        
+        .sidebar-option4 .tab-content {
+            flex: 1;
+            padding: 20px;
+            display: none;
+        }
+        
+        .sidebar-option4 .tab-content.active {
+            display: block;
+        }
+        
+        .sidebar-option4 .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            color: #8FA5A5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-option4 .nav-item:hover {
+            background: rgba(0, 196, 167, 0.05);
+            color: #F5F5F7;
+        }
+        
+        .sidebar-option4 .nav-item.active {
+            background: rgba(0, 196, 167, 0.1);
+            color: #00C4A7;
+        }
+        
+        /* Option 5: Nested Cards */
+        .sidebar-option5 {
+            width: 300px;
+            height: 100%;
+            background: #0A1414;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-option5 .nav-card {
+            background: #0F1A1A;
+            border: 1px solid #1A2F2F;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-option5 .nav-card.expanded {
+            border-color: #00C4A7;
+            box-shadow: 0 4px 12px rgba(0, 196, 167, 0.1);
+        }
+        
+        .sidebar-option5 .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-option5 .card-header:hover {
+            color: #F5F5F7;
+            background: rgba(0, 196, 167, 0.05);
+        }
+        
+        .sidebar-option5 .nav-card.expanded .card-header {
+            color: #00C4A7;
+            background: rgba(0, 196, 167, 0.1);
+            border-bottom: 1px solid #2A3F3F;
+        }
+        
+        .sidebar-option5 .card-header .expand-icon {
+            margin-left: auto;
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-option5 .nav-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-option5 .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .sidebar-option5 .nav-card.expanded .card-content {
+            max-height: 200px;
+        }
+        
+        .sidebar-option5 .submenu-item {
+            padding: 12px 16px 12px 48px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-option5 .submenu-item:hover {
+            background: rgba(0, 196, 167, 0.05);
+            color: #F5F5F7;
+        }
+        
+        .sidebar-option5 .submenu-item.active {
+            color: #00C4A7;
+            background: rgba(0, 196, 167, 0.1);
+        }
+        
+        /* Option 6: Inline Expand */
+        .sidebar-option6 {
+            width: 260px;
+            height: 100%;
+            background: #0A1414;
+            border-right: 1px solid #1A2F2F;
+            overflow-y: auto;
+        }
+        
+        .sidebar-option6 .nav-group {
+            margin: 20px 0;
+        }
+        
+        .sidebar-option6 .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #8FA5A5;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .sidebar-option6 .nav-item:hover {
+            color: #F5F5F7;
+            padding-left: 28px;
+        }
+        
+        .sidebar-option6 .nav-item.has-children {
+            font-weight: 500;
+        }
+        
+        .sidebar-option6 .nav-item.has-children .badge {
+            margin-left: auto;
+            background: #1A2F2F;
+            color: #6A8080;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-option6 .nav-item.has-children.expanded .badge {
+            background: #00C4A7;
+            color: #0A1414;
+        }
+        
+        .sidebar-option6 .inline-submenu {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s ease;
+        }
+        
+        .sidebar-option6 .inline-submenu.open {
+            max-height: 150px;
+        }
+        
+        .sidebar-option6 .inline-submenu .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px 10px 48px;
+            color: #6A8080;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .sidebar-option6 .inline-submenu .sub-item:hover {
+            color: #8FA5A5;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .sidebar-option6 .inline-submenu .sub-item.active {
+            color: #00C4A7;
+            position: relative;
+        }
+        
+        .sidebar-option6 .inline-submenu .sub-item.active::before {
+            content: '';
+            position: absolute;
+            left: 36px;
+            width: 4px;
+            height: 4px;
+            background: #00C4A7;
+            border-radius: 50%;
+        }
+        
+        /* Icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+            background: currentColor;
+            opacity: 0.8;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        
+        .icon-small {
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        /* Content Area */
+        .content-preview {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6A8080;
+            font-size: 14px;
+        }
+        
+        /* Interactive Demo Note */
+        .demo-note {
+            background: rgba(0, 196, 167, 0.1);
+            border: 1px solid #00C4A7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #00C4A7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Multi-Level Sidebar Navigation</h1>
+            <p class="subtitle">Different approaches for handling sub-menus in SIGMATIQ</p>
+        </div>
+        
+        <!-- Multi-level Options -->
+        <div class="options-grid">
+            <!-- Option 1: Accordion -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 1: Accordion Collapse</div>
+                <div class="option-description">Sub-items slide down within the sidebar. Clean and space-efficient.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option1">
+                        <div class="sidebar-logo">
+                            <div class="logo-text">SIGMATIQ</div>
+                        </div>
+                        <div style="padding: 20px 0;">
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                            <div class="nav-item has-children expanded">
+                                <div class="icon"></div>
+                                <span>Models Pack</span>
+                            </div>
+                            <div class="submenu open">
+                                <div class="nav-item active">
+                                    <span>Overview</span>
+                                </div>
+                                <div class="nav-item">
+                                    <span>Templates</span>
+                                </div>
+                                <div class="nav-item">
+                                    <span>Recent</span>
+                                </div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Scanner</span>
+                            </div>
+                            <div class="nav-item has-children">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                            </div>
+                            <div class="submenu">
+                                <div class="nav-item">
+                                    <span>Performance</span>
+                                </div>
+                                <div class="nav-item">
+                                    <span>Risk Analysis</span>
+                                </div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Settings</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: 2-3 items with sub-menus, clear hierarchy</div>
+            </div>
+            
+            <!-- Option 2: Indent with Lines -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 2: Tree Structure</div>
+                <div class="option-description">Visual hierarchy with connecting lines. Developer-friendly.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option2">
+                        <div class="sidebar-logo" style="padding: 24px; border-bottom: 1px solid #1A2F2F;">
+                            <div class="logo-text" style="font-size: 20px; color: #00C4A7; letter-spacing: 2px;">SIGMATIQ</div>
+                        </div>
+                        <div style="padding: 20px 0;">
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                            <div class="nav-item parent expanded">
+                                <div class="icon"></div>
+                                <span>Models Pack</span>
+                                <span class="expand-icon">›</span>
+                            </div>
+                            <div class="submenu open">
+                                <div class="nav-item active">
+                                    <span>Overview</span>
+                                </div>
+                                <div class="nav-item">
+                                    <span>Templates</span>
+                                </div>
+                                <div class="nav-item">
+                                    <span>Recent</span>
+                                </div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Scanner</span>
+                            </div>
+                            <div class="nav-item parent">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                                <span class="expand-icon">›</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: Complex hierarchies, file-system like navigation</div>
+            </div>
+            
+            <!-- Option 3: Flyout -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 3: Flyout Menus</div>
+                <div class="option-description">Sub-menus appear on hover. Keeps sidebar compact.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option3">
+                        <div class="sidebar-logo" style="padding: 24px; border-bottom: 1px solid #1A2F2F;">
+                            <div class="logo-text" style="font-size: 20px; color: #00C4A7; letter-spacing: 2px;">SIGMATIQ</div>
+                        </div>
+                        <div style="padding: 20px 0;">
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                            <div class="nav-item has-children" style="position: relative;">
+                                <div class="icon"></div>
+                                <span>Models Pack</span>
+                                <div class="flyout-menu" style="top: 0;">
+                                    <div class="submenu-item">Overview</div>
+                                    <div class="submenu-item">Templates</div>
+                                    <div class="submenu-item">Recent</div>
+                                </div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Scanner</span>
+                            </div>
+                            <div class="nav-item has-children" style="position: relative;">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                                <div class="flyout-menu" style="top: 0;">
+                                    <div class="submenu-item">Performance</div>
+                                    <div class="submenu-item">Risk Analysis</div>
+                                    <div class="submenu-item">Reports</div>
+                                </div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Settings</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: Many sub-items, power users, desktop-only</div>
+            </div>
+            
+            <!-- Option 4: Tab Switch -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 4: Tab Categories</div>
+                <div class="option-description">Top-level categories as tabs. Complete context switch.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option4">
+                        <div class="sidebar-logo" style="padding: 24px; border-bottom: 1px solid #1A2F2F;">
+                            <div class="logo-text" style="font-size: 20px; color: #00C4A7; letter-spacing: 2px;">SIGMATIQ</div>
+                        </div>
+                        <div class="nav-tabs">
+                            <div class="tab active">Main</div>
+                            <div class="tab">Models</div>
+                            <div class="tab">Tools</div>
+                        </div>
+                        <div class="tab-content active">
+                            <div class="nav-item active">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Overview</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Templates</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Recent</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: Distinct app sections, role-based navigation</div>
+            </div>
+            
+            <!-- Option 5: Nested Cards -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 5: Nested Cards</div>
+                <div class="option-description">Each parent is a card that expands. Visual and modern.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option5">
+                        <div class="nav-card">
+                            <div class="card-header">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                        </div>
+                        
+                        <div class="nav-card expanded">
+                            <div class="card-header">
+                                <div class="icon"></div>
+                                <span>Models Pack</span>
+                                <span class="expand-icon">▼</span>
+                            </div>
+                            <div class="card-content" style="max-height: 200px;">
+                                <div class="submenu-item active">Overview</div>
+                                <div class="submenu-item">Templates</div>
+                                <div class="submenu-item">Recent</div>
+                            </div>
+                        </div>
+                        
+                        <div class="nav-card">
+                            <div class="card-header">
+                                <div class="icon"></div>
+                                <span>Scanner</span>
+                            </div>
+                        </div>
+                        
+                        <div class="nav-card">
+                            <div class="card-header">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                                <span class="expand-icon">▼</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="submenu-item">Performance</div>
+                                <div class="submenu-item">Risk Analysis</div>
+                            </div>
+                        </div>
+                        
+                        <div class="nav-card">
+                            <div class="card-header">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: Visual distinction, touch-friendly, modern UI</div>
+            </div>
+            
+            <!-- Option 6: Inline Expand -->
+            <div class="option-wrapper">
+                <div class="option-label">Option 6: Inline Pills</div>
+                <div class="option-description">Sub-items appear inline with subtle indicators.</div>
+                <div class="sidebar-container">
+                    <div class="sidebar-option6">
+                        <div class="sidebar-logo" style="padding: 24px; border-bottom: 1px solid #1A2F2F;">
+                            <div class="logo-text" style="font-size: 20px; color: #00C4A7; letter-spacing: 2px;">SIGMATIQ</div>
+                        </div>
+                        <div class="nav-group">
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Dashboard</span>
+                            </div>
+                            
+                            <div class="nav-item has-children expanded">
+                                <div class="icon"></div>
+                                <span>Models Pack</span>
+                                <span class="badge">3</span>
+                            </div>
+                            <div class="inline-submenu open">
+                                <div class="sub-item active">
+                                    <div class="icon-small"></div>
+                                    <span>Overview</span>
+                                </div>
+                                <div class="sub-item">
+                                    <div class="icon-small"></div>
+                                    <span>Templates</span>
+                                </div>
+                                <div class="sub-item">
+                                    <div class="icon-small"></div>
+                                    <span>Recent</span>
+                                </div>
+                            </div>
+                            
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Scanner</span>
+                            </div>
+                            
+                            <div class="nav-item has-children">
+                                <div class="icon"></div>
+                                <span>Analytics</span>
+                                <span class="badge">2</span>
+                            </div>
+                            
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Portfolio</span>
+                            </div>
+                            
+                            <div class="nav-item">
+                                <div class="icon"></div>
+                                <span>Settings</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-preview">Main Content Area</div>
+                </div>
+                <div class="demo-note">✓ Best for: Minimal design, count indicators, subtle hierarchy</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

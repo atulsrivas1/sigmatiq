@@ -1,0 +1,227 @@
+{
+  "menu": [
+    {
+      "title": "Dashboard",
+      "route": "#/dashboard",
+      "hover": "At-a-glance status, quick actions, and system health.",
+      "api": [
+        "GET /models?pack_id=",
+        "GET /leaderboard?limit=10",
+        "GET /healthz"
+      ]
+    },
+    {
+      "title": "Packs",
+      "route": "#/packs",
+      "hover": "Explore packs; view presets, indicator sets, and docs; start create in pack context.",
+      "api": [
+        "GET /packs"
+      ],
+      "children": [
+        {
+          "title": "Overview",
+          "route": "#/packs",
+          "hover": "Pack description, presets, indicator sets, and docs.",
+          "api": [
+            "GET /packs",
+            "GET /packs/{pack_id}"
+          ]
+        },
+        {
+          "title": "Templates (Gallery)",
+          "route": "#/packs/:id/templates",
+          "hover": "Browse pack-filtered templates; use one to prefill Create.",
+          "api": [
+            "GET /packs/{pack_id}/templates"
+          ]
+        },
+        {
+          "title": "Recent Models",
+          "route": "#/packs/:id",
+          "hover": "Open Composer or Designer for models in this pack.",
+          "api": [
+            "GET /packs/{pack_id}"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Models",
+      "route": "#/models",
+      "hover": "Browse, create, edit, and run models.",
+      "api": [
+        "GET /models?pack_id="
+      ],
+      "children": [
+        {
+          "title": "List",
+          "route": "#/models",
+          "hover": "Search and filter all models; open details.",
+          "api": [
+            "GET /models?pack_id="
+          ]
+        },
+        {
+          "title": "Templates (Gallery)",
+          "route": "#/models/templates",
+          "hover": "Browse templates; filter by pack/horizon; use one to prefill Create.",
+          "optional": true,
+          "api": [
+            "GET /model_templates?pack=",
+            "GET /packs/{pack_id}/templates"
+          ]
+        },
+        {
+          "title": "Create Model",
+          "route": "#/models/new",
+          "hover": "Pick a template, name it, choose risk.",
+          "api": [
+            "GET /model_templates?pack=",
+            "POST /models"
+          ]
+        },
+        {
+          "title": "Designer",
+          "route": "#/models/:id/designer",
+          "hover": "Edit indicator set, policy, and metadata; save prompts rebuild.",
+          "api": [
+            "GET /indicator_sets?pack_id=",
+            "GET /validate_policy?model_id=&pack_id=",
+            "PATCH /models/{id}"
+          ]
+        },
+        {
+          "title": "Composer",
+          "route": "#/models/:id/composer",
+          "hover": "Build → Sweeps → Leaderboard → Train for this model.",
+          "api": [],
+          "children": [
+            {
+              "title": "Build",
+              "route": "#/models/:id/composer/build",
+              "hover": "Construct the training matrix; inspect Matrix Profile; copy matrix_sha.",
+              "api": [
+                "POST /build_matrix",
+                "GET /preview_matrix"
+              ]
+            },
+            {
+              "title": "Sweeps",
+              "route": "#/models/:id/composer/sweeps",
+              "hover": "Run backtests across thresholds/hours; apply Risk Profile; Gate results.",
+              "api": [
+                "POST /sweeps/run",
+                "GET /sweeps/{id}/status",
+                "GET /sweeps/{id}/results?limit=&offset=",
+                "POST /backtest_sweep"
+              ]
+            },
+        {
+          "title": "Leaderboard",
+          "route": "#/models/:id/composer/leaderboard",
+          "hover": "Compare and filter backtest results; select configs to train.",
+          "api": [
+            "GET /leaderboard?model_id=&pack_id=&risk_profile=&limit=&offset="
+          ]
+        },
+        {
+          "title": "Backtest",
+          "route": "#/models/:id/composer/backtest",
+          "hover": "Re-run a chosen Sweeps configuration (single backtest).",
+          "api": [
+            "POST /backtest"
+          ]
+        },
+        {
+          "title": "Train",
+          "route": "#/models/:id/composer/train",
+          "hover": "Queue only gate-passing selections; monitor progress and lineage.",
+          "api": [
+                "POST /train/batch",
+                "GET /train/jobs?model_id=&risk_profile=&status=&limit=&offset="
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Signals",
+      "route": "#/signals",
+      "hover": "Monitor live signals; compare models by live performance.",
+      "api": [
+        "GET /signals",
+        "GET /signals/leaderboard?pack=&risk_profile=&start=&end=&limit=&offset=",
+        "GET /signals/summary?model_id=&risk_profile=&start=&end"
+      ],
+      "children": [
+        {
+          "title": "Leaderboard",
+          "route": "#/signals?tab=leaderboard",
+          "hover": "Live period metrics (Sharpe, return, win, trades, fill, slip, capacity).",
+          "api": [
+            "GET /signals/leaderboard?pack=&risk_profile=&start=&end=&limit=&offset="
+          ]
+        },
+        {
+          "title": "Log",
+          "route": "#/signals?tab=log",
+          "hover": "Filterable entries/fills with slippage, status, and PnL; export CSV.",
+          "api": [
+            "GET /signals?model_id=&start=&end=&status=&limit=&offset="
+          ]
+        },
+        {
+          "title": "Analytics",
+          "route": "#/signals?tab=analytics",
+          "hover": "Equity/drawdown, calendar/hour heatmaps; parity/capacity charts.",
+          "api": [
+            "GET /signals/summary?model_id=&risk_profile=&start=&end"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Options Overlay",
+      "route": "#/overlay",
+      "hover": "Convert stock signals to options (single/vertical) with parity checks.",
+      "api": [
+        "POST /options_overlay"
+      ]
+    },
+    {
+      "title": "Health",
+      "route": "#/health",
+      "hover": "API/DB/data coverage status and troubleshooting.",
+      "api": [
+        "GET /healthz"
+      ]
+    },
+    {
+      "title": "Docs",
+      "route": "#/docs",
+      "hover": "Open runbooks, specs, and reference documentation.",
+      "api": []
+    },
+    {
+      "title": "Admin",
+      "route": "#/admin",
+      "hover": "Admin-only controls for jobs, quotas, risk profiles, packs, templates, flags, and users.",
+      "adminOnly": true,
+      "api": [
+        "GET /admin/* (RBAC: ADMIN_TOKEN)"
+      ],
+      "children": [
+        { "title": "Jobs", "route": "#/admin/jobs", "hover": "Monitor/cancel/retry sweeps and training.", "api": ["GET /admin/jobs", "POST /admin/jobs/{id}/retry", "POST /admin/jobs/{id}/cancel"] },
+        { "title": "Quotas & Limits", "route": "#/admin/quotas", "hover": "View/edit per-user quotas for sweeps and training.", "api": ["GET /admin/quotas?user=", "PATCH /admin/quotas", "GET /admin/quotas/usage?user="] },
+        { "title": "Risk Profiles", "route": "#/admin/risk-profiles", "hover": "Manage global Conservative/Balanced/Aggressive presets per pack.", "api": ["GET /admin/risk-profiles", "PATCH /admin/risk-profiles"] },
+        { "title": "Packs Manager", "route": "#/admin/packs", "hover": "Manage packs metadata and indicator sets registry.", "api": ["GET /admin/packs", "GET /admin/indicator_sets?pack="] },
+        { "title": "Templates Manager", "route": "#/admin/templates", "hover": "CRUD model templates; validate and publish versions.", "api": ["GET /admin/templates", "POST /admin/templates", "PATCH /admin/templates/{id}", "POST /admin/templates/{id}/publish"] },
+        { "title": "Feature Flags", "route": "#/admin/flags", "hover": "Toggle non-critical features (e.g., Assistant execute-on).", "api": ["GET /admin/flags", "PATCH /admin/flags"] },
+        { "title": "Data Health", "route": "#/admin/health", "hover": "DB/migrations, cache policy, workers; quick diagnostics.", "api": ["GET /admin/health"] },
+        { "title": "Audit & Logs", "route": "#/admin/audit", "hover": "Recent admin actions; export tail; link to full logs.", "api": ["GET /admin/audit?user=&action=&limit=&offset="] },
+        { "title": "Users & Roles", "route": "#/admin/users", "hover": "Assign roles; rotate API tokens.", "api": ["GET /admin/users", "PATCH /admin/users/{id}", "POST /admin/users/{id}/rotate_token"] }
+      ]
+    }
+  ]
+}

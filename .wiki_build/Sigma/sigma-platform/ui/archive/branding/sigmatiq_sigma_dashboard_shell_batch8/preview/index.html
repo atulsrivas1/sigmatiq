@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-sigma="zero">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sigmatiq Sigma — Dashboard Shell (Batch 8)</title>
+  <link rel="stylesheet" href="../tokens/colors.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/sigma-pack-themes.css">
+  <link rel="stylesheet" href="../components/shell.css">
+  <link rel="stylesheet" href="../components/table.css">
+</head>
+<body class="font-body">
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="app">
+    <header class="topbar" role="banner">
+      <div class="brand">
+        <img src="../icons/logo.svg" alt="" width="26" height="26">
+        <span class="title">Sigmatiq Sigma</span>
+      </div>
+      <div class="top-actions">
+        <button id="menuToggle" class="btn" aria-expanded="false" aria-controls="sidebar">Menu</button>
+        <button id="themeToggle" class="btn" aria-pressed="false">Toggle Theme</button>
+        <select id="packSel" class="btn" aria-label="Select pack">
+          <option value="zero">ZeroSigma</option>
+          <option value="swing">SwingSigma</option>
+          <option value="long">LongSigma</option>
+          <option value="overnight">OvernightSigma</option>
+          <option value="custom">CustomizedSigma</option>
+        </select>
+      </div>
+    </header>
+
+    <aside id="sidebar" class="sidebar" role="navigation" aria-label="Primary">
+      <div class="small">Navigation</div>
+      <ul class="nav">
+        <li><a href="#overview" data-key="overview" aria-current="page"><img class="icon" src="../icons/home.svg" width="16" height="16" alt="">Overview</a></li>
+        <li><a href="#packs" data-key="packs"><img class="icon" src="../icons/package.svg" width="16" height="16" alt="">Sigma Packs</a></li>
+        <li><a href="#models" data-key="models"><img class="icon" src="../icons/cpu.svg" width="16" height="16" alt="">Models</a></li>
+        <li><a href="#backtests" data-key="backtests"><img class="icon" src="../icons/chart.svg" width="16" height="16" alt="">Backtests</a></li>
+        <li><a href="#policies" data-key="policies"><img class="icon" src="../icons/shield.svg" width="16" height="16" alt="">Policies</a></li>
+        <li><a href="#alerts" data-key="alerts"><img class="icon" src="../icons/bell.svg" width="16" height="16" alt="">Alerts</a></li>
+        <li class="section">Settings</li>
+        <li><a href="#governance" data-key="governance"><img class="icon" src="../icons/eye.svg" width="16" height="16" alt="">Observability</a></li>
+        <li><a href="#settings" data-key="settings"><img class="icon" src="../icons/settings.svg" width="16" height="16" alt="">Settings</a></li>
+      </ul>
+    </aside>
+
+    <main id="main" class="main" role="main">
+      <div class="container">
+        <section class="grid" aria-labelledby="kpis">
+          <h2 id="kpis" class="col-12 h4">Key Stats</h2>
+          <div class="col-3 kpi">
+            <div class="label">Active Models</div>
+            <div class="value">14</div>
+          </div>
+          <div class="col-3 kpi">
+            <div class="label">Signals (24h)</div>
+            <div class="value">128</div>
+          </div>
+          <div class="col-3 kpi">
+            <div class="label">Win Rate (7d)</div>
+            <div class="value">56%</div>
+          </div>
+          <div class="col-3 kpi">
+            <div class="label">Latency p95</div>
+            <div class="value">220ms</div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:16px;" aria-labelledby="runs">
+          <div class="small">Recent Runs</div>
+          <h2 id="runs" class="h4" style="margin:6px 0 10px;">Backtests & Live</h2>
+          <div class="table-wrap">
+            <table id="runsTable" class="table" aria-describedby="runs">
+              <thead>
+                <tr>
+                  <th class="sort" data-key="pack">Pack</th>
+                  <th class="sort" data-key="model">Model</th>
+                  <th>Status</th>
+                  <th class="sort" data-key="sharpe" data-type="num">Sharpe</th>
+                  <th class="sort" data-key="mdd" data-type="num">Max DD</th>
+                  <th class="sort" data-key="updated">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-col="pack"><span class="badge" data-value="ZeroSigma">ZeroSigma</span></td>
+                  <td data-col="model">ZE-Alpha</td>
+                  <td data-col="status"><span class="badge">Live</span></td>
+                  <td data-col="sharpe" class="num" data-value="1.45">1.45</td>
+                  <td data-col="mdd" class="num" data-value="-0.12">-0.12</td>
+                  <td data-col="updated" data-value="2025-08-10">2025-08-10</td>
+                </tr>
+                <tr>
+                  <td data-col="pack"><span class="badge" data-value="SwingSigma">SwingSigma</span></td>
+                  <td data-col="model">SW-Reversal</td>
+                  <td data-col="status"><span class="badge">Backtest</span></td>
+                  <td data-col="sharpe" class="num" data-value="1.12">1.12</td>
+                  <td data-col="mdd" class="num" data-value="-0.18">-0.18</td>
+                  <td data-col="updated" data-value="2025-08-08">2025-08-08</td>
+                </tr>
+                <tr>
+                  <td data-col="pack"><span class="badge" data-value="LongSigma">LongSigma</span></td>
+                  <td data-col="model">LN-Factor</td>
+                  <td data-col="status"><span class="badge">Backtest</span></td>
+                  <td data-col="sharpe" class="num" data-value="1.77">1.77</td>
+                  <td data-col="mdd" class="num" data-value="-0.09">-0.09</td>
+                  <td data-col="updated" data-value="2025-08-01">2025-08-01</td>
+                </tr>
+                <tr>
+                  <td data-col="pack"><span class="badge" data-value="OvernightSigma">OvernightSigma</span></td>
+                  <td data-col="model">ON-Gap</td>
+                  <td data-col="status"><span class="badge">Live</span></td>
+                  <td data-col="sharpe" class="num" data-value="0.98">0.98</td>
+                  <td data-col="mdd" class="num" data-value="-0.14">-0.14</td>
+                  <td data-col="updated" data-value="2025-08-12">2025-08-12</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <button class="btn-secondary">Prev</button>
+            <button class="btn-accent">Next</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="../components/shell.js"></script>
+</body>
+</html>

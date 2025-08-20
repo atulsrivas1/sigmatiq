@@ -1,0 +1,62 @@
+/* Sigmatiq Sigma – Pack Explorer */
+:root {
+  --radius-sm: 8px; --radius-md: 10px; --radius-lg: 12px;
+}
+body { margin:0; background: var(--color-bg); color: var(--color-text-1); font-family: var(--font-body); }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.header, .toolbar { display:flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+
+/* Inputs (local minimal) */
+.input {
+  -webkit-appearance:none; appearance:none;
+  border:1px solid var(--color-border);
+  background: var(--color-surface-1);
+  color: var(--color-text-1);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-1);
+  font-size: var(--fs-16);
+}
+.input:focus-visible { outline:0; box-shadow: var(--focus-ring); }
+.input.select { padding-right: 34px; background-image: none; }
+
+/* Buttons (local minimal) */
+.btn { appearance:none; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-1); padding:10px 14px; border-radius: var(--radius-md); font-weight:600; cursor:pointer; box-shadow: var(--shadow-1); text-decoration:none; }
+.btn:hover { filter:brightness(.98); }
+.btn:focus-visible { outline:0; box-shadow: var(--focus-ring); }
+.btn-primary { background: var(--sigma-accent); color:#fff; border-color: var(--sigma-accent); }
+.btn-outline { background: transparent; color: var(--sigma-accent); border-color: var(--sigma-accent); }
+.btn-ghost { background: transparent; border-color: transparent; }
+
+/* Grid & card */
+.grid { display:grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.col-4 { grid-column: span 4; } .col-6 { grid-column: span 6; } .col-12 { grid-column: 1 / -1; }
+@media (max-width: 980px){ .col-4,.col-6 { grid-column: 1/-1; } }
+.card {
+  position:relative; border:1px solid var(--color-border); background: var(--color-surface-1);
+  border-radius: 14px; box-shadow: var(--shadow-1); padding: 16px;
+}
+.card::before { content:""; position:absolute; inset: 0 0 auto 0; height: 4px; border-radius: 14px 14px 0 0; background: var(--sigma-accent); opacity:.85; }
+.card-header { display:flex; align-items:center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.card-title { display:flex; align-items:center; gap: 10px; }
+.card .badge { padding: 4px 8px; border-radius: 999px; border:1px solid var(--color-border); background: var(--color-surface-2); font-size: var(--fs-14); color: var(--color-text-2); }
+.card .desc { color: var(--color-text-2); margin-top: 6px; }
+.meta { display:flex; gap: 12px; align-items:center; color: var(--color-text-2); font-size: var(--fs-14); margin-top: 10px; }
+.meta .item { display:inline-flex; gap:6px; align-items:center; }
+.meta .icon { width: 16px; height: 16px; color: var(--color-text-2); }
+.tags { display:flex; gap: 8px; flex-wrap: wrap; margin-top:10px; }
+.tag { border:1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text-2); border-radius: 999px; padding: 3px 8px; font-size: var(--fs-14); }
+.card-actions { display:flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.version { display:flex; align-items:center; gap: 8px; margin-top: 10px; }
+
+.toolbar { margin: 8px 0 16px; }
+.toolbar .left, .toolbar .right { display:flex; gap: 8px; align-items:center; flex-wrap: wrap; }
+.toolbar .search { position:relative; }
+.toolbar .search .icon { position:absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--color-text-2); }
+.toolbar .search input { padding-left: 36px; min-width: 260px; }
+.count { color: var(--color-text-2); }
+
+/* Helpers */
+.row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+.icon { width: 18px; height: 18px; display:inline-block; color: currentColor; }
+.muted { color: var(--color-text-2); }
