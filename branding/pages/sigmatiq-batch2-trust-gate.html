@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIGMATIQ - Batch 2: Trust HUD & Gate Badges (Card/Row Grid)</title>
+  <style>
+    :root{
+      --sigmatiq-dark-teal:#1A2F2F;
+      --sigmatiq-bright-teal:#00C4A7;
+      --sigmatiq-golden:#FFB800;
+      --color-bg:#0A1414;
+      --color-surface-1:#0F1A1A;
+      --color-surface-2:#111827;
+      --color-surface-3:#1A2F2F;
+      --color-border:#1A2F2F;
+      --color-text-1:#F5F5F7;
+      --color-text-2:#8FA5A5;
+      --color-text-3:#6A8080;
+      --status-success:#00C4A7;
+      --status-warning:#FFB800;
+      --status-error:#FF5757;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;background:var(--color-bg);color:var(--color-text-1);padding:24px}
+    .section{margin-bottom:48px;max-width:1200px;margin-left:auto;margin-right:auto}
+    .section-title{color:var(--sigmatiq-bright-teal);font-size:24px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--color-border)}
+    .demo-container{background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:12px;padding:24px;margin-bottom:24px}
+
+    /* ============ TRUST HUD badges (kept) ============ */
+    .trust-hud{display:flex;gap:12px;flex-wrap:wrap}
+    .trust-badge{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:help;position:relative;transition:.2s}
+    .trust-badge:hover{transform:translateY(-1px)}
+    .trust-badge.success{background:rgba(0,196,167,.2);border:1px solid var(--status-success);color:var(--status-success)}
+    .trust-badge.warning{background:rgba(255,184,0,.2);border:1px solid var(--status-warning);color:var(--status-warning)}
+    .trust-badge.error{background:rgba(255,87,87,.2);border:1px solid var(--status-error);color:var(--status-error)}
+    .trust-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:8px;padding:12px;margin-bottom:8px;display:none;white-space:nowrap;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);font-weight:400;font-size:12px;color:var(--color-text-1)}
+    .trust-badge:hover .trust-tooltip,.trust-badge:focus .trust-tooltip{display:block;animation:fadeIn .2s}
+
+    /* ============ Gate badge + tooltip (kept) ============ */
+    .gate-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:help;position:relative;transition:.2s}
+    .gate-badge:hover{transform:scale(1.05)}
+    .gate-badge.pass{background:rgba(0,196,167,.2);color:var(--status-success);border:1px solid rgba(0,196,167,.3)}
+    .gate-badge.fail{background:rgba(255,87,87,.2);color:var(--status-error);border:1px solid rgba(255,87,87,.3)}
+    .gate-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:8px;padding:12px;margin-bottom:8px;display:none;z-index:1000;min-width:260px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .gate-badge:hover .gate-tooltip,.gate-badge:focus .gate-tooltip{display:block;animation:fadeIn .2s}
+    .gate-tooltip-title{font-weight:600;margin-bottom:8px;font-size:12px}
+    .gate-tooltip-title.pass{color:var(--status-success)}
+    .gate-tooltip-title.fail{color:var(--status-error)}
+    .gate-tooltip-reasons{font-size:11px;color:var(--color-text-1);list-style:none;padding:0}
+    .gate-tooltip-reasons li{margin-bottom:4px;display:flex;align-items:center;gap:6px}
+    .gate-check{color:var(--status-success)} .gate-x{color:var(--status-error)}
+
+    /* ============ Risk selector (kept) ============ */
+    .risk-profile-selector{display:inline-flex;gap:4px;padding:4px;background:var(--color-surface-2);border-radius:8px;border:1px solid var(--color-border)}
+    .risk-option{padding:8px 16px;border-radius:6px;cursor:pointer;transition:.2s;font-size:14px;font-weight:500;background:transparent;border:none;color:var(--color-text-2);display:flex;align-items:center;gap:6px}
+    .risk-option:hover{background:var(--color-surface-3);color:var(--color-text-1)}
+    .risk-option.active{color:var(--color-bg)}
+    .risk-option.conservative.active{background:#4CAF50}
+    .risk-option.balanced.active{background:var(--sigmatiq-golden)}
+    .risk-option.aggressive.active{background:var(--status-error)}
+    .risk-details{margin-top:16px;padding:16px;background:var(--color-surface-2);border-radius:8px;font-size:12px}
+    .risk-detail-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--color-border)}
+    .risk-detail-row:last-child{border-bottom:none}
+    .risk-detail-label{color:var(--color-text-2)} .risk-detail-value{font-weight:600;color:var(--color-text-1)}
+
+    /* ============ Lineage chips (kept) ============ */
+    .lineage-chips{display:flex;gap:8px;flex-wrap:wrap}
+    .lineage-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:20px;font-size:11px;font-family:Monaco,"Courier New",monospace;color:var(--color-text-2);cursor:pointer;transition:.2s}
+    .lineage-chip:hover{border-color:var(--sigmatiq-bright-teal);color:var(--sigmatiq-bright-teal);transform:translateY(-1px)}
+    .lineage-chip-label{color:var(--color-text-3);font-weight:400}
+    .lineage-chip-hash{color:var(--sigmatiq-bright-teal);font-weight:600}
+
+    /* ============ NEW: Gate Cards grid ============ */
+    .gb-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+    .gb-search{flex:1;min-width:220px}
+    .gb-search input{width:100%;padding:8px 12px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:8px;color:var(--color-text-1);font-size:13px;outline:none}
+    .gb-search input:focus{border-color:var(--sigmatiq-bright-teal);box-shadow:0 0 0 2px rgba(0,196,167,.12)}
+    .gb-select{padding:8px 12px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:8px;color:var(--color-text-1);font-size:13px;cursor:pointer}
+    .view-toggle{display:flex;gap:2px;padding:3px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:8px}
+    .view-option{padding:5px 8px;background:transparent;border:none;color:var(--color-text-2);cursor:pointer;border-radius:5px;font-size:12px}
+    .view-option.active{background:var(--sigmatiq-bright-teal);color:var(--color-bg)}
+
+    .gate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:stretch;margin-top:8px}
+    .gate-grid.row-view{display:block}
+
+    .gate-card{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:10px;overflow:hidden;transition:.2s}
+    .gate-card:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,.2);border-color:var(--sigmatiq-bright-teal)}
+    .gate-head{display:flex;align-items:center;gap:10px;background:var(--color-surface-3);padding:12px;border-bottom:1px solid var(--color-border)}
+    .gate-id{font-size:13px;font-weight:700;color:var(--color-text-1);font-family:Monaco,Menlo,Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .gate-pack{font-size:11px;color:var(--color-text-3)}
+    .gate-head .gate-badge{margin-left:auto}
+
+    .gate-body{padding:12px}
+    .gb-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+    .gb-item{display:flex;flex-direction:column}
+    .gb-label{font-size:10px;color:var(--color-text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+    .gb-value{font-size:14px;font-weight:600;color:var(--color-text-1)}
+    .gb-value.positive{color:var(--status-success)}
+    .gb-value.negative{color:var(--status-error)}
+    .gb-meta{display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--color-border);font-size:10px;color:var(--color-text-3)}
+
+    /* Row reflow */
+    .gate-grid.row-view .gate-card{display:flex;align-items:center;margin-bottom:8px;padding:12px;border-radius:8px}
+    .gate-grid.row-view .gate-head{background:transparent;border:0;padding:0;gap:12px;flex:0 0 360px}
+    .gate-grid.row-view .gate-body{flex:1;padding:0 16px}
+    .gate-grid.row-view .gb-stats{display:flex;gap:20px;margin:0}
+    .gate-grid.row-view .gb-item{flex-direction:row;align-items:baseline;gap:6px}
+    .gate-grid.row-view .gb-meta{display:none}
+
+    /* Row header */
+    .gb-row-header{display:none;padding:8px 12px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:8px;margin:8px 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--color-text-3)}
+    .gate-grid.row-view ~ .gb-row-header{display:flex;align-items:center}
+    .gb-h-model{flex:0 0 360px;padding-left:4px}
+    .gb-h-metrics{flex:1;display:flex;gap:20px}
+
+    /* Pagination */
+    .gb-pagination{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0}
+    .page-btn{padding:6px 10px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:6px;color:var(--color-text-1);font-size:12px;cursor:pointer;min-width:32px}
+    .page-btn[disabled]{opacity:.5;cursor:not-allowed}
+    .page-btn.active{background:var(--sigmatiq-bright-teal);border-color:var(--sigmatiq-bright-teal);color:var(--color-bg)}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .subsection-title{font-size:16px;color:var(--color-text-1);margin-bottom:16px;font-weight:600}
+  </style>
+</head>
+<body>
+  <!-- TRUST HUD -->
+  <section class="section">
+    <h2 class="section-title">Trust HUD (Integrity/Parity/Capacity)</h2>
+    <div class="demo-container">
+      <div class="subsection-title">Success State</div>
+      <div class="trust-hud">
+        <div class="trust-badge success" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Integrity OK
+          <div class="trust-tooltip">Data integrity verified.<br>No missing values detected.<br>Last checked: 2 minutes ago</div>
+        </div>
+        <div class="trust-badge success" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
+          Parity Match
+          <div class="trust-tooltip">Premium vs Underlying: 0.3%<br>Within acceptable range</div>
+        </div>
+        <div class="trust-badge success" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10"/></svg>
+          Capacity High
+          <div class="trust-tooltip">High liquidity available.<br>OI: 5,000 | Volume: 10,000<br>Can support large positions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-container">
+      <div class="subsection-title">Mixed State</div>
+      <div class="trust-hud">
+        <div class="trust-badge warning" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+          Integrity Warning
+          <div class="trust-tooltip">2% missing data detected.<br>May affect model accuracy.<br>Consider data refresh</div>
+        </div>
+        <div class="trust-badge error" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Parity Drift -5.2%
+          <div class="trust-tooltip">Significant parity drift!<br>Premium vs underlying: -5.2%<br>Exceeds acceptable threshold</div>
+        </div>
+        <div class="trust-badge warning" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+          Capacity Medium
+          <div class="trust-tooltip">Moderate liquidity.<br>OI: 500 | Volume: 1,000<br>Position size limits apply</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GATE BADGES: CARD/ROW GRID -->
+  <section class="section">
+    <h2 class="section-title">Gate Badges with Failure Tooltips</h2>
+    <div class="demo-container">
+      <div class="gb-controls" id="gbControls">
+        <div class="gb-search"><input id="gbSearch" type="text" placeholder="Search models…"/></div>
+        <select id="gbPack" class="gb-select" aria-label="Pack">
+          <option value="">All Packs</option>
+          <option value="zerosigma">zerosigma</option>
+          <option value="swingsigma">swingsigma</option>
+          <option value="momentumsigma">momentumsigma</option>
+          <option value="weeklysigma">weeklysigma</option>
+        </select>
+        <select id="gbGate" class="gb-select" aria-label="Gate">
+          <option value="">All Gate States</option>
+          <option value="pass">Pass only</option>
+          <option value="fail">Fail only</option>
+        </select>
+        <select id="gbSort" class="gb-select" aria-label="Sort">
+          <option value="updated_desc">Sort: Updated</option>
+          <option value="violations_desc">Sort: Violations</option>
+          <option value="return_desc">Sort: Return</option>
+          <option value="sharpe_desc">Sort: Sharpe</option>
+          <option value="trades_desc">Sort: Trades</option>
+          <option value="id_asc">Sort: Model ID</option>
+          <option value="pack_asc">Sort: Pack</option>
+        </select>
+        <select id="gbPageSize" class="gb-select" aria-label="Items">
+          <option>6</option><option selected>12</option><option>24</option>
+        </select>
+        <div class="view-toggle" role="tablist" aria-label="View">
+          <button id="gbViewCards" class="view-option active" aria-selected="true">Cards</button>
+          <button id="gbViewRows" class="view-option" aria-selected="false">Rows</button>
+        </div>
+      </div>
+
+      <div class="gate-grid" id="gbGrid">
+        <!-- Card 1 -->
+        <article class="gate-card"
+                 data-id="spy_opt_0dte_hourly"
+                 data-pack="zerosigma"
+                 data-pass="true"
+                 data-violations="0"
+                 data-sharpe="2.41"
+                 data-return="24.5"
+                 data-trades="142"
+                 data-updated-min="120">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">spy_opt_0dte_hourly</div>
+              <div class="gate-pack">zerosigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge pass" tabindex="0" aria-label="All gates passed">
+              PASS
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title pass">All Gates Passed</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 142 ≥ 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 8.2% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.8x ≤ 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 0.8% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">2.41</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+24.5%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">142</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value">0</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 2 hours ago</span><span>Pass Gate: Yes</span></div>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="gate-card"
+                 data-id="aapl_eq_swing_daily"
+                 data-pack="swingsigma"
+                 data-pass="false"
+                 data-violations="2"
+                 data-sharpe="1.85"
+                 data-return="18.2"
+                 data-trades="3"
+                 data-updated-min="45">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">aapl_eq_swing_daily</div>
+              <div class="gate-pack">swingsigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge fail" tabindex="0" aria-label="Gate failed with two violations">
+              FAIL
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title fail">Gate Failed (2 violations)</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-x">✗</span> Min trades not met: 3 &lt; 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 12% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.5x ≤ 2.0x</li>
+                  <li><span class="gate-x">✗</span> Spread above limit: 12% &gt; 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">1.85</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+18.2%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">3</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value negative">2</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 45 min ago</span><span>Pass Gate: No</span></div>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="gate-card"
+                 data-id="tsla_opt_weekly"
+                 data-pack="weeklysigma"
+                 data-pass="false"
+                 data-violations="1"
+                 data-sharpe="0.45"
+                 data-return="-5.3"
+                 data-trades="28"
+                 data-updated-min="1440">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">tsla_opt_weekly</div>
+              <div class="gate-pack">weeklysigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge fail" tabindex="0" aria-label="Gate failed with one violation">
+              FAIL
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title fail">Gate Failed (1 violation)</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 28 ≥ 5</li>
+                  <li><span class="gate-x">✗</span> Max DD exceeded: 25% &gt; 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.9x ≤ 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 5% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">0.45</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value negative">-5.3%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">28</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value negative">1</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 1 day ago</span><span>Pass Gate: No</span></div>
+          </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="gate-card"
+                 data-id="qqq_eq_momentum"
+                 data-pack="momentumsigma"
+                 data-pass="true"
+                 data-violations="0"
+                 data-sharpe="1.62"
+                 data-return="15.8"
+                 data-trades="98"
+                 data-updated-min="240">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">qqq_eq_momentum</div>
+              <div class="gate-pack">momentumsigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge pass" tabindex="0">PASS
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title pass">All Gates Passed</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 98 ≥ 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 9.0% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.6x ≤ 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 0.9% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">1.62</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+15.8%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">98</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value">0</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 4 hours ago</span><span>Pass Gate: Yes</span></div>
+          </div>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="gate-card"
+                 data-id="nvda_opt_daily"
+                 data-pack="zerosigma"
+                 data-pass="false"
+                 data-violations="2"
+                 data-sharpe="0.92"
+                 data-return="3.1"
+                 data-trades="4"
+                 data-updated-min="5">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">nvda_opt_daily</div>
+              <div class="gate-pack">zerosigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge fail" tabindex="0">FAIL
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title fail">Gate Failed (2 violations)</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-x">✗</span> Min trades not met: 4 &lt; 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 14% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.7x ≤ 2.0x</li>
+                  <li><span class="gate-x">✗</span> Spread above limit: 14% &gt; 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">0.92</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+3.1%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">4</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value negative">2</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 5 min ago</span><span>Pass Gate: No</span></div>
+          </div>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="gate-card"
+                 data-id="iwm_eq_meanrev"
+                 data-pack="momentumsigma"
+                 data-pass="true"
+                 data-violations="0"
+                 data-sharpe="1.12"
+                 data-return="6.8"
+                 data-trades="76"
+                 data-updated-min="300">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">iwm_eq_meanrev</div>
+              <div class="gate-pack">momentumsigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge pass" tabindex="0">PASS
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title pass">All Gates Passed</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 76 ≥ 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 11% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.8x ≤ 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 1.1% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">1.12</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+6.8%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">76</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value">0</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 5 hours ago</span><span>Pass Gate: Yes</span></div>
+          </div>
+        </article>
+
+        <!-- Card 7 -->
+        <article class="gate-card"
+                 data-id="es_fut_intraday"
+                 data-pack="zerosigma"
+                 data-pass="false"
+                 data-violations="1"
+                 data-sharpe="0.60"
+                 data-return="-1.2"
+                 data-trades="22"
+                 data-updated-min="180">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">es_fut_intraday</div>
+              <div class="gate-pack">zerosigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge fail" tabindex="0">FAIL
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title fail">Gate Failed (1 violation)</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 22 ≥ 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 9% ≤ 20%</li>
+                  <li><span class="gate-x">✗</span> ES95 exceeded: 2.2x &gt; 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 0.4% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">0.60</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value negative">-1.2%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">22</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value negative">1</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 3 hours ago</span><span>Pass Gate: No</span></div>
+          </div>
+        </article>
+
+        <!-- Card 8 -->
+        <article class="gate-card"
+                 data-id="eurusd_fx_swing"
+                 data-pack="swingsigma"
+                 data-pass="true"
+                 data-violations="0"
+                 data-sharpe="1.05"
+                 data-return="4.2"
+                 data-trades="63"
+                 data-updated-min="720">
+          <div class="gate-head">
+            <div>
+              <div class="gate-id">eurusd_fx_swing</div>
+              <div class="gate-pack">swingsigma • Jul 18 → Aug 16</div>
+            </div>
+            <span class="gate-badge pass" tabindex="0">PASS
+              <div class="gate-tooltip">
+                <div class="gate-tooltip-title pass">All Gates Passed</div>
+                <ul class="gate-tooltip-reasons">
+                  <li><span class="gate-check">✓</span> Min trades: 63 ≥ 5</li>
+                  <li><span class="gate-check">✓</span> Max DD: 7% ≤ 20%</li>
+                  <li><span class="gate-check">✓</span> ES95: 1.4x ≤ 2.0x</li>
+                  <li><span class="gate-check">✓</span> Spread: 0.2% ≤ 10%</li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div class="gate-body">
+            <div class="gb-stats">
+              <div class="gb-item"><span class="gb-label">Sharpe</span><span class="gb-value">1.05</span></div>
+              <div class="gb-item"><span class="gb-label">Return</span><span class="gb-value positive">+4.2%</span></div>
+              <div class="gb-item"><span class="gb-label">Trades</span><span class="gb-value">63</span></div>
+              <div class="gb-item"><span class="gb-label">Violations</span><span class="gb-value">0</span></div>
+            </div>
+            <div class="gb-meta"><span>Updated 12 hours ago</span><span>Pass Gate: Yes</span></div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Row header -->
+      <div class="gb-row-header" id="gbRowHeader">
+        <div class="gb-h-model">Model • Gate</div>
+        <div class="gb-h-metrics"><div>Sharpe</div><div>Return</div><div>Trades</div><div>Violations</div></div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="gb-pagination">
+        <div id="gbPageInfo" style="font-size:13px;color:var(--color-text-2)">–</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="page-btn" id="gbPrev">‹</button>
+          <span id="gbNums" style="display:flex;gap:6px"></span>
+          <button class="page-btn" id="gbNext">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISK PROFILE SELECTOR -->
+  <section class="section">
+    <h2 class="section-title">Risk Profile Selector</h2>
+    <div class="demo-container">
+      <div class="subsection-title">Select Risk Profile</div>
+      <div class="risk-profile-selector">
+        <button class="risk-option conservative" onclick="selectRisk(this,'conservative')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>Conservative
+        </button>
+        <button class="risk-option balanced active" onclick="selectRisk(this,'balanced')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 9V6a2 2 0 00-2-2H6a2 2 0 00-2 2v3"/><path d="M12 4v16"/></svg>Balanced
+        </button>
+        <button class="risk-option aggressive" onclick="selectRisk(this,'aggressive')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Aggressive
+        </button>
+      </div>
+      <div class="risk-details" id="riskDetails">
+        <div class="risk-detail-row"><span class="risk-detail-label">Min Trades</span><span class="risk-detail-value" id="minTrades">5</span></div>
+        <div class="risk-detail-row"><span class="risk-detail-label">Max Drawdown</span><span class="risk-detail-value" id="maxDD">20%</span></div>
+        <div class="risk-detail-row"><span class="risk-detail-label">ES95 Multiplier</span><span class="risk-detail-value" id="es95">2.0x</span></div>
+        <div class="risk-detail-row"><span class="risk-detail-label">Max Spread</span><span class="risk-detail-value" id="maxSpread">10%</span></div>
+        <div class="risk-detail-row"><span class="risk-detail-label">Min OI</span><span class="risk-detail-value" id="minOI">500</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINEAGE CHIPS -->
+  <section class="section">
+    <h2 class="section-title">Lineage Chips</h2>
+    <div class="demo-container">
+      <div class="subsection-title">Model Lineage Trail</div>
+      <div class="lineage-chips">
+        <div class="lineage-chip" onclick="viewLineage('pack')" tabindex="0"><span class="lineage-chip-label">pack</span><span class="lineage-chip-hash">@a1b2c3</span></div>
+        <div class="lineage-chip" onclick="viewLineage('config')" tabindex="0"><span class="lineage-chip-label">config</span><span class="lineage-chip-hash">@d4e5f6</span></div>
+        <div class="lineage-chip" onclick="viewLineage('policy')" tabindex="0"><span class="lineage-chip-label">policy</span><span class="lineage-chip-hash">@g7h8i9</span></div>
+        <div class="lineage-chip" onclick="viewLineage('matrix')" tabindex="0"><span class="lineage-chip-label">matrix</span><span class="lineage-chip-hash">@j0k1l2</span></div>
+        <div class="lineage-chip" onclick="viewLineage('template')" tabindex="0"><span class="lineage-chip-label">template</span><span class="lineage-chip-hash">@m3n4o5</span></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Risk selector (kept)
+    function selectRisk(el, risk){
+      document.querySelectorAll('.risk-option').forEach(o=>o.classList.remove('active'));
+      el.classList.add('active');
+      const details={
+        conservative:{minTrades:'10',maxDD:'10%',es95:'1.5x',maxSpread:'5%',minOI:'1000'},
+        balanced:{minTrades:'5',maxDD:'20%',es95:'2.0x',maxSpread:'10%',minOI:'500'},
+        aggressive:{minTrades:'3',maxDD:'30%',es95:'2.5x',maxSpread:'15%',minOI:'200'}
+      }[risk];
+      document.getElementById('minTrades').textContent=details.minTrades;
+      document.getElementById('maxDD').textContent=details.maxDD;
+      document.getElementById('es95').textContent=details.es95;
+      document.getElementById('maxSpread').textContent=details.maxSpread;
+      document.getElementById('minOI').textContent=details.minOI;
+      console.log('Selected risk profile:',risk);
+    }
+    function viewLineage(type){console.log('Viewing lineage for:',type);alert(`Opening ${type} lineage details...`);}
+
+    // Gate grid: search • filters • sort • paging • view toggle
+    (function(){
+      const grid=document.getElementById('gbGrid');
+      const cards=[...grid.querySelectorAll('.gate-card')];
+
+      const q=document.getElementById('gbSearch');
+      const packSel=document.getElementById('gbPack');
+      const gateSel=document.getElementById('gbGate');
+      const sortSel=document.getElementById('gbSort');
+      const sizeSel=document.getElementById('gbPageSize');
+
+      const prev=document.getElementById('gbPrev');
+      const next=document.getElementById('gbNext');
+      const nums=document.getElementById('gbNums');
+      const info=document.getElementById('gbPageInfo');
+
+      const viewCards=document.getElementById('gbViewCards');
+      const viewRows=document.getElementById('gbViewRows');
+      const rowHeader=document.getElementById('gbRowHeader');
+
+      function row(el){
+        const d=el.dataset;
+        return{
+          el,
+          id:d.id||'',
+          pack:d.pack||'',
+          pass:d.pass==='true',
+          violations:parseInt(d.violations||'0',10)||0,
+          sharpe:parseFloat(d.sharpe||'0')||0,
+          ret:parseFloat(d.return||'0')||0,
+          trades:parseInt(d.trades||'0',10)||0,
+          updatedMin:parseInt(d.updatedMin||'999999',10)||999999
+        };
+      }
+      const rows=cards.map(row);
+
+      let state={term:'',pack:'',gate:'',sort:'updated_desc',page:1,size:parseInt(sizeSel.value,10)};
+
+      function apply(){
+        // filter
+        const t=state.term.toLowerCase();
+        let filtered=rows.filter(r=>
+          (!t || r.id.toLowerCase().includes(t) || r.pack.toLowerCase().includes(t)) &&
+          (!state.pack || r.pack===state.pack) &&
+          (!state.gate || (state.gate==='pass'?r.pass:!r.pass))
+        );
+
+        // sorters
+        const sorters={
+          updated_desc:(a,b)=>a.updatedMin-b.updatedMin,
+          violations_desc:(a,b)=>b.violations-a.violations||a.id.localeCompare(b.id),
+          return_desc:(a,b)=>b.ret-a.ret||a.id.localeCompare(b.id),
+          sharpe_desc:(a,b)=>b.sharpe-a.sharpe||a.id.localeCompare(b.id),
+          trades_desc:(a,b)=>b.trades-a.trades||a.id.localeCompare(b.id),
+          id_asc:(a,b)=>a.id.localeCompare(b.id),
+          pack_asc:(a,b)=>a.pack.localeCompare(b.pack)||a.id.localeCompare(b.id)
+        };
+        filtered.sort(sorters[state.sort]||sorters.updated_desc);
+
+        // pagination
+        const total=filtered.length;
+        const pages=Math.max(1,Math.ceil(total/state.size));
+        state.page=Math.min(state.page,pages);
+        const start=(state.page-1)*state.size;
+        const slice=filtered.slice(start,start+state.size);
+
+        // reorder DOM
+        const frag=document.createDocumentFragment();
+        slice.forEach(r=>frag.appendChild(r.el));
+        grid.innerHTML='';
+        grid.appendChild(frag);
+
+        // UI
+        info.textContent= total ? `Showing ${start+1}–${Math.min(start+state.size,total)} of ${total} models` : 'No results';
+        nums.innerHTML='';
+        for(let i=1;i<=pages;i++){
+          const b=document.createElement('button');
+          b.className='page-btn'+(i===state.page?' active':'');
+          b.textContent=i;
+          b.addEventListener('click',()=>{state.page=i;apply();});
+          nums.appendChild(b);
+        }
+        prev.disabled=state.page===1;
+        next.disabled=state.page===pages;
+      }
+
+      // events
+      q.addEventListener('input',e=>{state.term=e.target.value;state.page=1;apply();});
+      packSel.addEventListener('change',e=>{state.pack=e.target.value;state.page=1;apply();});
+      gateSel.addEventListener('change',e=>{state.gate=e.target.value;state.page=1;apply();});
+      sortSel.addEventListener('change',e=>{state.sort=e.target.value;state.page=1;apply();});
+      sizeSel.addEventListener('change',e=>{state.size=parseInt(e.target.value,10);state.page=1;apply();});
+      prev.addEventListener('click',()=>{if(state.page>1){state.page--;apply();}});
+      next.addEventListener('click',()=>{state.page++;apply();});
+
+      viewCards.addEventListener('click',()=>{viewCards.classList.add('active');viewRows.classList.remove('active');grid.classList.remove('row-view');rowHeader.style.display='none';});
+      viewRows.addEventListener('click',()=>{viewRows.classList.add('active');viewCards.classList.remove('active');grid.classList.add('row-view');rowHeader.style.display='flex';});
+
+      apply();
+    })();
+  </script>
+</body>
+</html>
