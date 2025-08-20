@@ -7,7 +7,8 @@ import pandas as pd
 
 from sigma_core.data.datasets import build_matrix as build_matrix_range
 from sigma_core.data.stocks import build_stock_matrix as build_stock_matrix_range
-from api.services.io import workspace_paths, load_config, resolve_indicator_set_path
+from api.services.io import workspace_paths, load_config, resolve_indicator_set_path, sanitize_out_path
+from fastapi.responses import JSONResponse
 from api.services.policy import ensure_policy_exists
 try:
     from api.services.model_cards import write_model_card
@@ -44,7 +45,10 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         return {"ok": False, "error": "start and end are required"}
     paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
     cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
-    out_csv = payload.out_csv or str(paths['matrices'] / 'training_matrix_built.csv')
+    try:
+        out_csv = str(sanitize_out_path(payload.out_csv, paths['matrices'] / 'training_matrix_built.csv'))
+    except ValueError as ve:
+        return JSONResponse({"ok": False, "error": str(ve)}, status_code=400)
     indicator_set_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
     try:
         paths['matrices'].mkdir(parents=True, exist_ok=True)
@@ -112,7 +116,10 @@ def build_stock_matrix_ep(payload: BuildStockMatrixRequest):
             ind_path = resolve_indicator_set_path(payload.pack_id, payload.model_id)
         paths = workspace_paths(payload.model_id or payload.ticker.lower(), payload.pack_id or 'swingsigma')
         out_csv = payload.out_csv or str(paths['matrices'] / 'stock_matrix.csv')
-        _Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
+        try:
+            out_csv = str(sanitize_out_path(payload.out_csv, _Path(out_csv)))
+        except ValueError as ve:
+            return JSONResponse({"ok": False, "error": str(ve)}, status_code=400)
         build_stock_matrix_range(
             start_date=payload.start,
             end_date=payload.end,

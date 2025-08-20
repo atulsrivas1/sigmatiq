@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 from datetime import date, datetime, timedelta
 from typing import List
 from pathlib import Path
@@ -26,6 +27,7 @@ from ..indicators.builtins.volatility import Volatility
 
 ET = pytz.timezone("US/Eastern")
 UTC = pytz.utc
+logger = logging.getLogger(__name__)
 
 
 def _daterange(start: date, end: date):
@@ -71,10 +73,10 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
         ddf = ddf.set_index('date')
         ddf['prev_close'] = ddf['close'].shift(1)
         prev_close_map = ddf['prev_close'].dropna().to_dict()
-        print(f"Daily prev_close map size: {len(prev_close_map)} (min={min(prev_close_map) if prev_close_map else 'n/a'}, max={max(prev_close_map) if prev_close_map else 'n/a'})")
+        logger.info("Daily prev_close map size: %s", len(prev_close_map))
     else:
         # Fallback: use last hourly close from prior day
-        print("No day data found for SPY. Falling back to previous day's last hourly close for prev_close anchor…")
+        logger.warning("No day data found for %s. Falling back to previous day's last hourly close for prev_close anchor…", ticker)
         hourly_dict = get_multi_timeframe_data(
             ticker,
             (start_date - timedelta(days=5)).strftime("%Y-%m-%d"),
@@ -102,7 +104,7 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
             prev_day = dates_sorted[i-1]
             curr_day = dates_sorted[i]
             prev_close_map[curr_day] = float(last_per_day.loc[prev_day])
-        print(f"Hourly-based prev_close map size: {len(prev_close_map)}")
+        logger.info("Hourly-based prev_close map size: %s", len(prev_close_map))
 
     # If some dates in the requested range are missing in prev_close_map (common for 'today' intraday
     # because daily bars are not yet available), backfill using hourly data for the whole window.
@@ -139,10 +141,10 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
                         prev_close_map[d] = hourly_prev[d]
                         filled += 1
                 if filled:
-                    print(f"Filled {filled} missing prev_close anchors from hourly data (range {start_date}..{end_date})")
+                    logger.info("Filled %s missing prev_close anchors from hourly data (range %s..%s)", filled, start_date, end_date)
         except Exception as e:
             # Non-fatal: keep prev_close_map as-is and proceed
-            print(f"WARN: Failed to backfill prev_close from hourly for missing dates: {e}")
+            logger.warning("Failed to backfill prev_close from hourly for missing dates: %s", e)
 
     records: List[dict] = []
 
@@ -212,7 +214,7 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
         raw.groupby(["date", "price_level", "spy_prev_close", "hour_et"], as_index=False)
            .agg({"calls_sold": "sum", "puts_sold": "sum", "calls_premium":"sum", "puts_premium":"sum"})
     )
-    print(f"Collected raw 0DTE flow records: {len(raw)}")
+    logger.info("Collected raw 0DTE flow records: %s", len(raw))
     return raw
 
 
@@ -359,14 +361,14 @@ def build_matrix(
     sd = datetime.strptime(start_date, "%Y-%m-%d").date()
     ed = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    print(f"Fetching 0DTE flow for {ticker} {sd} -> {ed} using Polygon keys from .env")
+    logger.info("Fetching 0DTE flow for %s %s -> %s using Polygon keys from .env", ticker, sd, ed)
     raw = fetch_0dte_flow(sd, ed, ticker=ticker, distance_max=distance_max)
     if raw.empty:
         raise RuntimeError(f"No 0DTE flow data collected for {ticker} from {sd} to {ed}. Halting matrix build. Check API key and data availability.")
     if dump_raw:
         raw_path = raw_out or out_csv.replace(".csv", "_raw.csv")
         raw.to_csv(raw_path, index=False)
-        print(f"Saved raw 0DTE flow to {raw_path}")
+        logger.info("Saved raw 0DTE flow to %s", raw_path)
 
     # Load indicator set if provided
     indicator_set = None
@@ -374,7 +376,7 @@ def build_matrix(
         try:
             indicator_set = load_indicator_set(indicator_set_path)
         except Exception as e:
-            print(f"WARN: failed to load indicator set from {indicator_set_path}: {e}")
+            logger.warning("failed to load indicator set from %s: %s", indicator_set_path, e)
 
     fb = FeatureBuilder(distance_max=distance_max, indicator_set=indicator_set)
     feats = fb.add_base_features(raw)
@@ -394,7 +396,7 @@ def build_matrix(
             if not inferred.empty:
                 feats = pd.merge(feats, inferred, on=['date','price_level','spy_prev_close','hour_et'], how='left')
         except Exception as e:
-            print(f"WARN: failed to compute trade-level premium inferred: {e}")
+            logger.warning("failed to compute trade-level premium inferred: %s", e)
 
     # Merge hourly underlying ticker close for label and price-derived features
     hourly = fetch_hourly_ticker(ticker, start_date, end_date)
@@ -444,8 +446,8 @@ def build_matrix(
             num2 = m["puts_premium_inf_total"].fillna(0.0) - m["calls_premium_inf_total"].fillna(0.0)
             den2 = m["puts_premium_inf_total"].fillna(0.0) + m["calls_premium_inf_total"].fillna(0.0) + 1e-6
             m["dealer_sold_premium_inferred"] = (num2 / den2).astype(float)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("aggregation step failed; continuing with partial features: %s", e)
     # Dealer-driven divergence score & orientation (recompute with aggregated totals if available)
     if indicator_set and (indicator_set.name == 'zerosigma_v1'): # This is a hack, will be removed
         try:
@@ -514,5 +516,5 @@ def build_matrix(
 
     Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
     m.to_csv(out_csv, index=False)
-    print(f"Saved training matrix to {out_csv} ({len(m)} rows)")
+    logger.info("Saved training matrix to %s (%s rows)", out_csv, len(m))
     return out_csv

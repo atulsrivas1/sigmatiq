@@ -83,6 +83,7 @@ app = FastAPI(title="Sigmatiq Sigma API")
 
 # Routers (modular endpoints)
 import importlib as _importlib
+import logging as _logging
 
 def _include_router(mod_path: str) -> None:
     try:
@@ -91,7 +92,7 @@ def _include_router(mod_path: str) -> None:
         if r is not None:
             app.include_router(r)
     except Exception:
-        pass
+        _logging.getLogger(__name__).warning("failed to include router: %s", mod_path)
 
 _include_router('api.routers.signals')
 _include_router('api.routers.health')
@@ -165,8 +166,8 @@ async def audit_mw(request, call_next):
                     lineage=lineage_vals,
                     payload=payload,
                 )
-    except Exception:
-        pass
+    except Exception as e:
+        _logging.getLogger(__name__).warning("audit middleware error: %s", e)
     return response
 
  

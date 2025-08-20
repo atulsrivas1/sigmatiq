@@ -273,13 +273,6 @@ def _parity_bracket_next_session_open(df: pd.DataFrame, br: Dict[str, Any]) -> D
         hits = 0
         pnl_sum = 0.0
         rr_sum = 0.0
-        for i in last_idx:
-            # next session
-            cur_date = d.loc[i, '_date']
-            # find next date key
-            # use the sorted unique dates list
-            # build once
-            pass
         # Build dates once
         dates = sorted(d['_date'].unique())
         date_to_pos = {dt: k for k, dt in enumerate(dates)}
