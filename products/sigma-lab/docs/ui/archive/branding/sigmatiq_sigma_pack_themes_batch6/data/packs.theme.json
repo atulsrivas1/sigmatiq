@@ -1,0 +1,47 @@
+{
+  "zero": {
+    "name": "ZeroSigma",
+    "accent": "#3B82F6",
+    "gradient": [
+      "#1D4ED8",
+      "#60A5FA"
+    ],
+    "badge": "Intraday"
+  },
+  "swing": {
+    "name": "SwingSigma",
+    "accent": "#F97316",
+    "gradient": [
+      "#EA580C",
+      "#F59E0B"
+    ],
+    "badge": "Swing"
+  },
+  "long": {
+    "name": "LongSigma",
+    "accent": "#22C55E",
+    "gradient": [
+      "#16A34A",
+      "#22C55E"
+    ],
+    "badge": "Long-Term"
+  },
+  "overnight": {
+    "name": "OvernightSigma",
+    "accent": "#8B5CF6",
+    "gradient": [
+      "#7C3AED",
+      "#A78BFA"
+    ],
+    "badge": "Overnight"
+  },
+  "custom": {
+    "name": "CustomizedSigma",
+    "accent": "#14B8A6",
+    "gradient": [
+      "#0EA5A5",
+      "#22D3EE"
+    ],
+    "badge": "Custom"
+  }
+}

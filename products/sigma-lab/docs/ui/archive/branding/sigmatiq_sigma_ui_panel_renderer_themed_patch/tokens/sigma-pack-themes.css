@@ -1,0 +1,51 @@
+/* Sigmatiq Sigma – Pack Themes (accent + gradient tokens per pack) */
+:root {
+  --sigma-zero-accent: #3B82F6;      /* Electric Blue */
+  --sigma-swing-accent: #F97316;     /* Swing Orange */
+  --sigma-long-accent: #22C55E;      /* Long Green */
+  --sigma-overnight-accent: #8B5CF6; /* Overnight Violet */
+  --sigma-custom-accent: #14B8A6;    /* Custom Teal */
+}
+
+/* Defaults (ZeroSigma) */
+:root, [data-sigma="zero"] {
+  --sigma-accent: var(--sigma-zero-accent);
+  --sigma-grad-start: #1D4ED8; /* blue-700 */
+  --sigma-grad-end:   #60A5FA; /* blue-400 */
+}
+
+/* SwingSigma */
+[data-sigma="swing"] {
+  --sigma-accent: var(--sigma-swing-accent);
+  --sigma-grad-start: #EA580C; /* orange-600 */
+  --sigma-grad-end:   #F59E0B; /* amber-500 */
+}
+
+/* LongSigma */
+[data-sigma="long"] {
+  --sigma-accent: var(--sigma-long-accent);
+  --sigma-grad-start: #16A34A; /* green-600 */
+  --sigma-grad-end:   #22C55E; /* green-500 */
+}
+
+/* OvernightSigma */
+[data-sigma="overnight"] {
+  --sigma-accent: var(--sigma-overnight-accent);
+  --sigma-grad-start: #7C3AED; /* violet-600 */
+  --sigma-grad-end:   #A78BFA; /* violet-300 */
+}
+
+/* CustomizedSigma */
+[data-sigma="custom"] {
+  --sigma-accent: var(--sigma-custom-accent);
+  --sigma-grad-start: #0EA5A5; /* teal-600 */
+  --sigma-grad-end:   #22D3EE; /* cyan-400 */
+}
+
+/* Derived helpers */
+:root {
+  --sigma-grad: linear-gradient(90deg, var(--sigma-grad-start), var(--sigma-grad-end));
+  --sigma-tint-12: color-mix(in srgb, var(--sigma-accent) 12%, transparent);
+  --sigma-tint-24: color-mix(in srgb, var(--sigma-accent) 24%, transparent);
+  --sigma-tint-36: color-mix(in srgb, var(--sigma-accent) 36%, transparent);
+}
