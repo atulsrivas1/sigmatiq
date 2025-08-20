@@ -1004,72 +1004,461 @@
         </section>
 
         <!-- Data Table -->
-        <section style="margin-bottom: 48px;">
-            <h2 class="section-title">Sweeps Results Table</h2>
-            <div class="card">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Threshold</th>
-                            <th>Hours</th>
-                            <th>Sharpe</th>
-                            <th>Return</th>
-                            <th>Trades</th>
-                            <th>Gate</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="badge" style="background: var(--color-surface-3);">threshold</span></td>
-                            <td>0.50</td>
-                            <td>13,14,15</td>
-                            <td style="color: var(--sigmatiq-bright-teal);">1.85</td>
-                            <td style="color: var(--sigmatiq-bright-teal);">+18.2%</td>
-                            <td>142</td>
-                            <td><span class="badge badge-success gate-badge" data-tooltip="Passed all checks">PASS</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn" style="padding: 6px 10px;">Add</button>
-                                    <button class="btn" style="padding: 6px 10px;">Compare</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge" style="background: var(--color-surface-3);">top_pct</span></td>
-                            <td>0.15</td>
-                            <td>14,15</td>
-                            <td>0.95</td>
-                            <td>+8.7%</td>
-                            <td>67</td>
-                            <td><span class="badge badge-warning gate-badge" data-tooltip="Min trades: 67 < 100">WARN</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn" style="padding: 6px 10px;">Add</button>
-                                    <button class="btn" style="padding: 6px 10px;">Compare</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="badge" style="background: var(--color-surface-3);">threshold</span></td>
-                            <td>0.65</td>
-                            <td>13</td>
-                            <td style="color: var(--status-error);">-0.23</td>
-                            <td style="color: var(--status-error);">-4.1%</td>
-                            <td>23</td>
-                            <td><span class="badge badge-error gate-badge" data-tooltip="Sharpe < 0, Min trades: 23 < 100">FAIL</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn" style="padding: 6px 10px;" disabled>Add</button>
-                                    <button class="btn" style="padding: 6px 10px;">View</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        
+        <!-- Sweeps Results (Card/Row Grid with Search • Sort • Paging) -->
+        <section style="margin-bottom: 48px;" id="sweeps">
+            <h2 class="section-title">Sweeps Results</h2>
+
+            <style>
+                /* ===== Sweeps Cards/Rows (namespaced) ===== */
+                #sweeps .controls {
+                    display: flex;
+                    gap: 12px;
+                    margin-bottom: 16px;
+                    flex-wrap: wrap;
+                    align-items: center;
+                }
+                #sweeps .search-box {
+                    position: relative;
+                    flex: 1;
+                    min-width: 220px;
+                }
+                #sweeps .search-input {
+                    width: 100%;
+                    padding: 8px 12px 8px 36px;
+                    background: var(--color-surface-2);
+                    border: 1px solid var(--color-border);
+                    border-radius: 8px;
+                    color: var(--color-text-1);
+                    outline: none;
+                }
+                #sweeps .search-icon {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 16px; height: 16px;
+                    color: var(--color-text-3);
+                }
+                #sweeps .select {
+                    padding: 8px 12px;
+                    background: var(--color-surface-2);
+                    border: 1px solid var(--color-border);
+                    border-radius: 8px;
+                    color: var(--color-text-1);
+                }
+                #sweeps .view-toggle {
+                    display: flex;
+                    gap: 4px;
+                    padding: 3px;
+                    background: var(--color-surface-2);
+                    border: 1px solid var(--color-border);
+                    border-radius: 8px;
+                }
+                #sweeps .view-btn {
+                    padding: 6px 10px;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-2);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 12px;
+                }
+                #sweeps .view-btn.active {
+                    background: var(--sigmatiq-bright-teal);
+                    color: var(--color-bg);
+                }
+
+                /* Container */
+                #sweeps .cards-container.card-view {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 12px;
+                    margin-bottom: 16px;
+                }
+                #sweeps .cards-container.row-view {
+                    display: block;
+                    margin-bottom: 8px;
+                }
+
+                /* Card */
+                #sweeps .cardX {
+                    background: var(--color-surface-1);
+                    border: 1px solid var(--color-border);
+                    border-radius: 10px;
+                    overflow: hidden;
+                    transition: border-color 0.2s, transform 0.2s;
+                }
+                #sweeps .cardX:hover {
+                    border-color: var(--sigmatiq-bright-teal);
+                }
+                #sweeps .card-head {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
+                    padding: 10px 12px;
+                    background: var(--color-surface-2);
+                    border-bottom: 1px solid var(--color-border);
+                }
+                #sweeps .type-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 3px 8px;
+                    border-radius: 999px;
+                    font-size: 11px;
+                    background: var(--color-surface-3);
+                    color: var(--color-text-2);
+                    text-transform: lowercase;
+                }
+                #sweeps .card-body {
+                    padding: 12px;
+                }
+                #sweeps .metrics {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                    margin-bottom: 10px;
+                }
+                #sweeps .metric label {
+                    display: block;
+                    font-size: 10px;
+                    color: var(--color-text-3);
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    margin-bottom: 2px;
+                }
+                #sweeps .metric .val {
+                    font-weight: 600;
+                    color: var(--color-text-1);
+                }
+                #sweeps .val.pos { color: var(--status-success); }
+                #sweeps .val.neg { color: var(--status-error); }
+                #sweeps .meta {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 8px;
+                    font-size: 11px;
+                    color: var(--color-text-3);
+                    border-top: 1px solid var(--color-border);
+                    padding-top: 8px;
+                }
+                #sweeps .actions {
+                    display: flex;
+                    gap: 6px;
+                    padding: 8px;
+                    border-top: 1px solid var(--color-border);
+                    background: var(--color-surface-2);
+                }
+                #sweeps .btnX {
+                    flex: 1;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    border: 1px solid var(--color-border);
+                    background: var(--color-surface-3);
+                    color: var(--color-text-1);
+                    font-size: 11px;
+                    cursor: pointer;
+                }
+                #sweeps .btnX.primary {
+                    background: var(--sigmatiq-bright-teal);
+                    border-color: var(--sigmatiq-bright-teal);
+                    color: var(--color-bg);
+                }
+
+                /* Row layout */
+                #sweeps .row-view .cardX {
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 12px;
+                    margin-bottom: 8px;
+                }
+                #sweeps .row-view .card-head { 
+                    border: none; 
+                    background: transparent; 
+                    padding: 0 12px 0 0; 
+                    gap: 10px;
+                }
+                #sweeps .row-view .card-body { 
+                    padding: 0 16px; 
+                    flex: 1; 
+                }
+                #sweeps .row-view .metrics {
+                    display: grid;
+                    grid-template-columns: repeat(5, 110px);
+                    gap: 16px;
+                    margin: 0;
+                }
+                #sweeps .row-view .actions { 
+                    border: none; 
+                    background: transparent; 
+                    padding: 0;
+                    width: 220px;
+                }
+                #sweeps .row-header {
+                    display: none;
+                    padding: 8px 12px;
+                    margin-bottom: 6px;
+                    background: var(--color-surface-2);
+                    border: 1px solid var(--color-border);
+                    border-radius: 8px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    color: var(--color-text-3);
+                }
+                #sweeps .row-header .h-type { width: 120px; }
+                #sweeps .row-header .h-metrics { display: grid; grid-template-columns: repeat(5, 110px); gap: 16px; padding: 0 16px; flex: 1; }
+                #sweeps .row-header .h-actions { width: 220px; text-align: center; }
+                #sweeps .cards-container.row-view + .row-header { display: flex; align-items: center; }
+
+                /* Gate badge reuse from design system */
+                #sweeps .gate-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 2px 8px;
+                    border-radius: 999px;
+                    font-size: 11px;
+                    font-weight: 700;
+                }
+                #sweeps .gate-pass { background: rgba(0,196,167,0.15); color: var(--status-success); border: 1px solid var(--status-success); }
+                #sweeps .gate-warn { background: rgba(255,184,0,0.15); color: var(--status-warning); border: 1px solid var(--status-warning); }
+                #sweeps .gate-fail { background: rgba(255,87,87,0.15); color: var(--status-error); border: 1px solid var(--status-error); }
+
+                /* Pagination */
+                #sweeps .pagination {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px;
+                    background: var(--color-surface-1);
+                    border: 1px solid var(--color-border);
+                    border-radius: 10px;
+                }
+                #sweeps .pages { display: flex; gap: 6px; }
+                #sweeps .page-btn {
+                    padding: 6px 10px;
+                    background: var(--color-surface-2);
+                    border: 1px solid var(--color-border);
+                    border-radius: 6px;
+                    color: var(--color-text-1);
+                    font-size: 13px;
+                    cursor: pointer;
+                }
+                #sweeps .page-btn.active {
+                    background: var(--sigmatiq-bright-teal);
+                    border-color: var(--sigmatiq-bright-teal);
+                    color: var(--color-bg);
+                }
+                #sweeps .page-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+                @media (max-width: 900px) {
+                    #sweeps .row-view .metrics { grid-template-columns: repeat(3, 110px); }
+                }
+            </style>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input id="sweepsSearch" class="search-input" placeholder="Search type, threshold, hours, gate..." />
+                </div>
+                <select id="sweepsSort" class="select">
+                    <option value="sharpe-desc">Sort: Sharpe ↓</option>
+                    <option value="sharpe-asc">Sort: Sharpe ↑</option>
+                    <option value="ret-desc">Sort: Return ↓</option>
+                    <option value="ret-asc">Sort: Return ↑</option>
+                    <option value="trades-desc">Sort: Trades ↓</option>
+                    <option value="trades-asc">Sort: Trades ↑</option>
+                </select>
+                <select id="sweepsPageSize" class="select">
+                    <option value="6">Rows: 6</option>
+                    <option value="12" selected>Rows: 12</option>
+                    <option value="24">Rows: 24</option>
+                </select>
+                <div class="view-toggle" style="margin-left: auto;">
+                    <button class="view-btn active" id="btnCard">Cards</button>
+                    <button class="view-btn" id="btnRow">Rows</button>
+                </div>
             </div>
+
+            <!-- Cards/Rows -->
+            <div id="sweepsContainer" class="cards-container card-view"></div>
+            <div class="row-header">
+                <div class="h-type" style="padding-left: 4px;">Type</div>
+                <div class="h-metrics">
+                    <div>Threshold</div><div>Hours</div><div>Sharpe</div><div>Return</div><div>Trades</div>
+                </div>
+                <div class="h-actions">Actions</div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <div id="sweepsInfo" style="font-size: 13px; color: var(--color-text-2);">—</div>
+                <div class="pages" id="sweepsPages"></div>
+            </div>
+
+            <script>
+                // Data from original table + a few programmatic variants to demo paging
+                const sweepsData = [
+                    {type:'threshold', threshold:0.50, hours:[13,14,15], sharpe:1.85, ret:18.2, trades:142, gate:'PASS', gateTip:'Passed all checks'},
+                    {type:'top_pct',   threshold:0.15, hours:[14,15],   sharpe:0.95, ret:8.7,  trades:67,  gate:'WARN', gateTip:'Min trades: 67 < 100'},
+                    {type:'threshold', threshold:0.65, hours:[13],      sharpe:-0.23,ret:-4.1, trades:23,  gate:'FAIL', gateTip:'Sharpe < 0, Min trades: 23 < 100'},
+                ];
+                // Expand to showcase pagination
+                for (let i=0;i<9;i++){
+                    const base = sweepsData[i % sweepsData.length];
+                    sweepsData.push({...base, threshold: +(base.threshold + (i+1)*0.01).toFixed(2), trades: base.trades + i*3, ret: +(base.ret + (i%2? -1:1)*0.4).toFixed(1), sharpe: +(base.sharpe + (i%3?-0.1:0.15)).toFixed(2)});
+                }
+
+                let state = {
+                    view: 'card',
+                    sort: 'sharpe-desc',
+                    q: '',
+                    page: 1,
+                    pageSize: 12
+                };
+
+                const elSearch = document.getElementById('sweepsSearch');
+                const elSort   = document.getElementById('sweepsSort');
+                const elPS     = document.getElementById('sweepsPageSize');
+                const elCard   = document.getElementById('btnCard');
+                const elRow    = document.getElementById('btnRow');
+                const elCont   = document.getElementById('sweepsContainer');
+                const elPages  = document.getElementById('sweepsPages');
+                const elInfo   = document.getElementById('sweepsInfo');
+
+                elSearch.addEventListener('input', ()=>{ state.q = elSearch.value.toLowerCase(); state.page = 1; render(); });
+                elSort.addEventListener('change', ()=>{ state.sort = elSort.value; state.page = 1; render(); });
+                elPS.addEventListener('change', ()=>{ state.pageSize = +elPS.value; state.page = 1; render(); });
+                elCard.addEventListener('click', ()=>{ state.view='card'; elCard.classList.add('active'); elRow.classList.remove('active'); elCont.className='cards-container card-view'; render(); });
+                elRow.addEventListener('click',  ()=>{ state.view='row';  elRow.classList.add('active');  elCard.classList.remove('active'); elCont.className='cards-container row-view'; render(); });
+
+                function searchFilter(d){
+                    const s = state.q;
+                    if(!s) return true;
+                    const hay = [d.type, String(d.threshold), d.hours.join(','), d.gate].join(' ').toLowerCase();
+                    return hay.includes(s);
+                }
+
+                function sortCmp(a,b){
+                    const [key,dir] = state.sort.split('-'); // sharpe, ret, trades
+                    let ka = key==='ret'? a.ret : key==='trades'? a.trades : a.sharpe;
+                    let kb = key==='ret'? b.ret : key==='trades'? b.trades : b.sharpe;
+                    return (dir==='asc' ? ka-kb : kb-ka);
+                }
+
+                function gateClass(g){
+                    return g==='PASS' ? 'gate-pass' : g==='WARN' ? 'gate-warn' : 'gate-fail';
+                }
+
+                function cardHTML(d){
+                    const retClass = d.ret>=0 ? 'pos':'neg';
+                    const shClass  = d.sharpe>=0 ? 'pos':'neg';
+                    const gateCls  = gateClass(d.gate);
+                    return `
+                        <div class="cardX">
+                            <div class="card-head">
+                                <span class="type-badge">${d.type}</span>
+                                <span class="gate-badge ${gateCls}" title="${d.gate==='PASS'?'All gates passed':d.gate==='WARN'?'Check warnings':d.gateTip}">${d.gate}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="metrics">
+                                    <div class="metric"><label>Threshold</label><div class="val">${d.threshold.toFixed ? d.threshold.toFixed(2) : d.threshold}</div></div>
+                                    <div class="metric"><label>Hours</label><div class="val">${d.hours.join(',')}</div></div>
+                                    <div class="metric"><label>Sharpe</label><div class="val ${shClass}">${d.sharpe}</div></div>
+                                    <div class="metric"><label>Return</label><div class="val ${retClass}">${d.ret>=0?'+':''}${d.ret}%</div></div>
+                                    <div class="metric"><label>Trades</label><div class="val">${d.trades}</div></div>
+                                </div>
+                                <div class="meta"><span>Sim</span><span>Ready</span></div>
+                            </div>
+                            <div class="actions">
+                                <button class="btnX primary">Add</button>
+                                <button class="btnX">Compare</button>
+                                <button class="btnX">View</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                function rowHTML(d){
+                    const retClass = d.ret>=0 ? 'pos':'neg';
+                    const shClass  = d.sharpe>=0 ? 'pos':'neg';
+                    const gateCls  = gateClass(d.gate);
+                    return `
+                        <div class="cardX">
+                            <div class="card-head" style="min-width:120px;">
+                                <span class="type-badge">${d.type}</span>
+                                <span class="gate-badge ${gateCls}" title="${d.gate==='PASS'?'All gates passed':d.gate==='WARN'?'Check warnings':d.gateTip}">${d.gate}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="metrics">
+                                    <div class="metric"><label>Threshold</label><div class="val">${d.threshold.toFixed ? d.threshold.toFixed(2) : d.threshold}</div></div>
+                                    <div class="metric"><label>Hours</label><div class="val">${d.hours.join(',')}</div></div>
+                                    <div class="metric"><label>Sharpe</label><div class="val ${shClass}">${d.sharpe}</div></div>
+                                    <div class="metric"><label>Return</label><div class="val ${retClass}">${d.ret>=0?'+':''}${d.ret}%</div></div>
+                                    <div class="metric"><label>Trades</label><div class="val">${d.trades}</div></div>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btnX primary">Add</button>
+                                <button class="btnX">Compare</button>
+                                <button class="btnX">View</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                function render(){
+                    // filter + sort
+                    const items = sweepsData.filter(searchFilter).sort(sortCmp);
+                    const total = items.length;
+                    const pages = Math.max(1, Math.ceil(total / state.pageSize));
+                    if(state.page > pages) state.page = pages;
+
+                    const start = (state.page-1)*state.pageSize;
+                    const pageItems = items.slice(start, start + state.pageSize);
+
+                    elCont.innerHTML = pageItems.map(d => state.view==='card' ? cardHTML(d) : rowHTML(d)).join('');
+
+                    // pages
+                    elPages.innerHTML = '';
+                    const prev = document.createElement('button');
+                    prev.className='page-btn'; prev.disabled = state.page===1; prev.textContent='«';
+                    prev.onclick = ()=>{ if(state.page>1){ state.page--; render(); } };
+                    elPages.appendChild(prev);
+
+                    const maxBtns = 7;
+                    let startBtn = Math.max(1, state.page - Math.floor(maxBtns/2));
+                    let endBtn = Math.min(pages, startBtn + maxBtns - 1);
+                    if(endBtn - startBtn + 1 < maxBtns) startBtn = Math.max(1, endBtn - maxBtns + 1);
+                    for(let p=startBtn; p<=endBtn; p++){
+                        const b = document.createElement('button');
+                        b.className='page-btn' + (p===state.page?' active':'');
+                        b.textContent = p;
+                        b.onclick = ()=>{ state.page = p; render(); };
+                        elPages.appendChild(b);
+                    }
+
+                    const next = document.createElement('button');
+                    next.className='page-btn'; next.disabled = state.page===pages; next.textContent='»';
+                    next.onclick = ()=>{ if(state.page<pages){ state.page++; render(); } };
+                    elPages.appendChild(next);
+
+                    // info
+                    const from = total ? start+1 : 0;
+                    const to   = start + pageItems.length;
+                    elInfo.textContent = `Showing ${from}-${to} of ${total}`;
+                }
+
+                // Initial render
+                render();
+            </script>
         </section>
+    
 
         <!-- Signal Cards -->
         <section style="margin-bottom: 48px;">

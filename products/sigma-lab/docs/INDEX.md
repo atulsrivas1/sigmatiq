@@ -41,6 +41,7 @@ Note: This workspace uses a product-first layout with Sigma Lab as the product a
 ## root
 
 - [AGENTS.md](AGENTS.md)
+- [BACKEND_AUDIT.md](BACKEND_AUDIT.md)
 - [ENGINEERING_STATUS.md](../../ENGINEERING_STATUS.md)
 - [CONTRACT.md](CONTRACT.md)
 - [DB_NAMING_AND_SEPARATION.md](DB_NAMING_AND_SEPARATION.md)
