@@ -1,6 +1,17 @@
 import axios from 'axios'
 
-const API_BASE_URL = '/api'
+// Allow overriding API base via Vite env (useful when not using Vite dev proxy)
+// Preferred: keep UI on relative '/api' and route via proxy or gateway
+const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || '/api'
+
+// Dev trace to confirm effective base
+try {
+  const MODE = (import.meta as any)?.env?.MODE
+  if (MODE === 'development') {
+    // eslint-disable-next-line no-console
+    console.log(`[api] base: ${API_BASE_URL}`)
+  }
+} catch {}
 
 const api = axios.create({
   baseURL: API_BASE_URL,

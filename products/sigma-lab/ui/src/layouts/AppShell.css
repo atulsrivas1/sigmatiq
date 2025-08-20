@@ -290,10 +290,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-text-2);
   cursor: pointer;
   transition: all 0.3s;
   z-index: 101;
-  color: rgba(255, 255, 255, 0.6);
 }
 
 .sidebar-toggle:hover {
@@ -342,7 +342,7 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  color: var(--color-text-2);
+  color: var(--color-text-1);
 }
 
 .icon-btn:hover {
@@ -424,7 +424,7 @@
   gap: 2px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-text-2);
+  color: var(--color-text-1);
 }
 
 .icon-btn:hover .cmd-k {
@@ -585,7 +585,7 @@
 .quick-action-btn svg {
   width: 18px;
   height: 18px;
-  color: var(--color-text-2);
+  color: var(--color-text-1);
 }
 
 .quick-action-btn:hover svg {

@@ -7,10 +7,11 @@ Overview
 
 Quick Start
 - Python 3.10+
-- Install: pip install -r products/mock-api/requirements.txt
-- Dev: make -C products/mock-api dev (reload on changes)
-- Run: make -C products/mock-api run (port 8010)
+- Install: pip install -r products/sigma-lab/mock-api/requirements.txt
+- Dev: make -C products/sigma-lab/mock-api dev (reload on changes)
+- Run: make -C products/sigma-lab/mock-api run (port 8010)
 - Docs: http://localhost:8010/docs
+- Smoke: make -C products/sigma-lab/mock-api smoke (sets MOCK_API_URL or defaults to http://localhost:8010)
 
 Endpoints
 - GET `/`
@@ -29,7 +30,9 @@ Endpoints
   - { ok, groups: [{ group, indicators: [...] }] }
   - curl -sS http://localhost:8010/indicator_sets | jq .
 - GET `/leaderboard?limit=&offset=`
-  - { ok, rows, limit, offset, next_offset }
+  - Accepts `model_id, pack_id, tag, risk_profile, pass_gate, limit, offset`
+  - Returns `{ ok, rows, limit, offset, next_offset }`
+  - Row fields include: `started_at, model_id, pack_id, sharpe, trades, win_rate, max_drawdown, cum_ret, tag, gate { pass, reasons[] }, lineage { matrix_sha, policy_sha, config_sha, risk_profile }`
   - curl -sS "http://localhost:8010/leaderboard?limit=2&offset=0" | jq .
 - GET `/signals?limit=&offset=`
   - Example model signals
@@ -50,7 +53,7 @@ Endpoints
   - curl -sS -X POST http://localhost:8010/scan     -H "Content-Type: application/json"     -d '{"pack_id":"swingsigma","model_id":"universe_eq_swing_daily_scanner","indicator_set":"swing_eq_breakout_scanner","start":"2024-07-01","end":"2024-07-05","tickers":"AAPL,MSFT"}' | jq .
 - POST `/build_matrix`
   - Body: { model_id, pack_id, start, end }
-  - Returns { path, rows }
+  - Returns { path, rows, matrix_sha, profile { features, rows, label_balance, nan_pct } }
 - POST `/preview_matrix`
   - Body: { model_id, pack_id, start, end }
   - Returns { nan_stats, columns, rows }
@@ -60,6 +63,14 @@ Endpoints
 - POST `/backtest`
   - Body: { model_id, pack_id }
   - Returns { summary: { sharpe, trades, win_rate, max_dd }, artifacts }
+
+- POST `/models`
+  - Body: { template_id, name, risk_profile }
+  - Returns { ok, model_id, template_id, risk_profile }
+
+- POST `/backtest_sweep`
+  - Body: { model_id, risk_profile, sweep: { thresholds_variants[], hours_variants[], top_pct_variants[] }, tag? }
+  - Returns { ok, rows: [ { kind, value, allowed_hours, sharpe, cum_ret, trades, gate { pass, reasons[] }, parity, capacity, tag, lineage, csv } ] }
 
 UI Integration Tips
 - Point your UI API base to http://localhost:8010.

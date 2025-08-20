@@ -167,6 +167,17 @@ const icons: Record<string, React.ReactElement> = {
       <path d="M12 1v6m0 6v6m4.22-5.46l4.24-4.24M1.54 12.7l4.24 4.24m12.68 0l-4.24 4.24M6.34 7.76L2.1 3.52"/>
     </>
   ),
+
+  // Branding mock icons
+  trendUp: (
+    <>
+      <path d="M7 17l5-5 5 5"/>
+      <path d="M12 12V3"/>
+    </>
+  ),
+  checkPath: (
+    <path d="M3 17l6-6 4 4 8-8"/>
+  ),
   
   // Status Icons
   success: (

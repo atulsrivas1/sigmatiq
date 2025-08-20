@@ -253,6 +253,14 @@ export const AppShell: React.FC = () => {
           >
             <span className="cmd-k">⌘K</span>
           </button>
+          <button 
+            className="icon-btn" 
+            aria-label="User Profile" 
+            title="User Profile"
+            onClick={() => console.log('Profile clicked')}
+          >
+            <Icon name="user" size={18} />
+          </button>
         </div>
       </header>
 

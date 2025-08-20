@@ -77,12 +77,60 @@ def indicator_sets():
 
 
 @app.get("/leaderboard")
-def leaderboard(limit: int = Query(5), offset: int = Query(0)):
-    rows = [
-        {"model_id": "spy_opt_0dte_hourly", "pack_id": "zerosigma", "sharpe": 2.1, "trades": 120, "win_rate": 0.58},
-        {"model_id": "spy_eq_swing_daily", "pack_id": "swingsigma", "sharpe": 1.4, "trades": 80, "win_rate": 0.55},
-        {"model_id": "aapl_eq_intraday_hourly", "pack_id": "swingsigma", "sharpe": 1.1, "trades": 65, "win_rate": 0.52},
+def leaderboard(
+    model_id: Optional[str] = Query(None),
+    pack_id: Optional[str] = Query(None),
+    tag: Optional[str] = Query(None),
+    risk_profile: Optional[str] = Query(None),
+    pass_gate: bool = Query(False),
+    limit: int = Query(5),
+    offset: int = Query(0),
+):
+    base_rows = [
+        {
+            "started_at": "2025-08-16T11:50:00Z",
+            "model_id": "spy_opt_0dte_hourly",
+            "pack_id": "zerosigma",
+            "sharpe": 2.1,
+            "trades": 120,
+            "win_rate": 0.58,
+            "max_drawdown": -0.12,
+            "cum_ret": 0.22,
+            "gate": {"pass": True, "reasons": []},
+            "tag": "demo",
+            "lineage": {"matrix_sha": "c7d8e9a", "policy_sha": "e5f6abc", "config_sha": "a1b2c3d", "risk_profile": risk_profile or "Balanced"},
+        },
+        {
+            "started_at": "2025-08-15T16:10:00Z",
+            "model_id": "spy_eq_swing_daily",
+            "pack_id": "swingsigma",
+            "sharpe": 1.4,
+            "trades": 80,
+            "win_rate": 0.55,
+            "max_drawdown": -0.08,
+            "cum_ret": 0.12,
+            "gate": {"pass": False, "reasons": ["min_trades_not_met"]},
+            "tag": "smoke",
+            "lineage": {"matrix_sha": "d4e5f6b", "policy_sha": "aa11bb2", "config_sha": "cc33dd4", "risk_profile": risk_profile or "Balanced"},
+        },
+        {
+            "started_at": "2025-08-14T10:20:00Z",
+            "model_id": "aapl_eq_intraday_hourly",
+            "pack_id": "swingsigma",
+            "sharpe": 1.1,
+            "trades": 65,
+            "win_rate": 0.52,
+            "max_drawdown": -0.10,
+            "cum_ret": 0.09,
+            "gate": {"pass": True, "reasons": []},
+            "tag": "demo",
+            "lineage": {"matrix_sha": "1122abc", "policy_sha": "3344def", "config_sha": "5566fed", "risk_profile": risk_profile or "Balanced"},
+        },
     ]
+    # Apply simple filters (mock behavior)
+    rows = [r for r in base_rows if (not model_id or r["model_id"] == model_id) and (not pack_id or r["pack_id"] == pack_id) and (not tag or r.get("tag") == tag)]
+    if pass_gate:
+        rows = [r for r in rows if r.get("gate", {}).get("pass")]
     return {"ok": True, "rows": rows[offset:offset+limit], "limit": limit, "offset": offset, "next_offset": offset+limit}
 
 
@@ -167,7 +215,21 @@ def scan_ep(payload: ScanRequest):
 
 @app.post("/build_matrix")
 def build_matrix(model_id: str = Body(..., embed=True), pack_id: str = Body("zerosigma", embed=True), start: str = Body(...), end: str = Body(...)):
-    return {"ok": True, "model_id": model_id, "pack_id": pack_id, "path": f"mock://matrices/{model_id}/training_matrix_built.csv", "rows": 12345}
+    # Provide additional fields used by UI
+    return {
+        "ok": True,
+        "model_id": model_id,
+        "pack_id": pack_id,
+        "path": f"mock://matrices/{model_id}/training_matrix_built.csv",
+        "rows": 12345,
+        "matrix_sha": "c7d8e9a",
+        "profile": {
+            "features": 128,
+            "rows": 12345,
+            "label_balance": {"pos": 0.48, "neg": 0.52},
+            "nan_pct": 0.012
+        }
+    }
 
 
 @app.post("/preview_matrix")
@@ -194,4 +256,82 @@ def backtest(model_id: str = Body(..., embed=True), pack_id: str = Body("zerosig
         "summary": {"sharpe": 1.92, "trades": 234, "win_rate": 0.57, "max_dd": -0.12},
         "artifacts": {"report_csv": f"mock://reports/{model_id}_bt.csv", "plots": [f"mock://plots/{model_id}_eq_curve.png"]},
     }
+
+
+class CreateModelRequest(BaseModel):
+    template_id: str
+    name: str
+    risk_profile: Optional[str] = "Balanced"
+
+
+@app.post("/models")
+def create_model(payload: CreateModelRequest):
+    # Minimal success response with new model_id
+    return {
+        "ok": True,
+        "model_id": payload.name,
+        "template_id": payload.template_id,
+        "risk_profile": payload.risk_profile or "Balanced",
+    }
+
+
+class BacktestSweepSpec(BaseModel):
+    thresholds_variants: Optional[List[List[float]]] = None
+    hours_variants: Optional[List[List[int]]] = None
+    top_pct_variants: Optional[List[List[float]]] = None
+
+
+class BacktestSweepBody(BaseModel):
+    model_id: str
+    risk_profile: Optional[str] = "Balanced"
+    sweep: BacktestSweepSpec
+    tag: Optional[str] = None
+
+
+@app.post("/backtest_sweep")
+def backtest_sweep(payload: BacktestSweepBody):
+    rows: List[Dict[str, Any]] = []
+    tag = payload.tag or "demo"
+    # Build a few mock combinations from provided variants or fallbacks
+    thr_sets = payload.sweep.thresholds_variants or [[0.50, 0.55, 0.60]]
+    hr_sets = payload.sweep.hours_variants or [[13, 14], [13, 14, 15]]
+    top_sets = payload.sweep.top_pct_variants or [[0.10, 0.15]]
+
+    # thresholds-based rows
+    for hs in hr_sets:
+        for t in thr_sets[0][:2]:
+            rows.append({
+                "kind": "thr",
+                "value": t,
+                "allowed_hours": hs,
+                "sharpe": round(0.3 + (t - 0.5) * 1.2, 2),
+                "cum_ret": 1.0 + round((t - 0.5) * 0.2, 4),
+                "trades": 50 + int((t - 0.5) * 100),
+                "gate": {"pass": True if t >= 0.55 else False, "reasons": [] if t >= 0.55 else ["min_trades_not_met"]},
+                "parity": "ok",
+                "capacity": "medium" if len(hs) == 3 else "high",
+                "tag": tag,
+                "lineage": {"matrix_sha": "c7d8e9a", "policy_sha": "e5f6abc", "config_sha": "a1b2c3d", "risk_profile": payload.risk_profile},
+                "csv": f"mock://reports/{payload.model_id}_thr_{t:.2f}_hours_{'-'.join(map(str,hs))}.csv",
+            })
+
+    # top_pct-based rows
+    for tp in top_sets[0][:2]:
+        hs = hr_sets[0]
+        rows.append({
+            "kind": "top_pct",
+            "value": tp,
+            "allowed_hours": hs,
+            "sharpe": 0.41,
+            "cum_ret": 0.9999,
+            "trades": 60,
+            "gate": {"pass": False, "reasons": ["min_trades_not_met"]},
+            "parity": "—",
+            "capacity": "high",
+            "tag": tag,
+            "lineage": {"matrix_sha": "c7d8e9a", "policy_sha": "e5f6abc", "config_sha": "a1b2c3d", "risk_profile": payload.risk_profile},
+            "csv": f"mock://reports/{payload.model_id}_top_{tp:.2f}_hours_{'-'.join(map(str,hs))}.csv",
+        })
+
+    return {"ok": True, "rows": rows}
 

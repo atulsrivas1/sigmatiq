@@ -1,69 +1,112 @@
-/* Dark Theme (Default) */
+/* Dark Theme (Default) - Official Sigmatiq Colors */
 [data-theme="dark"] {
-  --color-bg: #0a0e1a;
-  --color-surface-1: #1a1f2e;
-  --color-surface-2: #252b3d;
-  --color-surface-3: #2f364b;
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-text-1: #ffffff;
-  --color-text-2: #a0a9c5;
-  --color-text-3: #6b7594;
-  --sigmatiq-bright-teal: #00c4a7;
-  --sigmatiq-golden: #ffd700;
-  --status-success: #10b981;
-  --status-warning: #f59e0b;
-  --status-error: #ef4444;
+  --color-bg: #0A1414;
+  --color-surface-1: #0F1A1A;
+  --color-surface-2: #1A2F2F;
+  --color-surface-3: #2A3F3F;
+  --color-border: #2A3F3F;
+  --color-text-1: #F5F5F7;
+  --color-text-2: #8FA5A5;
+  --color-text-3: #6A8080;
+  --sigmatiq-bright-teal: #00C4A7;
+  --sigmatiq-golden: #FFB800;
+  --sigmatiq-cream: #E8E3D9;
+  --sigmatiq-dark-teal: #1A2F2F;
+  --sigmatiq-gray: #F5F5F7;
+  --status-success: #00C4A7;
+  --status-warning: #FFB800;
+  --status-error: #EB5757;
 }
 
-/* Light Theme */
+/* Light Theme - Official Sigmatiq Colors */
 [data-theme="light"] {
-  --color-bg: #ffffff;
-  --color-surface-1: #f9fafb;
-  --color-surface-2: #f3f4f6;
-  --color-surface-3: #e5e7eb;
-  --color-border: rgba(0, 0, 0, 0.1);
-  --color-text-1: #111827;
-  --color-text-2: #4b5563;
-  --color-text-3: #9ca3af;
-  --sigmatiq-bright-teal: #00a693;
-  --sigmatiq-golden: #f59e0b;
-  --status-success: #10b981;
-  --status-warning: #f59e0b;
-  --status-error: #ef4444;
+  --color-bg: #F5F5F7;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #F0EBE3;
+  --color-surface-3: #E8E3D9;
+  --color-border: #D8D3C9;
+  --color-text-1: #1A2F2F;
+  --color-text-2: #3A5555;
+  --color-text-3: #6A8080;
+  --sigmatiq-bright-teal: #00997F;  /* Darker teal for better contrast on light */
+  --sigmatiq-golden: #CC9400;  /* Darker gold for better contrast */
+  --sigmatiq-cream: #E8E3D9;
+  --sigmatiq-dark-teal: #1A2F2F;
+  --sigmatiq-gray: #F5F5F7;
+  --status-success: #00997F;
+  --status-warning: #CC9400;
+  --status-error: #D73535;
 }
 
-/* Slate Theme (Light) */
+/* Cream Theme (Light Variant) - Official Sigmatiq Colors */
 [data-theme="slate"] {
-  --color-bg: #f8fafc;
-  --color-surface-1: #f1f5f9;
-  --color-surface-2: #e2e8f0;
-  --color-surface-3: #cbd5e1;
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-text-1: #0f172a;
-  --color-text-2: #475569;
-  --color-text-3: #64748b;
-  --sigmatiq-bright-teal: #0891b2;
-  --sigmatiq-golden: #f59e0b;
-  --status-success: #10b981;
-  --status-warning: #f59e0b;
-  --status-error: #ef4444;
+  --color-bg: #E8E3D9;
+  --color-surface-1: #F0EBE3;
+  --color-surface-2: #D8D3C9;
+  --color-surface-3: #C8C3B9;
+  --color-border: #C8C3B9;
+  --color-text-1: #1A2F2F;
+  --color-text-2: #3A5555;
+  --color-text-3: #6A8080;
+  --sigmatiq-bright-teal: #00997F;  /* Darker teal for better contrast on cream */
+  --sigmatiq-golden: #CC9400;  /* Darker gold for better contrast */
+  --sigmatiq-cream: #E8E3D9;
+  --sigmatiq-dark-teal: #1A2F2F;
+  --sigmatiq-gray: #F5F5F7;
+  --status-success: #00997F;
+  --status-warning: #CC9400;
+  --status-error: #D73535;
 }
 
-/* Midnight Theme (Dark) */
+/* Midnight Theme (Dark Variant) - Official Sigmatiq Colors */
 [data-theme="midnight"] {
-  --color-bg: #000000;
-  --color-surface-1: #0a0a0a;
-  --color-surface-2: #171717;
-  --color-surface-3: #262626;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-text-1: #fafafa;
-  --color-text-2: #a3a3a3;
-  --color-text-3: #737373;
-  --sigmatiq-bright-teal: #14b8a6;
-  --sigmatiq-golden: #facc15;
-  --status-success: #22c55e;
-  --status-warning: #facc15;
-  --status-error: #ef4444;
+  --color-bg: #050A0A;
+  --color-surface-1: #0A1414;
+  --color-surface-2: #0F1A1A;
+  --color-surface-3: #1A2F2F;
+  --color-border: #1A2F2F;
+  --color-text-1: #F5F5F7;
+  --color-text-2: #8FA5A5;
+  --color-text-3: #6A8080;
+  --sigmatiq-bright-teal: #00C4A7;
+  --sigmatiq-golden: #FFB800;
+  --sigmatiq-cream: #E8E3D9;
+  --sigmatiq-dark-teal: #1A2F2F;
+  --sigmatiq-gray: #F5F5F7;
+  --status-success: #00C4A7;
+  --status-warning: #FFB800;
+  --status-error: #EB5757;
+}
+
+/* Sigma Pack Accent Colors */
+:root {
+  /* Pack-specific accent colors */
+  --sigma-zero-accent: #3B82F6;      /* ZeroSigma - Blue */
+  --sigma-swing-accent: #F97316;     /* SwingSigma - Orange */
+  --sigma-long-accent: #22C55E;      /* LongSigma - Green */
+  --sigma-overnight-accent: #8B5CF6; /* OvernightSigma - Purple */
+  --sigma-momentum-accent: #EC4899;  /* MomentumSigma - Pink */
+  --sigma-custom-accent: #14B8A6;    /* CustomizedSigma - Teal */
+}
+
+/* Pack-specific data attributes */
+[data-sigma="zero"] {
+  --sigma-accent: var(--sigma-zero-accent);
+}
+[data-sigma="swing"] {
+  --sigma-accent: var(--sigma-swing-accent);
+}
+[data-sigma="long"] {
+  --sigma-accent: var(--sigma-long-accent);
+}
+[data-sigma="overnight"] {
+  --sigma-accent: var(--sigma-overnight-accent);
+}
+[data-sigma="momentum"] {
+  --sigma-accent: var(--sigma-momentum-accent);
+}
+[data-sigma="custom"] {
+  --sigma-accent: var(--sigma-custom-accent);
 }
 
 /* Theme transition */
