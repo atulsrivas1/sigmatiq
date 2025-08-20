@@ -1,0 +1,175 @@
+/* Component Showcase Styles */
+
+.showcase-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  background: var(--color-bg);
+  min-height: 100vh;
+}
+
+.showcase-header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.showcase-header h1 {
+  font-size: 32px;
+  color: var(--sigmatiq-bright-teal);
+  margin-bottom: 8px;
+}
+
+.showcase-header p {
+  font-size: 16px;
+  color: var(--color-text-2);
+}
+
+.showcase-section {
+  margin-bottom: 48px;
+}
+
+.showcase-section-title {
+  font-size: 24px;
+  color: var(--sigmatiq-bright-teal);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.showcase-items {
+  display: grid;
+  gap: 32px;
+}
+
+.showcase-item {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.showcase-item h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Badge Groups */
+.badge-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Icon Grid */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 16px;
+  max-width: 300px;
+}
+
+.icon-grid svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-1);
+}
+
+/* Form Stack */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+}
+
+/* Progress Stack */
+.progress-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+}
+
+/* Alert Stack */
+.alert-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* State Grid */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.state-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tooltip Group */
+.tooltip-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px 0;
+}
+
+/* View Toggle */
+.view-toggle-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .showcase-container {
+    padding: 16px;
+  }
+  
+  .card-grid,
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .showcase-header h1 {
+    font-size: 24px;
+  }
+  
+  .showcase-section-title {
+    font-size: 20px;
+  }
+}

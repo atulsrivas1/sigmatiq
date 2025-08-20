@@ -1,0 +1,129 @@
+/* Toggle Switch Component Styles */
+
+.toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Toggle Sizes */
+.toggle-sm {
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-md {
+  width: 48px;
+  height: 24px;
+}
+
+.toggle-lg {
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-surface-3);
+  transition: 0.2s;
+  border-radius: 100px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  background: var(--color-text-2);
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+/* Size-specific slider button */
+.toggle-sm .toggle-slider:before {
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+}
+
+.toggle-md .toggle-slider:before {
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+}
+
+.toggle-lg .toggle-slider:before {
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+}
+
+/* Checked state */
+.toggle-input:checked + .toggle-slider {
+  background: var(--sigmatiq-bright-teal);
+}
+
+.toggle-input:checked + .toggle-slider:before {
+  background: white;
+}
+
+.toggle-sm .toggle-input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+}
+
+.toggle-md .toggle-input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.toggle-lg .toggle-input:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+
+/* Focus state */
+.toggle-input:focus + .toggle-slider {
+  box-shadow: 0 0 0 2px rgba(0, 196, 167, 0.2);
+}
+
+/* Disabled state */
+.toggle-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-disabled .toggle-slider {
+  cursor: not-allowed;
+}
+
+/* Label */
+.toggle-label {
+  font-size: 13px;
+  color: var(--color-text-1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label-left {
+  margin-right: 8px;
+}
+
+.toggle-label-right {
+  margin-left: 8px;
+}

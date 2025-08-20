@@ -1,0 +1,660 @@
+/* AppShell Styles - Based on Extracted Theme */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+}
+
+/* Single Flat Header */
+.main-header {
+  height: var(--header-height, 56px);
+  background: var(--color-surface-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: var(--sidebar-width, 240px);
+}
+
+.header-right,
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* User Profile */
+.user-profile {
+  width: 32px;
+  height: 32px;
+  background: var(--color-surface-3);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.user-profile:hover {
+  background: var(--color-surface-3);
+  opacity: 0.8;
+}
+
+.user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width, 240px);
+  background: var(--color-surface-1);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s;
+  position: relative;
+  overflow-y: auto;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed, 60px);
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 12px 0;
+  padding-bottom: 70px;
+  overflow-y: auto;
+}
+
+/* Navigation Items - Base styles for consistency */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  margin: 0 12px 2px 12px;
+  position: relative;
+  color: var(--color-text-2);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: calc(100% - 24px);
+  text-align: left;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.nav-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  margin: 0 12px 2px 12px;
+  position: relative;
+  color: var(--color-text-2);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: calc(100% - 24px);
+  text-align: left;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.nav-item:hover,
+.nav-child:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.nav-item:focus-visible,
+.nav-child:focus-visible {
+  outline: 2px solid var(--sigmatiq-bright-teal);
+  outline-offset: -2px;
+}
+
+.nav-item.active,
+.nav-child.active {
+  color: var(--sigmatiq-bright-teal);
+  font-weight: 500;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background: var(--sigmatiq-bright-teal);
+  border-radius: 0 3px 3px 0;
+}
+
+/* Disabled state - subtle indication without changing text appearance */
+.nav-item.disabled,
+.nav-child.disabled {
+  cursor: not-allowed;
+}
+
+.nav-item.disabled:hover,
+.nav-child.disabled:hover {
+  background: transparent;
+  color: var(--color-text-2);
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-text {
+  transition: opacity 0.3s;
+  font-size: 14px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+.sidebar.collapsed .nav-text { display: none; }
+
+.nav-arrow {
+  margin-left: auto;
+  opacity: 0.5;
+}
+
+.nav-item.has-children {
+  padding-right: 8px;
+}
+
+/* No chevrons: parent visual stays minimal */
+.nav-item.has-children::after { content: none; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--color-surface-3);
+  color: var(--color-text-3);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  transition: all var(--transition-base);
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Hide counts when sidebar is collapsed to avoid overlap with icons */
+.sidebar.collapsed .nav-badge { display: none; }
+
+/* Ensure chevron stays at far right after badge */
+.nav-item.has-children .nav-badge { margin-right: 0; }
+
+/* Inline pills style on expand */
+.nav-item.has-children.expanded .nav-badge,
+.nav-item.active .nav-badge {
+  background: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+  font-weight: 600;
+}
+
+/* Subtle inline expansion left slide */
+/* Keep fixed left padding on hover for stability */
+.nav-item:hover { padding-left: 20px; }
+
+/* No chevrons for nested children */
+.nav-child.has-children::after { content: none; }
+
+/* Navigation Children */
+.nav-children {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nav-children.expanded {
+  max-height: 600px;
+}
+
+.nav-child.section-header {
+  font-weight: 600;
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 12px 20px 4px 44px;
+  cursor: default;
+}
+
+.nav-child.section-header:hover {
+  background: transparent;
+  color: var(--color-text-2);
+}
+
+.sidebar.collapsed .nav-child {
+  display: none;
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 101;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sidebar-toggle:hover {
+  color: var(--sigmatiq-bright-teal);
+}
+
+.sidebar-toggle:focus {
+  outline: 2px solid var(--sigmatiq-bright-teal);
+  outline-offset: 2px;
+}
+
+.sidebar-toggle svg {
+  width: 20px;
+  height: 20px;
+  color: inherit;
+  transition: color 0.3s;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-surface-1);
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--color-surface-1);
+}
+
+/* Icon Buttons */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  color: var(--color-text-2);
+}
+
+.icon-btn:hover {
+  border-color: var(--sigmatiq-bright-teal);
+  color: var(--sigmatiq-bright-teal);
+}
+
+.icon-btn:focus {
+  outline: 2px solid var(--sigmatiq-bright-teal);
+  outline-offset: 2px;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s;
+}
+
+.icon-btn.active {
+  border-color: var(--sigmatiq-bright-teal);
+  color: var(--sigmatiq-bright-teal);
+  background: rgba(0, 196, 167, 0.1);
+}
+
+.quick-access-text {
+  font-size: 12px;
+  margin-right: 4px;
+  color: var(--color-text-2);
+}
+
+.icon-btn:has(.quick-access-text) {
+  width: auto;
+  padding: 0 12px;
+  gap: 4px;
+}
+
+/* Notification badge */
+.notification-btn {
+  position: relative;
+}
+
+.notification-btn::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  background: var(--status-warning);
+  border-radius: 50%;
+}
+
+/* Bottom Bar */
+.bottom-bar {
+  height: 40px;
+  background: var(--color-surface-1);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.bottom-actions {
+  flex: 1;
+  display: flex;
+  padding: 0 16px;
+}
+
+.bottom-tools {
+  display: flex;
+  gap: 4px;
+}
+
+/* Command K Style */
+.cmd-k {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+.icon-btn:hover .cmd-k {
+  color: var(--sigmatiq-bright-teal);
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: var(--color-surface-3);
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+.icon-btn:hover .tooltip,
+.icon-btn:focus .tooltip {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -240px;
+    top: var(--header-height, 56px);
+    bottom: 40px;
+    z-index: 50;
+    transition: left var(--transition-base);
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .bottom-actions {
+    display: none;
+  }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Quick Access Drawer (footer) */
+.quick-access-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-surface-1);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 90;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Sidebar: inline dots variant (per packs-icon-showcase-2 Option 6) */
+.nav-children {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  border-left: none !important;
+}
+
+.nav-item.has-children::after { content: none; }
+
+/* Child items use base styles but with indented padding */
+
+/* Ensure consistent gap between last dot and label across depths */
+.nav-child.depth-1 { padding-left: 52px !important; } /* Indent for first level */
+.nav-child.depth-2 { padding-left: 68px !important; } /* Indent for second level */
+.nav-child.depth-3 { padding-left: 84px !important; } /* Indent for third level */
+.nav-child.depth-4 { padding-left: 100px !important; } /* Indent for fourth level */
+
+/* Active state styling handled by base styles above */
+
+.quick-access-drawer.open {
+  transform: translateY(0);
+}
+
+.drawer-handle {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 18px;
+  background: var(--color-surface-2);
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-2);
+  border: 1px solid var(--color-border);
+}
+
+.drawer-handle:hover {
+  background: var(--color-surface-3);
+}
+
+.drawer-content {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-action-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-action-btn:hover {
+  border-color: var(--sigmatiq-bright-teal);
+}
+
+.quick-action-btn:focus {
+  outline: 2px solid var(--sigmatiq-bright-teal);
+  outline-offset: 2px;
+}
+
+.quick-action-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-2);
+}
+
+.quick-action-btn:hover svg {
+  color: var(--sigmatiq-bright-teal);
+}
+
+.edit-btn {
+  margin-left: 16px;
+  border-color: var(--sigmatiq-golden);
+}
+
+.edit-btn svg {
+  color: var(--sigmatiq-golden);
+}
+.nav-child::before {
+  content: '';
+  position: absolute;
+  left: 36px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--color-text-3);
+  opacity: 0.6;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.nav-child.active::before {
+  background: var(--sigmatiq-bright-teal);
+  opacity: 1;
+}
+
+/* Dots per level using before + box-shadow; last dot will be overdrawn by ::after when active */
+.nav-child.depth-1::before,
+.nav-child.depth-2::before,
+.nav-child.depth-3::before,
+.nav-child.depth-4::before {
+  content: '';
+  position: absolute;
+  left: 36px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--color-text-3);
+  opacity: 0.6;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.nav-child.depth-2::before { box-shadow: 8px 0 0 var(--color-text-3); }
+.nav-child.depth-3::before { box-shadow: 8px 0 0 var(--color-text-3), 16px 0 0 var(--color-text-3); }
+.nav-child.depth-4::before { box-shadow: 8px 0 0 var(--color-text-3), 16px 0 0 var(--color-text-3), 24px 0 0 var(--color-text-3); }
+
+/* Active: highlight the last dot teal with an ::after overlay at appropriate offset */
+.nav-child.depth-1.active::after,
+.nav-child.depth-2.active::after,
+.nav-child.depth-3.active::after,
+.nav-child.depth-4.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--sigmatiq-bright-teal);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.nav-child.depth-1.active::after { left: 36px; }
+.nav-child.depth-2.active::after { left: 44px; }
+.nav-child.depth-3.active::after { left: 52px; }
+.nav-child.depth-4.active::after { left: 60px; }

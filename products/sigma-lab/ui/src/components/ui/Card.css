@@ -1,0 +1,216 @@
+/* Card Component Styles - Based on sigmatiq-card-grid-layout.html */
+
+.card {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.card-hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  border-color: var(--sigmatiq-bright-teal);
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+
+/* Card Header */
+.card-header {
+  padding: 12px;
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--sigmatiq-bright-teal);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-icon svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-bg);
+}
+
+.card-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.card-subtitle {
+  font-size: 11px;
+  color: var(--color-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.card-badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.card-badge.success {
+  background: rgba(0,196,167,0.2);
+  color: var(--status-success);
+}
+
+.card-badge.warning {
+  background: rgba(255,184,0,0.2);
+  color: var(--status-warning);
+}
+
+.card-badge.error {
+  background: rgba(255,87,87,0.2);
+  color: var(--status-error);
+}
+
+.card-badge.info {
+  background: rgba(59,130,246,0.2);
+  color: var(--status-info);
+}
+
+.card-badge.default {
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+}
+
+/* Card Content */
+.card-content {
+  padding: 12px;
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-stats-1 {
+  grid-template-columns: 1fr;
+}
+
+.card-stats-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.card-stats-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card-stats-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-1);
+}
+
+.stat-value.positive {
+  color: var(--status-success);
+}
+
+.stat-value.negative {
+  color: var(--status-error);
+}
+
+.card-chart {
+  height: 40px;
+  margin-bottom: 10px;
+  background: var(--color-surface-2);
+  border-radius: 4px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.mini-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+  font-size: 10px;
+  color: var(--color-text-3);
+}
+
+.card-actions {
+  padding: 8px;
+  background: var(--color-surface-2);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 6px;
+}
+
+.card-btn {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-1);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.card-btn:hover {
+  background: var(--sigmatiq-bright-teal);
+  border-color: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+}
+
+.card-btn.primary {
+  background: var(--sigmatiq-bright-teal);
+  border-color: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+}

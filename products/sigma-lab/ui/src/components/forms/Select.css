@@ -1,0 +1,149 @@
+/* Select Component Styles */
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.select-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-1);
+}
+
+.select-required {
+  color: var(--status-error);
+  margin-left: 2px;
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.select {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-1);
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  padding-right: 36px;
+  width: 100%;
+}
+
+.select:focus {
+  border-color: var(--sigmatiq-bright-teal);
+  box-shadow: 0 0 0 2px rgba(0, 196, 167, 0.1);
+}
+
+.select:hover:not(:disabled) {
+  border-color: var(--sigmatiq-bright-teal);
+}
+
+/* Select Sizes */
+.select-sm {
+  padding: 6px 10px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+.select-md {
+  padding: 8px 12px;
+  font-size: 13px;
+  min-height: 36px;
+}
+
+.select-lg {
+  padding: 12px 16px;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+/* Select Icon */
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-3);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.select:focus + .select-icon,
+.select:hover:not(:disabled) + .select-icon {
+  color: var(--sigmatiq-bright-teal);
+}
+
+/* Select States */
+.select-error {
+  border-color: var(--status-error);
+}
+
+.select-error:focus {
+  border-color: var(--status-error);
+  box-shadow: 0 0 0 2px rgba(255, 87, 87, 0.1);
+}
+
+.select-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Full Width */
+.select-full-width {
+  width: 100%;
+}
+
+/* Helper Text */
+.select-error-text {
+  font-size: 12px;
+  color: var(--status-error);
+}
+
+.select-help-text {
+  font-size: 12px;
+  color: var(--color-text-3);
+}
+
+/* Filter Select - specific styling for filter dropdowns */
+.filter-select {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-1);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  appearance: none;
+  padding: 8px 32px 8px 12px;
+  min-width: 120px;
+}
+
+.filter-select:hover {
+  border-color: var(--sigmatiq-bright-teal);
+}
+
+.filter-select:focus {
+  border-color: var(--sigmatiq-bright-teal);
+  box-shadow: 0 0 0 2px rgba(0, 196, 167, 0.1);
+}
+
+/* Option styling */
+.select option {
+  background: var(--color-surface-1);
+  color: var(--color-text-1);
+  padding: 8px;
+}
+
+.select option:disabled {
+  color: var(--color-text-3);
+  opacity: 0.6;
+}

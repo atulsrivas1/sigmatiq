@@ -1,0 +1,102 @@
+/* Badge Component Styles */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  border-radius: 10px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Badge Sizes */
+.badge-sm {
+  padding: 2px 6px;
+  font-size: 9px;
+}
+
+.badge-md {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.badge-lg {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Badge Variants */
+.badge-success {
+  background: rgba(0, 196, 167, 0.2);
+  color: var(--status-success);
+}
+
+.badge-warning {
+  background: rgba(255, 184, 0, 0.2);
+  color: var(--status-warning);
+}
+
+.badge-error {
+  background: rgba(255, 87, 87, 0.2);
+  color: var(--status-error);
+}
+
+.badge-info {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--status-info);
+}
+
+.badge-default {
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+}
+
+.badge-neutral {
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+}
+
+/* Dot Badge */
+.badge-dot {
+  padding-left: 8px;
+}
+
+.badge-dot-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-success .badge-dot-indicator {
+  background: var(--status-success);
+}
+
+.badge-warning .badge-dot-indicator {
+  background: var(--status-warning);
+}
+
+.badge-error .badge-dot-indicator {
+  background: var(--status-error);
+}
+
+.badge-info .badge-dot-indicator {
+  background: var(--status-info);
+}
+
+.badge-default .badge-dot-indicator {
+  background: var(--color-text-1);
+}
+
+.badge-neutral .badge-dot-indicator {
+  background: var(--color-text-2);
+}
+
+/* Pack Badge - Special styling for pack identifiers */
+.pack-badge {
+  background: var(--color-surface-3);
+  color: var(--sigmatiq-bright-teal);
+  border-radius: 4px;
+}

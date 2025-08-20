@@ -1,0 +1,185 @@
+/* Tabs Component Styles */
+
+.tabs-container {
+  width: 100%;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* Tab Sizes */
+.tabs-sm .tab {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.tabs-md .tab {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.tabs-lg .tab {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+/* Default variant */
+.tabs-default .tab:hover:not(.tab-disabled) {
+  color: var(--color-text-1);
+  background: var(--color-surface-2);
+}
+
+.tabs-default .tab-active {
+  color: var(--sigmatiq-bright-teal);
+  border-bottom: 2px solid var(--sigmatiq-bright-teal);
+}
+
+/* Pills variant */
+.tabs-pills {
+  gap: 8px;
+  border-bottom: none;
+  padding: 4px;
+  background: var(--color-surface-2);
+  border-radius: 8px;
+}
+
+.tabs-pills .tab {
+  border-radius: 6px;
+}
+
+.tabs-pills .tab:hover:not(.tab-disabled) {
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+}
+
+.tabs-pills .tab-active {
+  background: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+  border-bottom: none;
+}
+
+/* Underline variant */
+.tabs-underline {
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tabs-underline .tab {
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+}
+
+.tabs-underline .tab:hover:not(.tab-disabled) {
+  color: var(--color-text-1);
+  border-bottom-color: var(--color-text-3);
+}
+
+.tabs-underline .tab-active {
+  color: var(--sigmatiq-bright-teal);
+  border-bottom-color: var(--sigmatiq-bright-teal);
+}
+
+/* Full width */
+.tabs-full-width .tab {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Tab states */
+.tab-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+}
+
+.tab-label {
+  display: flex;
+  align-items: center;
+}
+
+.tab-badge {
+  margin-left: 4px;
+  padding: 2px 6px;
+  background: var(--color-surface-3);
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+.tab-active .tab-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}
+
+/* Tab Content */
+.tabs-content {
+  padding: 20px 0;
+}
+
+.tab-panel {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Period Selector */
+.period-selector {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--color-surface-2);
+  border-radius: 8px;
+}
+
+.period-option {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.period-option:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+}
+
+.period-option.active {
+  background: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+}

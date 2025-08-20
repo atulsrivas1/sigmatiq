@@ -1,0 +1,113 @@
+.sweeps-page {
+  padding: var(--spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sweeps-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-lg);
+}
+
+.sweep-configuration {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.sweep-configuration h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-1);
+  margin-bottom: var(--spacing-lg);
+}
+
+.config-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.config-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-3);
+  margin-bottom: var(--spacing-md);
+}
+
+.risk-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.risk-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.risk-btn:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+}
+
+.risk-btn.active {
+  background: var(--sigmatiq-bright-teal);
+  color: var(--color-bg);
+  border-color: var(--sigmatiq-bright-teal);
+}
+
+.what-if-panel {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.what-if-panel p {
+  font-size: 13px;
+  color: var(--color-text-2);
+  margin-bottom: var(--spacing-md);
+}
+
+.sweep-results {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.sweep-results h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-1);
+  margin-bottom: var(--spacing-lg);
+}
+
+.placeholder-content {
+  padding: var(--spacing-xl);
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--color-text-3);
+}
+
+.placeholder-content p {
+  margin-bottom: var(--spacing-sm);
+}
+
+@media (max-width: 1024px) {
+  .sweeps-container {
+    grid-template-columns: 1fr;
+  }
+}

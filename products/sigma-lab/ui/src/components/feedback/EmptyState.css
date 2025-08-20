@@ -1,0 +1,66 @@
+/* Empty State Component Styles */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  min-height: 300px;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  color: var(--color-text-3);
+  opacity: 0.5;
+}
+
+.empty-state-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-1);
+  margin-bottom: 8px;
+}
+
+.empty-state-message {
+  font-size: 14px;
+  color: var(--color-text-2);
+  max-width: 400px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.empty-state-action {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Variant Styles */
+.empty-state-no-data .empty-state-icon {
+  color: var(--color-text-3);
+}
+
+.empty-state-no-results .empty-state-icon {
+  color: var(--sigmatiq-bright-teal);
+  opacity: 0.3;
+}
+
+.empty-state-first-time .empty-state-icon {
+  color: var(--sigmatiq-golden);
+  opacity: 0.6;
+}
+
+.empty-state-error .empty-state-icon {
+  color: var(--status-error);
+  opacity: 0.5;
+}

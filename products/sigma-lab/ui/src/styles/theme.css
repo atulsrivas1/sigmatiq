@@ -1,0 +1,130 @@
+:root {
+  /* Brand Colors - From Mock Pages */
+  --sigmatiq-teal-primary: #1ABC9C;
+  --sigmatiq-teal-light: #48C9B0;
+  --sigmatiq-teal-dark: #16A085;
+  --sigmatiq-bright-teal: #00C4A7;
+  --sigmatiq-golden: #F59E0B;
+  --sigmatiq-cream: #E8E3D9;
+  
+  /* Logo Colors */
+  --logo-teal-1: #6AAFA7;
+  --logo-teal-2: #4A8B83;
+  --logo-golden: #C4975C;
+  
+  /* Dark Theme - From Dashboard Mock */
+  --color-bg: #0A1414;
+  --color-surface-1: #0F1A1A;
+  --color-surface-2: #111827;
+  --color-surface-3: #1A2F2F;
+  --color-border: #2A3F3F;
+  
+  /* Text Colors */
+  --color-text-1: #F5F5F7;
+  --color-text-2: #8FA5A5;
+  --color-text-3: #6A8080;
+  
+  /* Status Colors */
+  --status-success: #00C4A7;
+  --status-warning: #FFB800;
+  --status-error: #FF5757;
+  --status-info: #3B82F6;
+  
+  /* Layout */
+  --header-height: 56px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 60px;
+  --mobile-tab-height: 56px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text-1);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--sigmatiq-bright-teal);
+  outline-offset: 2px;
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--color-text-2);
+}
+
+.text-dim {
+  color: var(--color-text-3);
+}
+
+.text-success {
+  color: var(--status-success);
+}
+
+.text-warning {
+  color: var(--status-warning);
+}
+
+.text-error {
+  color: var(--status-error);
+}
+
+.text-info {
+  color: var(--status-info);
+}
