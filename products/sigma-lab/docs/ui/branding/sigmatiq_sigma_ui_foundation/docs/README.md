@@ -83,7 +83,7 @@ module.exports = {
 - `data-pack="swingsigma"` → Orange accent
 - `data-pack="longsigma"` → Green accent
 
-You can define future packs (e.g. `overnightsigma`, `customizededge`) by adding their accents inside `tokens/colors.css` under the pack section.
+You can define future packs (e.g. `overnightsigma`, `customizedsigma`) by adding their accents inside `tokens/colors.css` under the pack section.
 
 ---
 

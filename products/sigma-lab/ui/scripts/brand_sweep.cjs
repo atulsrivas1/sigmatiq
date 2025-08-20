@@ -3,7 +3,14 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'src');
-const banned = [/Sigmatix/i, /ZeroEdge(?!\sWorkspace)/i];
+// Flag legacy brand/product names in UI source files
+// - Sigmatix → Sigmatiq
+// - ZeroEdge → ZeroSigma (except literal "ZeroEdge Workspace" if present)
+const banned = [
+  /\bSigmatix\b/i,
+  /sigmatix[_-]/i,
+  /ZeroEdge(?!\sWorkspace)/i,
+];
 let bad = [];
 
 function walk(p){

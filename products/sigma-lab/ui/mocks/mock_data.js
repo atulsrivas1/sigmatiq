@@ -8,15 +8,15 @@ export const CADENCES = ['1min', '5min', '15min', '30min', '1hour', '4hour', 'da
 
 export const INDICATOR_SETS = [
   {
-    name: 'zeroedge_core_v2',
+    name: 'zerosigma_core_v2',
     indicators: ['options_gamma', 'options_iv', 'intraday_open', 'vix_level', 'momentum_score']
   },
   {
-    name: 'swingedge_momentum_v1', 
+    name: 'swingsigma_momentum_v1', 
     indicators: ['ema_12', 'ema_26', 'macd', 'rsi_14', 'bollinger_bands', 'volume_sma']
   },
   {
-    name: 'longedge_trend_v1',
+    name: 'longsigma_trend_v1',
     indicators: ['sma_50', 'sma_200', 'atr_14', 'adx_14', 'stochastic']
   }
 ];

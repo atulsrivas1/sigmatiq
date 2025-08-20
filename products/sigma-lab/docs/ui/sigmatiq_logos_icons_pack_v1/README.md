@@ -12,11 +12,11 @@ sigmatiq/
   png/sigmatiq_mark_{2048,1024,512,256,128,64,32}.png
   favicon.ico
 sigmatiq_sigma/
-  svg/sigmatiq_edge_mark.svg
-  svg/sigmatiq_edge_lockup_horizontal.svg
-  png/sigmatiq_edge_mark_{sizes}.png
+  svg/sigmatiq_sigma_mark.svg
+  svg/sigmatiq_sigma_lockup_horizontal.svg
+  png/sigmatiq_sigma_mark_{sizes}.png
   favicon.ico
-packs/{zerosigma|swingsigma|longsigma|overnightsigma|customizededge}/
+packs/{zerosigma|swingsigma|longsigma|overnightsigma|customizedsigma}/
   svg/*_mark.svg, *_lockup_horizontal.svg
   png/*_mark_{sizes}.png
   favicon.ico
@@ -28,7 +28,7 @@ colors.json
 ## Usage
 ```html
 <img src="/sigmatiq/svg/sigmatiq_mark.svg" alt="Sigmatiq" width="128">
-<img src="/sigmatiq_sigma/png/sigmatiq_edge_mark_512.png" alt="Sigmatiq Sigma" width="128">
+<img src="/sigmatiq_sigma/png/sigmatiq_sigma_mark_512.png" alt="Sigmatiq Sigma" width="128">
 <link rel="stylesheet" href="/sigmatiq-brand.css">
 ```
 

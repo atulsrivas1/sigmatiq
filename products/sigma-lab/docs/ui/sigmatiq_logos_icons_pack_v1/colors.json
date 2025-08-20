@@ -1,7 +1,7 @@
 {
   "sigmatiq_bg": "#0A2540",
-  "sigmatiq_edge_bg": "#0A2540",
-  "sigmatiq_edge_accent": "#1ABC9C",
+  "sigmatiq_sigma_bg": "#0A2540",
+  "sigmatiq_sigma_accent": "#1ABC9C",
   "zero": "#3B82F6",
   "swing": "#F97316",
   "long": "#22C55E",

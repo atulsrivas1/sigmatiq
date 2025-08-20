@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMATIQ - Twisted Data Layers Galaxy Concept</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0A1414;
+            color: #F5F5F7;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #2A3F3F;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #1ABC9C;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #8FA5A5;
+        }
+        
+        /* Logo Sections */
+        .logo-section {
+            background: #0F1A1A;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid #1A2F2F;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #1ABC9C;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+        
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .logo-card {
+            background: #0A1414;
+            border: 1px solid #2A3F3F;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .logo-card:hover {
+            border-color: #1ABC9C;
+            transform: translateY(-2px);
+        }
+        
+        .logo-container {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-name {
+            font-size: 16px;
+            color: #1ABC9C;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .logo-desc {
+            font-size: 12px;
+            color: #6A8080;
+            line-height: 1.5;
+        }
+        
+        .transformation-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+        }
+        
+        .arrow {
+            color: #1ABC9C;
+            font-size: 24px;
+        }
+        
+        /* Animation */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes orbit {
+            from { transform: rotate(0deg) translateX(45px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+        }
+        
+        .rotating {
+            animation: rotate 20s linear infinite;
+        }
+        
+        .orbiting {
+            animation: orbit 10s linear infinite;
+        }
+        
+        /* Variations */
+        .variations {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #2A3F3F;
+        }
+        
+        .variation {
+            text-align: center;
+        }
+        
+        .variation-label {
+            font-size: 10px;
+            color: #6A8080;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Twisted Data Layers</h1>
+            <p class="subtitle">Brand Logo Transformed into Orbital Galaxy</p>
+        </div>
+        
+        <!-- Transformation Concept -->
+        <div class="logo-section">
+            <h2 class="section-title">The Transformation: Linear to Circular</h2>
+            
+            <div class="transformation-display">
+                <!-- Original Brand Logo -->
+                <div>
+                    <svg width="180" height="100" viewBox="0 0 180 100">
+                        <text x="90" y="20" font-family="Arial, sans-serif" font-size="12" fill="#8FA5A5" text-anchor="middle">BRAND (Linear)</text>
+                        <!-- Exact data layers from brand -->
+                        <rect x="40" y="30" width="100" height="4" fill="#1ABC9C" rx="2"/>
+                        <rect x="40" y="39" width="85" height="4" fill="#16A085" rx="2"/>
+                        <rect x="40" y="48" width="100" height="4" fill="#48C9B0" rx="2"/>
+                        <rect x="40" y="57" width="85" height="4" fill="#16A085" rx="2"/>
+                        <rect x="40" y="66" width="100" height="4" fill="#1ABC9C" rx="2"/>
+                        <!-- IQ accent dot -->
+                        <circle cx="130" cy="32" r="3" fill="#F59E0B"/>
+                    </svg>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <!-- Twisted into Circle -->
+                <div>
+                    <svg width="180" height="100" viewBox="0 0 180 100">
+                        <text x="90" y="20" font-family="Arial, sans-serif" font-size="12" fill="#8FA5A5" text-anchor="middle">PRODUCT (Twisted)</text>
+                        <g transform="translate(90, 60)">
+                            <!-- Same layers, now circular - matching exact proportions -->
+                            <circle r="30" fill="none" stroke="#1ABC9C" stroke-width="4"/>
+                            <circle r="25.5" fill="none" stroke="#16A085" stroke-width="4"/>
+                            <circle r="21" fill="none" stroke="#48C9B0" stroke-width="4"/>
+                            <circle r="16.5" fill="none" stroke="#16A085" stroke-width="4"/>
+                            <circle r="12" fill="none" stroke="#1ABC9C" stroke-width="4"/>
+                            
+                            <!-- Sun core (was IQ dot, now center) -->
+                            <circle r="4" fill="#F59E0B"/>
+                            
+                            <!-- Earth on outer edge -->
+                            <circle cx="30" cy="0" r="3" fill="#3B82F6"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div style="text-align: center; color: #8FA5A5; font-size: 14px; margin-top: 20px;">
+                The five data layers maintain their exact widths and color sequence,<br>
+                just twisted from horizontal lines into concentric circles
+            </div>
+        </div>
+        
+        <!-- Sigma Suite Master Logo -->
+        <div class="logo-section">
+            <h2 class="section-title">Sigma Suite - Twisted Data Galaxy</h2>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <div class="logo-container">
+                        <svg width="280" height="120" viewBox="0 0 280 120">
+                            <!-- Twisted Data Layers Galaxy -->
+                            <g transform="translate(60, 60)">
+                                <!-- Five data layers - same as brand but circular -->
+                                <circle r="45" fill="none" stroke="#1ABC9C" stroke-width="4"/>
+                                <circle r="38.25" fill="none" stroke="#16A085" stroke-width="4"/>
+                                <circle r="31.5" fill="none" stroke="#48C9B0" stroke-width="4"/>
+                                <circle r="24.75" fill="none" stroke="#16A085" stroke-width="4"/>
+                                <circle r="18" fill="none" stroke="#1ABC9C" stroke-width="4"/>
+                                
+                                <!-- Sun Core (Yellow - was the IQ dot) -->
+                                <circle r="6" fill="#F59E0B"/>
+                                
+                                <!-- Earth on outermost layer -->
+                                <circle cx="45" cy="0" r="4" fill="#3B82F6"/>
+                            </g>
+                            <!-- Text -->
+                            <text x="120" y="55" font-family="Arial, sans-serif" font-size="22" font-weight="300" fill="#F5F5F7">SIGMA</text>
+                            <text x="120" y="75" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="#1ABC9C">SUITE</text>
+                        </svg>
+                    </div>
+                    <div class="logo-name">Perfect Data Layer Translation</div>
+                    <div class="logo-desc">Exact same five layers, twisted into orbital form</div>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-container">
+                        <svg width="280" height="120" viewBox="0 0 280 120">
+                            <!-- With spacing for clarity -->
+                            <g transform="translate(60, 60)">
+                                <!-- Five layers with small gaps -->
+                                <circle r="46" fill="none" stroke="#1ABC9C" stroke-width="3"/>
+                                <circle r="39" fill="none" stroke="#16A085" stroke-width="3"/>
+                                <circle r="32" fill="none" stroke="#48C9B0" stroke-width="3"/>
+                                <circle r="25" fill="none" stroke="#16A085" stroke-width="3"/>
+                                <circle r="18" fill="none" stroke="#1ABC9C" stroke-width="3"/>
+                                
+                                <!-- Sun Core -->
+                                <circle r="7" fill="#F59E0B"/>
+                                <circle r="10" fill="none" stroke="#F59E0B" stroke-width="1" opacity="0.3"/>
+                                
+                                <!-- Earth with orbit indication -->
+                                <circle cx="46" cy="0" r="
