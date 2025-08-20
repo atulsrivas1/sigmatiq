@@ -89,6 +89,7 @@ app = FastAPI(title="Sigmatiq Sigma API")
 # Routers (modular endpoints)
 import importlib as _importlib
 import logging as _logging
+from api import runtime as _runtime
 
 def _include_router(mod_path: str) -> None:
     try:
@@ -96,8 +97,12 @@ def _include_router(mod_path: str) -> None:
         r = getattr(mod, 'router', None)
         if r is not None:
             app.include_router(r)
+            _runtime.ROUTER_STATUS[mod_path] = True
+        else:
+            _runtime.ROUTER_STATUS[mod_path] = False
     except Exception:
         _logging.getLogger(__name__).warning("failed to include router: %s", mod_path)
+        _runtime.ROUTER_STATUS[mod_path] = False
 
 _include_router('api.routers.signals')
 _include_router('api.routers.health')
@@ -181,6 +186,35 @@ async def audit_mw(request, call_next):
     except Exception as e:
         _logging.getLogger(__name__).warning("audit middleware error: %s", e)
     return response
+
+
+# Optional simple in-memory rate limit (dev scaffold)
+try:
+    import os as _os
+    _RATE_ENABLED = (_os.getenv('RATELIMIT_ENABLED', 'false').lower() == 'true')
+    _RATE_PER_MIN = int(_os.getenv('RATELIMIT_PER_MIN', '120'))
+except Exception:
+    _RATE_ENABLED = False
+    _RATE_PER_MIN = 120
+
+_rate_counters: dict[tuple[str,str,int], int] = {}
+
+@app.middleware("http")
+async def _rate_limit_mw(request, call_next):
+    if not _RATE_ENABLED:
+        return await call_next(request)
+    try:
+        import time as _t
+        now_min = int(_t.time() // 60)
+        key = (str(request.client.host) if request.client else 'unknown', str(request.url.path), now_min)
+        cnt = _rate_counters.get(key, 0) + 1
+        _rate_counters[key] = cnt
+        if cnt > _RATE_PER_MIN:
+            from fastapi.responses import JSONResponse as _JR
+            return _JR({"ok": False, "error": "rate_limited"}, status_code=429)
+    except Exception:
+        pass
+    return await call_next(request)
 
  
 

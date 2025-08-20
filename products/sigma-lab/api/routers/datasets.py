@@ -39,6 +39,25 @@ class BuildMatrixRequest(BaseModel):
         except Exception:
             raise ValueError('start/end must be ISO date YYYY-MM-DD')
 
+    @validator('distance_max', pre=True)
+    def _validate_distance(cls, v):  # type: ignore
+        try:
+            iv = int(v)
+            if iv <= 0:
+                raise ValueError('distance_max must be > 0')
+            return iv
+        except Exception:
+            raise ValueError('distance_max must be a positive integer')
+
+    @validator('ticker', pre=True)
+    def _validate_ticker(cls, v):  # type: ignore
+        if v is None:
+            return v
+        s = str(v).strip().upper()
+        if not s or any(ch in s for ch in ('/', '\\', ' ')):
+            raise ValueError('ticker must be a simple symbol')
+        return s
+
 @router.post('/build_matrix')
 def build_matrix_ep(payload: BuildMatrixRequest):
     model_id = payload.model_id

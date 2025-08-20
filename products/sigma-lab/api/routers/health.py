@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 import os
 
 from sigma_core.storage.relational import get_db
+from sigma_core.indicators.registry import registry as indicator_registry
+from sigma_core.indicators.registry import get_load_errors as _get_indicator_load_errors
+from api.runtime import ROUTER_STATUS
 from api.services.model_cards import list_model_cards
 from api.services.io import workspace_paths
 from sigma_core.data.sources.polygon import (
@@ -25,6 +28,18 @@ def health():
 def healthz(ticker: str = Query("SPY"), pack_id: str = Query("zerosigma"), model_id: str | None = Query(None)):
     errors: Dict[str, str] = {}
     checks: Dict[str, Any] = {}
+    # Routers + indicators quick status
+    try:
+        checks["routers"] = {k: bool(v) for k, v in ROUTER_STATUS.items()}
+    except Exception:
+        checks["routers"] = {}
+    try:
+        checks["indicators_count"] = int(len(indicator_registry.indicators))
+        errs = _get_indicator_load_errors()
+        if errs:
+            errors["indicators_load"] = f"{len(errs)} load errors"
+    except Exception:
+        pass
     poly = os.getenv("POLYGON_API_KEY") or os.getenv("ZE_POLYGON_API_KEY")
     checks["polygon_api_key"] = bool(poly)
     today = datetime.now().date()
