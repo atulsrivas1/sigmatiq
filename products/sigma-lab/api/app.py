@@ -2,23 +2,23 @@ import json
 import sys as _sys
 import os as _os
 from pathlib import Path as _Path
-# Ensure shared core (parent repo) is importable for data/backtest/train modules
+# DEV-ONLY path hacks (gate via SIGMA_USE_PATH_HACKS=1). In packaged deployments, disable.
 _WS_ROOT = _Path(__file__).resolve().parent.parent
 _PARENT = _WS_ROOT.parent
-_CORE_ENV = _os.environ.get("ZE_CORE_PATH")
-if _CORE_ENV and _CORE_ENV not in _sys.path:
-    _sys.path.insert(0, _CORE_ENV)
-# Also attempt to add sibling sigma-core if present (monorepo layout)
-try:
-    _SIGMA_CORE_DIR = _PARENT / 'sigma-core'
-    if _SIGMA_CORE_DIR.exists() and str(_SIGMA_CORE_DIR) not in _sys.path:
-        _sys.path.insert(0, str(_SIGMA_CORE_DIR))
-except Exception:
-    pass
-if str(_PARENT) not in _sys.path:
-    _sys.path.insert(0, str(_PARENT))
-if str(_WS_ROOT) not in _sys.path:
-    _sys.path.insert(0, str(_WS_ROOT))
+if _os.getenv("SIGMA_USE_PATH_HACKS", "1") in ("1","true","True"):
+    _CORE_ENV = _os.environ.get("ZE_CORE_PATH")
+    if _CORE_ENV and _CORE_ENV not in _sys.path:
+        _sys.path.insert(0, _CORE_ENV)
+    try:
+        _SIGMA_CORE_DIR = _PARENT / 'sigma-core'
+        if _SIGMA_CORE_DIR.exists() and str(_SIGMA_CORE_DIR) not in _sys.path:
+            _sys.path.insert(0, str(_SIGMA_CORE_DIR))
+    except Exception:
+        pass
+    if str(_PARENT) not in _sys.path:
+        _sys.path.insert(0, str(_PARENT))
+    if str(_WS_ROOT) not in _sys.path:
+        _sys.path.insert(0, str(_WS_ROOT))
 
 # Load .env early so env vars (e.g., POLYGON_API_KEY) are available
 try:
