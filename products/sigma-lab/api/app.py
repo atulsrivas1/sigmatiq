@@ -67,15 +67,15 @@ import csv as _csv
 import uuid as _uuid
 import numpy as _np
 try:
-    from sigma_platform.brackets import apply_stock_brackets
+    from sigma_core.services.brackets import apply_stock_brackets
 except Exception:
     apply_stock_brackets = None
 try:
-    from sigma_platform.lineage import compute_lineage as _compute_lineage
+    from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
 try:
-    from sigma_platform.policy import validate_policy_file as _validate_policy_file
+    from sigma_core.services.policy import validate_policy_file as _validate_policy_file
 except Exception:
     _validate_policy_file = None
 
@@ -122,7 +122,7 @@ _include_router('api.routers.packs')
 
 # Lightweight audit middleware (DB optional). Logs POST requests to key endpoints.
 try:
-    from sigma_platform.audit import log_audit as _log_audit
+    from sigma_core.services.audit import log_audit as _log_audit
 except Exception:
     _log_audit = None
 

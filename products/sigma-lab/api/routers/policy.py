@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Query
 
-from sigma_platform.policy import load_policy, validate_policy_file
-from sigma_platform.io import workspace_paths
+from sigma_core.services.policy import load_policy, validate_policy_file
+from sigma_core.services.io import workspace_paths
 
 router = APIRouter()
 

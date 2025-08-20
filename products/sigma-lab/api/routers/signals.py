@@ -105,7 +105,7 @@ def signals_leaderboard(
 ):
     """Aggregate live metrics across models. CSV-based fallback when DB is not configured."""
     try:
-        from sigma_platform.signals_live import leaderboard_from_csv
+        from sigma_core.services.signals_live import leaderboard_from_csv
         from pathlib import Path as _Path
         root = _Path(__file__).resolve().parents[2]
         # If DB is available, compute over models discovered in packs and aggregate in-memory

@@ -7,14 +7,14 @@ import pandas as pd
 
 from sigma_core.backtest.engine import run_backtest
 from sigma_core.registry.backtest_registry import create_backtest_run, leaderboard as db_leaderboard, create_backtest_folds
-from sigma_platform.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
-from sigma_platform.policy import load_policy
+from sigma_core.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
+from sigma_core.services.policy import load_policy
 try:
-    from sigma_platform.lineage import compute_lineage as _compute_lineage
+    from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
 try:
-    from sigma_platform.model_cards import write_model_card
+    from sigma_core.services.model_cards import write_model_card
 except Exception:
     write_model_card = None
 
