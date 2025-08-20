@@ -1,16 +1,65 @@
-# Sigmatiq Edge Lab UI Development Guide
+# Sigmatiq Sigma Lab - Complete Development Guide
 
 ## Project Overview
 
-Sigmatiq Edge Lab is an institutional-grade trading platform for retail investors featuring model authoring, backtesting, and automated execution. The UI provides a comprehensive interface for the Build → Train → Backtest (BTB) pipeline with advanced risk management and signal monitoring capabilities.
+Sigmatiq Sigma Lab is an institutional-grade trading platform for retail investors that provides the complete lifecycle: **discover → validate → simulate → subscribe → automate → review**. The platform features model authoring, backtesting, automated execution, and comprehensive risk management through the Build → Train → Backtest (BTB) pipeline.
+
+### Product Ecosystem
+- **Sigma Lab**: Model authoring and evaluation (preview, build/train/backtest, sweeps/leaderboard, model cards and lineage)
+- **Sigma Sim**: Broker-aware paper trading for validation before capital deployment
+- **Sigma Market**: Curated signal feeds from AI models and vetted human traders
+- **Sigma Pilot**: Policy-driven execution automation across supported brokers
+
+### Core Principles
+1. **Evidence over opinion** - All signals carry provenance, assumptions, and expected ranges
+2. **Transparency first** - Model cards, data sheets, and post-trade attribution are standard
+3. **Risk-aware by default** - Conservative controls enabled; users opt into higher risk
+4. **Human control** - Automation is reversible and bounded by user policies
+5. **Continuous learning** - Every trade feeds evaluation loops and improves models
+
+## Project Structure & Conventions
+
+### Repository Layout
+```
+products/
+  sigma-lab/           # Main product directory
+    api/               # FastAPI backend
+    ui/                # React TypeScript frontend
+    docs/              # Comprehensive documentation
+    packs/             # Trading strategy packs (zerosigma, swingsigma, etc.)
+    matrices/          # Generated training matrices
+    artifacts/         # Model artifacts
+    live_data/         # Live trading data
+    static/            # Static assets and plots
+    reports/           # Generated reports
+  sigma-core/          # Shared core libraries
+  sigma-platform/      # Platform helpers
+  mock-api/            # Mock API for UI development
+```
+
+### Key Conventions
+- **Product root**: `products/sigma-lab/`
+- **API**: Runs on port 8001 (`python products/sigma-lab/api/run_api.py --host 0.0.0.0 --port 8001 --reload`)
+- **Mock API**: Development server on port 8010 for UI testing
+- **Environment**: `.env` file with POLYGON_API_KEY, DB_* settings
+- **Package naming**: `sigma_core` (shared libs), `sigma_platform` (platform helpers)
+- **Data caching**: Historical-only cache; today's data always live
+- **Naming convention**: Models use `ticker_asset_horizon_cadence` format
 
 ## Architecture & Technology Stack
 
-- **Frontend**: React-based SPA with TypeScript
-- **API**: FastAPI backend with REST endpoints
-- **Database**: PostgreSQL with migration support
+### Backend
+- **API Framework**: FastAPI with Pydantic models
+- **Database**: PostgreSQL (no container requirement)
+- **Data Provider**: Polygon.io for market data
+- **Caching**: Historical-only, never cache today's data
+- **Testing**: pytest with coverage targets
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite for fast HMR and builds
 - **Styling**: CSS-in-JS with semantic design tokens
-- **State Management**: Type-safe API client with optimistic updates
+- **State Management**: React Context + type-safe API client
 - **Testing**: Unit tests + E2E accessibility compliance
 
 ## Core UI Principles
@@ -27,6 +76,22 @@ Sigmatiq Edge Lab is an institutional-grade trading platform for retail investor
 - Clear risk profile management (Conservative/Balanced/Aggressive)
 - Real-time monitoring with performance attribution
 - Context-aware AI assistant guidance
+
+## Trading Packs (Strategy Types)
+
+### Available Packs
+1. **ZeroSigma (0DTE)**: Options expiring same day, high frequency trading
+2. **SwingSigma**: 2-10 day equity/options swing trades
+3. **LongSigma**: 63-252 day long-term positions
+4. **OvernightSigma**: Close-to-open overnight gap trading
+5. **MomentumSigma**: Vol-scaled momentum strategies
+
+### Pack Configuration
+Each pack includes:
+- Indicator sets (90+ technical indicators available)
+- Policy templates and risk profiles
+- Model templates with pre-configured defaults
+- Pack-specific ranking metrics and gates
 
 ## Application Structure
 
@@ -349,6 +414,141 @@ GET /healthz?ticker&pack_id&model_id
 - Error rate tracking
 - Feature usage analytics
 
+## Development Commands
+
+### Start Development Servers
+```bash
+# Start UI development server (runs on http://localhost:5173)
+cd products/sigma-lab/ui
+npm install
+npm run dev
+
+# Start API server (runs on http://localhost:8001)
+python products/sigma-lab/api/run_api.py --host 0.0.0.0 --port 8001 --reload
+
+# Start Mock API for UI development (runs on http://localhost:8010)
+cd products/mock-api
+pip install -r requirements.txt
+make dev
+```
+
+### Testing
+```bash
+# Run core tests
+pytest products/sigma-core/tests -q
+
+# Run API tests  
+pytest products/sigma-lab/api/tests -q
+
+# Run all tests with coverage
+pytest --cov=sigma_core --cov=sigma_platform --cov-report term-missing
+```
+
+### Build & Deploy
+```bash
+# Build UI for production
+cd products/sigma-lab/ui
+npm run build
+
+# Run database migrations
+psql -U user -d sigmalab -f products/sigma-lab/api/migrations/0001_init.sql
+```
+
+## Current Implementation Status
+
+### ✅ Completed Features
+- React TypeScript application structure with routing
+- 4-theme system (2 dark: dark/midnight, 2 light: light/slate) with persistence
+- Command palette (Cmd/Ctrl+K) with grouped commands and smooth animations
+- Sidebar navigation with hamburger menu icon
+- Logo alignment with sidebar icons
+- Consistent font sizing and styling across all menu levels
+- Active state indicators (green line on left, no background change)
+- Component library (buttons, forms, data display, tooltips)
+- Mock API integration for development
+- Vite configuration with hot module replacement
+
+### 🚧 In Progress (Backlog P0)
+1. Tests for /backtest_sweep endpoint
+2. UI Sweeps: tag filter, CSV export, parity columns
+3. Parity computation and rendering in sweeps
+4. Gate badges with improved tooltips
+5. Selection cart persistence across sessions
+
+### 📋 Next Priorities (P1)
+- Signals monitoring UI (leaderboard, log, analytics tabs)
+- Model Designer interface for indicator selection
+- Options overlay UI for conversion workflows
+- AI Assistant integration with context-aware help
+- Structured logging and observability improvements
+
+## Key Documentation References
+
+### Essential Docs
+- `docs/INDEX.md` - Complete documentation index
+- `docs/CONTRACT.md` - API contract specifications
+- `docs/CONVENTIONS.md` - Project conventions
+- `docs/STATUS_AND_PLANS.md` - Current status and roadmap
+- `docs/BACKLOG.md` - Prioritized task list
+- `docs/ENGINEERING_STATUS.md` - Recent engineering updates
+
+### Architecture Decision Records (ADRs)
+- `0001-architectural-overview.md` - System architecture
+- `0005-btb-pipeline-and-risk-profiles.md` - BTB pipeline design
+- `0006-template-first-create-and-split-designer-composer.md` - UI workflow
+
+### API Specifications
+- `docs/api/BTB_API_Spec_v1.md` - BTB pipeline API
+- `docs/api/Signals_API_Spec_v1.md` - Signals monitoring API
+- `docs/api/Assistant_API_Spec_v1.md` - AI assistant API
+
+### UI Specifications
+- `docs/ui/Sigma_Lab_UI_Requirements_v1.md` - Detailed UI requirements
+- `docs/ui/BTB_UI_Spec_v1.md` - BTB pipeline UI specification
+- `docs/ui/AI_Assistant_Spec_v1.md` - AI assistant integration
+
+## Important Notes
+
+### Security & Best Practices
+- Never commit secrets or API keys
+- Use environment variables for configuration
+- Follow security best practices for all code
+- Implement proper input validation
+- Use parameterized queries for database access
+
+### Performance Guidelines
+- Table virtualization for datasets >1000 rows
+- Lazy loading for heavy components
+- Debounced search (300ms default)
+- Historical data caching only (never cache today's data)
+- Bundle splitting by route
+
+### Accessibility Requirements
+- WCAG AA compliance (AAA for critical text)
+- Keyboard navigation for all interactive elements
+- Screen reader support with proper ARIA labels
+- Focus management in modals and drawers
+- High contrast theme support
+
+## Git Information
+
+### Current Branch
+- Branch: main
+- Recent commits include complete UI implementation with themes and command palette
+- All code has been committed and is ready for deployment
+
+### Recent Changes
+- Implemented 4-theme system with theme toggle
+- Added command palette with keyboard shortcuts
+- Fixed TypeScript errors in showcase route
+- Aligned logo and sidebar icons properly
+- Made sidebar background consistent with page
+- Removed sidebar border for cleaner look
+- Changed to hamburger menu icon for sidebar toggle
+- Implemented single-icon theme button with color changes
+
 ---
 
-This guide provides the foundation for building the Sigmatiq Edge Lab UI. Focus on the P0 features first, ensuring solid accessibility and performance foundations before expanding to advanced features.
+**Last Updated**: 2025-08-20
+**Current Focus**: UI implementation complete, ready for P0 backlog items
+**Development Server**: Running on http://localhost:5173

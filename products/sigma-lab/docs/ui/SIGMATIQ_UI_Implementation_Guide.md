@@ -1,204 +1,200 @@
-# SIGMATIQ UI Implementation Guide for Claude Code
+# SIGMATIQ UI Implementation Guide (Developer Edition)
 
-## Project Overview
-SIGMATIQ Sigma Lab is a comprehensive trading platform with a flat, minimalist design system focused on accessibility, performance, and user experience. This guide reflects the final production-ready implementation with all refinements.
+Purpose: Provide concrete, end-to-end guidance to implement Sigma Lab’s UI with zero ambiguity. This document ties specs to actual code in `sigma-lab/ui/src/**`, defines component contracts, routes, tokens, storage keys, and API shapes.
 
-## 📁 Project Structure
+What this covers
+- App shell and navigation behavior, including accessibility details
+- Theme/density/accent tokens and persistence
+- Page routes and how they map to existing components
+- Command Palette, keyboard shortcuts, and JSON configs
+- API client contracts and example payloads
+- State, error, loading, and empty patterns (uniform across pages)
+- Performance, testing, and acceptance
 
+References
+- AppShell platform: `products/sigma-lab/docs/ui/AppShell_Platform_v1.md`
+- Tokens checklist: `products/sigma-lab/docs/ui/Design_Tokens_Checklist.md`
+- Requirements: `products/sigma-lab/docs/ui/Sigma_Lab_UI_Requirements_v1.md`
+- Wireframes: `products/sigma-lab/docs/ui/Sigma_Lab_UI_Wireframes_v1.md`
+
+Project Overview
+- Stack: React + TypeScript + Vite; CSS modules/simple CSS files under `src/styles/**`.
+- Entry: `sigma-lab/ui/src/main.tsx` mounts `AppShell` and routes.
+- Shell: `src/layouts/AppShell.tsx` with topbar, sidebar, main content, command palette.
+- API: `src/services/api.ts` wraps Axios with `/api` base and auth header support.
+- Config: `src/config/menu.ts` drives navigation tree; `implementedPaths` disables not-yet-implemented links.
+- Components: `src/components/**` includes UI primitives (buttons, cards, badges, tables) and specialized widgets.
+
+Directory Structure (actual)
 ```
-sigmatiq/
-├── src/
-│   ├── components/
-│   │   ├── core/           # P0 Priority Components
-│   │   ├── analytics/      # P1 Priority Components
-│   │   ├── admin/          # P2 Admin Components
-│   │   └── shared/         # Shared UI elements
-│   ├── styles/
-│   │   ├── theme.css       # Design tokens & variables
-│   │   ├── components.css  # Component styles
-│   │   └── utilities.css   # Utility classes
-│   ├── assets/
-│   │   ├── logo/           # SIGMA LAB logo variants
-│   │   └── icons/          # Icon library
-│   ├── layouts/
-│   │   ├── AppShell.jsx    # Main navigation shell
-│   │   └── AdminLayout.jsx # Admin section layout
-│   ├── contexts/
-│   │   └── AppContext.jsx  # Global state management
-│   ├── services/
-│   │   ├── api.js          # API integration
-│   │   └── websocket.js    # WebSocket service
-│   └── data/
-│       └── menu.json       # Navigation structure
+sigma-lab/ui/src/
+├── assets/
+├── components/
+│   ├── ui/              # Button, Badge, Card, Tooltip, GateBadge, etc.
+│   ├── forms/           # Input, Select, Toggle, etc.
+│   ├── data-display/    # DataGrid
+│   ├── feedback/        # Alert, EmptyState, ErrorState
+│   ├── navigation/      # Tabs, Pagination
+│   ├── CommandPalette.tsx(.css)
+│   ├── Icon.tsx, Logo.tsx, index.ts
+├── config/menu.ts
+├── contexts/            # ThemeContext, UIContext
+├── layouts/AppShell.tsx(.css)
+├── pages/               # Dashboard, Models, ModelCreate, Designer, Composer, Sweeps, Leaderboard, Signals, Health, Overlay
+├── services/api.ts
+├── styles/              # global.css, themes.css, extracted-theme.css
+└── App.tsx, main.tsx
 ```
 
-## 🎨 Design System Setup
+Routing and Navigation
+- Router paths (React Router) correspond to menu items in `config/menu.ts`.
+- Each `MenuItem` maps to a normalized `path` (hash removed). Disabled links are determined by `implementedPaths` via simple `:param` matching.
+- Active route exact-match only; ancestor chain auto-expands in the sidebar.
+- Keyboard and ARIA:
+  - Skip link: focusable `#main-content` anchor is present.
+  - Sidebar has `role="navigation"` and aria-label “Primary”.
+  - Active item has `aria-current="page"` on `<Link>`.
+  - Sidebar collapse/expand button includes `aria-label` and `title` reflecting state.
 
-### 1. CSS Variables (Theme Tokens)
-Updated flat design system with uniform backgrounds:
+Header, Keyboard, and Command Palette
+- Header controls: Dashboard switch (placeholder), Theme toggle, Command Palette button.
+- Keyboard: global `(Ctrl|⌘)+K` toggles Command Palette (`components/CommandPalette.tsx`).
+- Palette source of truth: `products/sigma-lab/docs/ui/command_palette.json`. Implement a loader or hardcode initial commands aligned with this file. Required fields per item: `command`, `route` or `routeTemplate`, `requiresModel`, `hover`, optional `api` references.
+- Palette a11y: `role="dialog"`, labelled title, ESC closes, focus trap inside component. Provide `onClose()` prop and `isOpen` boolean.
 
-```css
-/* styles/theme.css */
-:root {
-  /* Brand Colors - Updated */
-  --sigmatiq-teal-primary: #1ABC9C;
-  --sigmatiq-teal-light: #48C9B0;
-  --sigmatiq-teal-dark: #16A085;
-  --sigmatiq-bright-teal: #00C4A7;
-  --sigmatiq-golden: #F59E0B;
-  --sigmatiq-cream: #E8E3D9;
-  
-  /* Logo Colors */
-  --logo-teal-1: #6AAFA7;
-  --logo-teal-2: #4A8B83;
-  --logo-golden: #C4975C;
-  
-  /* Flat Surface Colors - No elevation */
-  --color-bg: #0A1414;
-  --color-surface-1: #0F1A1A;      /* Uniform background */
-  --color-surface-2: #111827;      /* Cards/components */
-  --color-surface-3: #1A2F2F;      /* Hover states */
-  --color-border: #2A3F3F;         /* Minimal borders only */
-  
-  /* Text Colors */
-  --color-text-1: #F5F5F7;
-  --color-text-2: #8FA5A5;
-  --color-text-3: #6A8080;
-  
-  /* Status Colors */
-  --status-success: #00C4A7;
-  --status-warning: #FFB800;
-  --status-error: #FF5757;
-  --status-info: #3B82F6;
-  
-  /* Layout - Single Header */
-  --header-height: 56px;
-  --sidebar-width: 240px;
-  --sidebar-collapsed: 60px;
-  --mobile-tab-height: 56px;
+Theme, Density, and Accent
+- Theme context: `contexts/ThemeContext.tsx` exposes `theme`, `setTheme`, `cycleTheme`, `currentThemeConfig`.
+- Themes supported: `dark | midnight | light | slate`. Persisted key: `localStorage['theme']`. HTML attribute: `data-theme` set by context effect.
+- Density (global): add `data-density` on `<html>` mirroring `AppShell_Platform_v1.md` values `compact|cozy|comfortable`; persist as `localStorage['ui.density']`. Pattern: apply density to spacing via CSS variables (`--padding`, `--font-size`).
+- Accent (per pack): set `data-sigma` at `<html>` or page wrapper; derive `--accent` token per design tokens.
+- Focus ring: visible on all interactive via `:focus-visible` implementing `--ring` variable.
+
+Design Tokens and CSS
+- Use tokens listed in `Design_Tokens_Checklist.md`. Do not hardcode colors in components; reference CSS custom properties.
+- Styles live in `src/styles/**` and component-local CSS files. Keep surfaces/text consistent across themes.
+- Suggested mapping:
+  - Surfaces: `--surface-1` (cards, table bg), `--surface-2` (containers), `--bg-hover` (item hover).
+  - Text: `--text-primary`, `--text-secondary`, `--text-muted`, `--text-inverse`.
+  - Status: `--status-success`, `--status-warning`, `--status-error`.
+  - Borders: `--border-color`, `--border-strong`.
+
+State, Storage, and Global UX
+- Storage keys:
+  - `theme` (string: ThemeName)
+  - `ui.density` (string: compact|cozy|comfortable)
+  - `auth_token` (string; axios Authorization header)
+  - Optional: `risk.profile` (Conservative|Balanced|Aggressive), `selection.cart` (JSON array)
+- Global patterns:
+  - Loading: show spinners/skeletons via `feedback` components.
+  - Empty: concise message + suggested action.
+  - Error: banner with short reason, retry, and preserve filters/inputs.
+  - Toasts: use a centralized `ToastCenter` (to be implemented) for success/error.
+
+API Client Contracts (`services/api.ts`)
+- Base URL `/api`; request/response interceptors already implemented (auth + 401 handling).
+- Methods exposed:
+  - Health: `getHealth(): GET /health`
+  - Models: `getModels(params)`, `getModelDetail(model_id, pack_id)`, `createModel({ template_id, name, risk_profile })`
+  - Leaderboard: `getLeaderboard(params)` with `{ model_id?, pack_id?, tag?, risk_profile?, pass_gate?, limit?, offset? }`
+  - Signals: `getSignals(params)` and `getOptionSignals(params)`
+  - Indicator Sets: `getIndicatorSets()`
+  - Pipeline: `buildMatrix`, `previewMatrix`, `train`, `backtest`, `backtestSweep`
+  - Calibration: `calibrateThresholds`
+  - Scan: `scan`
+  - Policy: `explainPolicy(model_id, pack_id)`
+
+Types and Example Payloads
+- Leaderboard row (example minimal):
+```ts
+type LeaderboardRow = {
+  id?: string
+  model_id: string
+  pack_id: string
+  metrics?: { sharpe?: number; cum_ret?: number; win_rate?: number; trades?: number; max_drawdown?: number }
+  gate?: { pass: boolean; reasons?: string[] }
+  lineage?: { matrix_sha?: string; config_sha?: string; policy_sha?: string; risk_profile?: string; risk_sha?: string }
+  tag?: string
+  started_at?: string
 }
 ```
-
-## 🏗️ Component Implementation
-
-### Logo Component - Diamond Formation
-Updated 4-square diamond logo for SIGMA LAB:
-
-```jsx
-// components/shared/Logo.jsx
-const Logo = ({ size = 40, showText = true }) => (
-  <div className="logo">
-    <svg width={size} height={size} viewBox="0 0 40 40">
-      <g transform="translate(20, 20) rotate(45)">
-        <rect x="-9" y="-9" width="8" height="8" fill="#6AAFA7" rx="1"/>
-        <rect x="1" y="-9" width="8" height="8" fill="#C4975C" rx="1"/>
-        <rect x="-9" y="1" width="8" height="8" fill="#4A8B83" rx="1"/>
-        <rect x="1" y="1" width="8" height="8" fill="#6AAFA7" rx="1"/>
-      </g>
-    </svg>
-    {showText && (
-      <div className="logo-text">
-        <span className="sigma">SIGMA</span>
-        <span className="lab">LAB</span>
-      </div>
-    )}
-  </div>
-);
+- Sweeps request:
+```ts
+interface BacktestSweepBody {
+  model_id: string
+  risk_profile: 'Conservative'|'Balanced'|'Aggressive'
+  sweep: {
+    thresholds_variants?: number[][]   // e.g., [[0.50,0.55,0.60]]
+    hours_variants?: number[][]        // e.g., [[13,14],[13,14,15]]
+    top_pct_variants?: number[][]      // e.g., [[0.10,0.15]]
+  }
+  tag?: string
+}
+```
+- Backtest request:
+```ts
+interface BacktestBody {
+  model_id: string
+  pack_id: string
+  config?: { kind: 'thr'|'top_pct'; value: number; allowed_hours?: number[]; splits?: number }
+  matrix_sha?: string
+}
+```
+- Build request:
+```ts
+interface BuildBody { model_id: string; pack_id: string; start: string; end: string }
+```
+- Train request:
+```ts
+interface TrainBody { model_id: string; pack_id: string; csv?: string; calibration?: any }
 ```
 
-### Icon System
-Create an icon component that can render all the icons used throughout the app:
+Pages and Components (mapping to code)
+- Dashboard: `pages/Dashboard.tsx` (cards for Recent Models, Last Runs, Quick Actions, Health). Uses `feedback` components for loading/empty.
+- Models: `pages/Models.tsx` + `pages/Models.css` implements list with search, pack filter, sorting, and actions linking to Designer/Composer/Sweeps/Backtest.
+- ModelCreate (Template Picker): `pages/ModelCreate.tsx` with steps and Create actions.
+- Designer: `pages/ModelDesigner.tsx` (edit indicator set/policy; integrate validation and explain hooks per Assistant spec).
+- Composer: `pages/Composer.tsx` hosts tabs Build/Backtest/Train and links to leaderboard. Ensure `Matrix Profile` modal and payload echo.
+- Sweeps: `pages/Sweeps.tsx` contains risk profile, configuration, what-if panel, results table with Gate badges and actions (Add/Compare, Export CSV).
+- Leaderboard: `pages/Leaderboard.tsx` filters and table with selection + batch actions; performance summary at bottom.
+- Signals: `pages/Signals.tsx` with tabs Leaderboard | Log | Analytics.
+- Health: `pages/Health.tsx`; Overlay: `pages/Overlay.tsx`.
 
-```jsx
-// components/shared/Icon.jsx
-const icons = {
-  dashboard: <rect x="3" y="3" width="7" height="7"/>,
-  models: <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z"/>,
-  build: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77..."/>,
-  sweeps: <path d="M3 12H7M10 12H14M17 12H21"/>,
-  leaderboard: <><rect x="8" y="8" width="8" height="13"/><rect x="3" y="11" width="5" height="10"/></>,
-  signals: <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>,
-  packs: <path d="M3 3h18v18H3zM9 9h6v6H9z"/>,
-  health: <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>,
-  docs: <><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></>,
-  settings: <circle cx="12" cy="12" r="3"/>,
-  theme: <circle cx="12" cy="12" r="5"/>,
-  export: <><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
-  refresh: <><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></>,
-  lightning: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
-  edit: <><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
-  plus: <path d="M12 5v14M5 12h14"/>,
-  grid: <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></>,
-  cube: <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z"/>,
-  chart: <><path d="M3 3v18h18"/><path d="M7 10l4 4 8-8"/></>,
-  menu: <path d="M3 12h18M3 6h18M3 18h18"/>
-};
+UI Primitives and Contracts (selected)
+- Button: `components/ui/Button.tsx(.css)` variants `btn btn-primary|secondary|ghost`, `btn-sm` size; respect `:focus-visible`.
+- Badge: `components/ui/Badge.tsx(.css)` variants `badge-success|error|warning|pack-<id>`.
+- GateBadge: `components/ui/GateBadge.tsx(.css)` unify PASS/FAIL with reason tooltip on hover/focus.
+- Tooltip: `components/ui/Tooltip.tsx(.css)` uses aria-describedby, appears on focus and hover.
+- DataGrid/Table: `components/data-display/DataGrid.tsx(.css)` or page-local tables; sticky headers with tokens.
+- Tabs: `components/navigation/Tabs.tsx(.css)` keyboard accessible.
 
-const Icon = ({ name, size = 20, color = "currentColor" }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke={color} 
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    {icons[name]}
-  </svg>
-);
-```
+Accessibility Checklist (apply to all pages)
+- Use semantic landmarks: header, nav, main, footer.
+- Every interactive has visible focus via `:focus-visible` and an accessible name.
+- Tables: `scope="col"` for headers; rows focusable when clickable.
+- Tooltips: appear on keyboard focus and be dismissible; do not trap focus.
+- Dialogs (palette/modals): focus trap, ESC closes, aria-labelledby/aria-describedby.
 
-## 🔧 Component Integration Guide
+Performance and UX Budgets
+- Page load ≤ 2s for primary list views (Dashboard, Models, Leaderboard with ≤ 50 rows).
+- Use skeletons for lists/cards; defer heavy charts; lazy-load non-critical modules.
+- Avoid layout shifts; reserve space for async content.
 
-### Single Flat Header Component
-Unified header with all controls:
+Testing Guidance
+- Unit: test ThemeContext, density switching, and selection cart persistence.
+- Integration: mock API responses for Models and Leaderboard; verify filters affect API params.
+- E2E: keyboard nav through topbar and sidebar; palette opens on ⌘K; theme persists after reload.
 
-```jsx
-// components/core/Header.jsx
-const Header = () => {
-  const [currentDashboard, setCurrentDashboard] = useState(0);
-  const dashboards = [
-    { id: 'overview', icon: 'grid', name: 'Overview Dashboard' },
-    { id: 'models', icon: 'cube', name: 'Models Dashboard' },
-    { id: 'analytics', icon: 'chart', name: 'Analytics Dashboard' },
-    { id: 'custom', icon: 'settings', name: 'Custom Dashboard' }
-  ];
+Acceptance Summary (cross-check with Requirements)
+- Navigation disables unimplemented routes via `implementedPaths`.
+- Theme toggle cycles `dark → midnight → light → slate`; persists in `localStorage['theme']` and updates `data-theme`.
+- Sweeps shows Risk Profile presets, allows running sweeps, renders Gate badges with reasons, and supports CSV export.
+- Leaderboard filters, supports “Pass Gate only”, selection + Train Selected action stubbed.
+- Build/Backtest/Train in Composer echo payloads and show success/error with retries.
 
-  const cycleDashboard = () => {
-    setCurrentDashboard((prev) => (prev + 1) % 4);
-  };
-
-  return (
-    <header className="main-header" role="banner">
-      <div className="header-left">
-        <Logo size={36} showText={true} />
-      </div>
-      
-      <div className="header-controls">
-        <button 
-          className="icon-btn" 
-          onClick={cycleDashboard}
-          aria-label={`${dashboards[currentDashboard].name} - ${currentDashboard + 1} of 4`}
-        >
-          <Icon name={dashboards[currentDashboard].icon} />
-          <Tooltip text={`${dashboards[currentDashboard].name} (${currentDashboard + 1}/4)`} />
-        </button>
-        
-        <button className="icon-btn" aria-label="Toggle Theme">
-          <Icon name="theme" />
-          <Tooltip text="Toggle Theme" />
-        </button>
-        
-        <button className="icon-btn" aria-label="Command Palette">
-          <span className="cmd-k">⌘K</span>
-          <Tooltip text="Command Palette (⌘K)" />
-        </button>
-      </div>
-    </header>
-  );
-};
-```
+Notes and Next Steps
+- Align `menu.json` and `config/menu.ts` periodically; add a dev script to validate parity.
+- Expand `services/api.ts` types and narrow `any` where feasible.
+- Wire Assistant hooks per `Assistant_Hooks_and_Integrations.md` (data-ai-hook attributes and context packet builder).
 
 ### P0 Components (Must Have - Implement First)
 

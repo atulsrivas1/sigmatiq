@@ -40,6 +40,13 @@ Backtest under Runs is for ad‑hoc tests; discovery should use Sweeps.
 ---
 
 ## Layout Shell
+Tokens
+- Header height: 56px (`--header-height`)
+- Sidebar width: 240px, collapsed 60px (`--sidebar-width`, `--sidebar-collapsed`)
+- Gutters: 16/20/24px for compact/cozy/comfortable densities
+Keyboard
+- ⌘/Ctrl+K opens Command Palette (dialog with focus trap, ESC closes)
+- Tab order: Header → Sidebar → Main → Quick Access drawer
 ```
 +--------------------------------------------------------------------------------+
 | Topbar: [☰] Sigma Lab    [Search ⌘K]   [Theme ◑] [Density ▾]    [Docs] [Health] [User] |
@@ -77,6 +84,8 @@ Details
 - Last Runs columns: time, model_id, action, status; link to plots/leaderboard where applicable.
 - Health: shows API/DB/data coverage quick status; link to health page.
 - Empty states: “No recent models yet” with CTA [Create Model].
+ - A11y: Cards are role="region" with labelled headings; buttons have aria‑labels; focus ring visible.
+ - Spacing: card padding aligns with density (compact/cozy/comfortable → 16/20/24px).
 
 ---
 
@@ -98,6 +107,7 @@ Details
 - Keyboard: Tab through filters; table rows focusable; Enter opens detail.
 - Empty: “No models match your filters.” CTA [Clear filters].
 - Error: banner with retry; show last successful fetch timestamp.
+ - Column widths guidance: model_id 36%, pack 12%, updated 20%, sharpe 10%, spark 10%, actions 12%.
 
 ---
 
@@ -164,6 +174,7 @@ Tabs: [Build] [Backtest] [Train]
 Build
 Start [____]  End [____]   [Run Build]
 [loading…]  Result: matrix path + preview link
+Layout: 2‑column form; date pickers validate ISO; [Matrix Profile] opens modal (see requirements).
 
 Train
 Allowed Hours [13,14,15]   [Run Train]
@@ -174,6 +185,7 @@ Selected: Thr [0.60]  Top% [—]  Hours [13,14,15]  Splits [5]  Matrix [c7d8]  T
 Date: Start [____]  End [____]   [Run Backtest]
 Plot: cum_returns.png
 Metrics: sharpe, cum_ret, trades; [Open Leaderboard]
+Help: “splits”, “allowed hours” show tooltips on focus/hover.
 
 (P1) Parity Panel
 - Underlying vs Premium parity summary for period tested
@@ -231,6 +243,8 @@ Details
 - If parity available from policy brackets, show parity column with hit rates.
 - Row actions: train with selected params; open leaderboard filtered by tag.
 - Empty: “No results. Adjust variants or relax guards.”
+ - Column widths guidance: kind 8%, value 12%, hours 14%, sharpe 10%, cum_ret 10%, trades 8%, Gate 10%, parity 8%, capacity 8%, tag 6%, CSV 4%, actions 12%.
+ - Tooltips: Gate reasons show IDs and humanized text; parity tooltip cites data source.
 
 ---
 
@@ -249,6 +263,8 @@ Pagination: « 1 2 3 »
 Details
 - Tag chip inputs (type ahead); server filter via `tag` query supported.
 - Row click opens run detail (P2); for now opens plots/metrics drawer.
+ - Column widths guidance: started_at 22%, model_id 34%, sharpe 12%, cum_ret 12%, Gate 8%, tag 6%, actions 6%.
+ - Batch select: leftmost checkbox column with “select all”.
 
 ---
 
@@ -294,10 +310,12 @@ Open Docs
 - Error: banner with retry; preserves user inputs.
 - Keyboard: Tab order follows layout; buttons and interactive chips/rows have visible `:focus-visible` rings.
 - ARIA: landmarks (header/nav/main/footer); labels on controls.
+ - Tooltips: appear on focus and hover; dismiss on ESC or blur.
 
 ## Responsive
 - Tables collapse to cards; filters move into a drawer on small screens.
 - Wizard uses full-screen modal on mobile; Next/Back pinned at bottom.
+ - Breakpoints: ≥1200px desktop; 768–1199px tablet; <768px mobile (cards for tables).
 
 ---
 
