@@ -72,8 +72,8 @@ def flatten_name(rel):
     if '/' not in rel:
         return base
     parts = rel.split('/')
-    # Drop leading 'Sigma' directory if present
-    if parts[0] == 'Sigma':
+    # Drop leading 'Sigma' or 'sigma' directory if present
+    if parts[0].lower() == 'sigma':
         parts = parts[1:]
     # If README.md, drop it and use the directory path
     if parts[-1].lower() == 'readme.md':

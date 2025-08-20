@@ -1,17 +1,17 @@
 ## Navigation
 
-- [[Home|Home]]
+- [[Home|home]]
 
 ### Brand
-- [[SIGMATIQ_Vision_V1|SIGMATIQ_Vision_V1]]
-- [[SIGMA_REPOSITORIES|SIGMA_REPOSITORIES]]
-- [[ENGINEERING_STATUS|ENGINEERING_STATUS]]
-- [[STATUS_AND_PLANS|STATUS_AND_PLANS]]
-- [[BACKLOG|BACKLOG]]
-- [[PACKS_ROADMAP|PACKS_ROADMAP]]
-- [[SIGMATIQ_UI_Implementation_Guide|SIGMATIQ_UI_Implementation_Guide]]
-- [Messaging Matrix](Sigmatiq_Messaging_Matrix_v1.xlsx)
-- [[Sigmatiq_Tone_of_Voice_Guide_v1|Sigmatiq_Tone_of_Voice_Guide_v1]]
+- [[Sigmatiq Vision V1|sigmatiq-vision-v1]]
+- [[Sigmatiq Repositories|sigmatiq-repositories]]
+- [[Engineering Status|engineering-status]]
+- [[Sigmatiq Status and Plans|sigmatiq-status-and-plans]]
+- [[Backlog|backlog]]
+- [[Packs Roadmap|sigma-core-packs-packs-roadmap]]
+- [[Sigmatiq UI Implementation Guide|sigma-lab-ui-sigmatiq-sigmalab-ui-implementation-guide]]
+- [Messaging Matrix](sigmatiq_messaging_matrix_v1.xlsx)
+- [[Sigmatiq Tone of Voice Guide V1|sigmatiq-tone-of-voice-guide-v1]]
 
 ### Sigma Core
 - [[Overview|sigma-core]]
