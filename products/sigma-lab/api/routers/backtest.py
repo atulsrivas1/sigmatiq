@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, List, Any, Dict
 from fastapi import APIRouter, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from datetime import datetime
 import pandas as pd
 
@@ -42,6 +42,41 @@ class BacktestRequest(BaseModel):
     momentum_column: Optional[str] = None
     save: Optional[bool] = True
     tag: Optional[str] = None
+
+    @validator('allowed_hours', pre=True)
+    def _coerce_hours(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [int(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('allowed_hours must be a list of ints or comma-separated ints')
+        return None
+
+    @validator('thresholds', pre=True)
+    def _coerce_thresholds(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [float(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('thresholds must be a list of floats or comma-separated floats')
+        return None
+
+    @validator('per_hour_select_by', pre=True)
+    def _validate_select_by(cls, v):  # type: ignore
+        v = str(v or 'sharpe')
+        if v not in ('sharpe','cum_ret','trades'):
+            raise ValueError("per_hour_select_by must be one of: sharpe, cum_ret, trades")
+        return v
+
+    @validator('calibration', pre=True)
+    def _check_calibration(cls, v):  # type: ignore
+        if v in (None, 'none', 'sigmoid', 'isotonic'):
+            return v
+        raise ValueError("calibration must be one of: none, sigmoid, isotonic")
 
 
 @router.post('/backtest')

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, List, Any, Dict
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pathlib import Path as _Path
 import pandas as pd
 import joblib
@@ -62,6 +62,23 @@ class TrainRequest(BaseModel):
     model_out: Optional[str] = None
     target: Optional[str] = None
     pack_id: Optional[str] = 'zerosigma'
+
+    @validator('allowed_hours', pre=True)
+    def _coerce_hours(cls, v):  # type: ignore
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.strip():
+            try:
+                return [int(x) for x in v.split(',') if x.strip()]
+            except Exception:
+                raise ValueError('allowed_hours must be a list of ints or comma-separated ints')
+        return None
+
+    @validator('calibration', pre=True)
+    def _check_calibration(cls, v):  # type: ignore
+        if v in (None, 'none', 'sigmoid', 'isotonic'):
+            return v
+        raise ValueError("calibration must be one of: none, sigmoid, isotonic")
 
 @router.post('/train')
 def train_ep(payload: TrainRequest):
