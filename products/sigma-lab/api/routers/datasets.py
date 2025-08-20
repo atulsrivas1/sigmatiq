@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Any, Dict
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pathlib import Path as _Path
 import pandas as pd
 
@@ -29,6 +29,15 @@ class BuildMatrixRequest(BaseModel):
     dump_raw: bool = False
     raw_out: Optional[str] = None
     ticker: Optional[str] = None
+
+    @validator('start', 'end', pre=True)
+    def _validate_dates(cls, v):  # type: ignore
+        from datetime import date
+        try:
+            date.fromisoformat(str(v))
+            return v
+        except Exception:
+            raise ValueError('start/end must be ISO date YYYY-MM-DD')
 
 @router.post('/build_matrix')
 def build_matrix_ep(payload: BuildMatrixRequest):
@@ -61,7 +70,7 @@ def build_matrix_ep(payload: BuildMatrixRequest):
             fixed_bp=payload.fixed_bp,
             distance_max=int(payload.distance_max),
             dump_raw=bool(payload.dump_raw),
-            raw_out=payload.raw_out,
+            raw_out=(str(sanitize_out_path(payload.raw_out, _Path(out_csv).with_name(_Path(out_csv).stem + '_raw.csv'))) if payload.dump_raw else None),
             ticker=str((payload.ticker) or cfgm.get('ticker', 'SPY')),
             indicator_set_path=str(indicator_set_path),
             label_config=(cfgm.get('labels') or cfgm.get('label') or None),
@@ -107,6 +116,15 @@ class BuildStockMatrixRequest(BaseModel):
     pack_id: Optional[str] = None
     model_id: Optional[str] = None
     label_kind: Optional[str] = None
+
+    @validator('start', 'end', pre=True)
+    def _validate_dates(cls, v):  # type: ignore
+        from datetime import date
+        try:
+            date.fromisoformat(str(v))
+            return v
+        except Exception:
+            raise ValueError('start/end must be ISO date YYYY-MM-DD')
 
 @router.post('/build_stock_matrix')
 def build_stock_matrix_ep(payload: BuildStockMatrixRequest):
