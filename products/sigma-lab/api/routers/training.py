@@ -10,7 +10,7 @@ from sigma_core.features.builder import select_features as select_features_train
 from xgboost import XGBClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
-from api.services.io import workspace_paths, load_config
+from api.services.io import workspace_paths, load_config, sanitize_out_path
 from api.services.policy import ensure_policy_exists
 from api.services.io import resolve_indicator_set_path, PACKS_DIR
 try:
@@ -79,7 +79,11 @@ def train_ep(payload: TrainRequest):
     if isinstance(allowed_hours, str) and allowed_hours:
         allowed_hours = [int(x) for x in allowed_hours.split(',')]
     calib = payload.calibration or 'sigmoid'
-    out_path = _Path(payload.model_out or (paths['artifacts'] / 'gbm.pkl'))
+    # Sanitize output path to remain within product workspace
+    try:
+        out_path = _Path(sanitize_out_path(payload.model_out, paths['artifacts'] / 'gbm.pkl'))
+    except ValueError as ve:
+        return {'ok': False, 'error': str(ve)}
     cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
     fcfg = cfgm.get('features') or {}
     try:

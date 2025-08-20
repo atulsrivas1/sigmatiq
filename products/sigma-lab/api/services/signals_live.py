@@ -125,7 +125,15 @@ def compute_live_metrics(df: pd.DataFrame, *, now_ts: Optional[pd.Timestamp] = N
         idx = dff["ts"].sort_values()
         if not idx.empty:
             last_ts = idx.iloc[-1]
-            now_ts = now_ts or pd.Timestamp.utcnow().tz_localize("UTC") if not pd.Timestamp.utcnow().tzinfo else pd.Timestamp.utcnow()
+            first_ts = idx.iloc[0]
+            # coverage as share of calendar days with at least one signal
+            try:
+                uniq_days = idx.dt.date.nunique()
+                total_days = max(1, (last_ts.normalize() - first_ts.normalize()).days + 1)
+                m.coverage_pct = float(uniq_days) * 100.0 / float(total_days)
+            except Exception:
+                m.coverage_pct = None
+            now_ts = now_ts or (pd.Timestamp.utcnow().tz_localize("UTC") if not pd.Timestamp.utcnow().tzinfo else pd.Timestamp.utcnow())
             m.freshness_sec = int((now_ts - last_ts).total_seconds())
     return m
 

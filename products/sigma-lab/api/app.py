@@ -39,6 +39,7 @@ import yaml
 from fastapi import FastAPI, Request, Body, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+import time as _time
 
 from sigma_core.data.datasets import build_matrix as build_matrix_range
 from sigma_core.data.stocks import build_stock_matrix as build_stock_matrix_range
@@ -73,6 +74,10 @@ try:
     from api.services.lineage import compute_lineage as _compute_lineage
 except Exception:
     _compute_lineage = None
+try:
+    from api.services.policy import validate_policy_file as _validate_policy_file
+except Exception:
+    _validate_policy_file = None
 
 
 # Workspace is the repository root (Sigmatiq-Sigma)
@@ -118,7 +123,14 @@ except Exception:
 
 @app.middleware("http")
 async def audit_mw(request, call_next):
+    # basic request logging with duration
+    _t0 = _time.time()
     response = await call_next(request)
+    try:
+        dur_ms = int((_time.time() - _t0) * 1000)
+        _logging.getLogger(__name__).info("%s %s -> %s (%dms)", request.method, request.url.path, getattr(response, 'status_code', '?'), dur_ms)
+    except Exception:
+        pass
     try:
         if _log_audit is not None and request.method in {"POST"}:
             path = str(request.url.path)
@@ -233,72 +245,12 @@ def _ensure_policy_exists(model_id: str, pack_id: str) -> Optional[str]:
     if not pol.exists():
         return f"Policy file missing for model '{model_id}'. Please create: {pol}"
     # Validate policy schema
-    ok, errs = _validate_policy_file(pol)
+    ok, errs = (True, []) if _validate_policy_file is None else _validate_policy_file(pol)
     if not ok:
         return f"Policy file invalid for model '{model_id}': {', '.join(errs)} (path: {pol})"
     return None
 
-def _validate_policy_file(path: Path) -> (bool, List[str]):
-    errs: List[str] = []
-    try:
-        data = yaml.safe_load(path.read_text())
-    except Exception as e:
-        return False, [f"failed to parse YAML: {e}"]
-    if not isinstance(data, dict):
-        return False, ["policy root must be a mapping"]
-    # Support either root keys or nested under 'policy'
-    pol = data.get("policy") if "policy" in data else data
-    if not isinstance(pol, dict):
-        errs.append("'policy' must be a mapping if present; otherwise provide keys at root")
-        return False, errs
-    # Required sections
-    for sec in ("risk", "execution", "alerting"):
-        if sec not in pol or not isinstance(pol.get(sec), dict):
-            errs.append(f"missing or invalid section: {sec}")
-    # Basic field checks
-    exec = pol.get("execution", {}) if isinstance(pol.get("execution", {}), dict) else {}
-    if "slippage_bps" in exec and not isinstance(exec.get("slippage_bps"), (int, float)):
-        errs.append("execution.slippage_bps must be a number")
-    if "size_by_conf" in exec and not isinstance(exec.get("size_by_conf"), bool):
-        errs.append("execution.size_by_conf must be a boolean")
-    if "conf_cap" in exec and not isinstance(exec.get("conf_cap"), (int, float)):
-        errs.append("execution.conf_cap must be a number")
-    alert = pol.get("alerting", {}) if isinstance(pol.get("alerting", {}), dict) else {}
-    if "cooldown_minutes" in alert and not isinstance(alert.get("cooldown_minutes"), (int, float)):
-        errs.append("alerting.cooldown_minutes must be a number")
-    # Risk section optional numeric checks
-    risk = pol.get("risk", {}) if isinstance(pol.get("risk", {}), dict) else {}
-    for k in ("max_drawdown", "max_exposure"):
-        if k in risk and not isinstance(risk.get(k), (int, float)):
-            errs.append(f"risk.{k} must be a number")
-    # Optional: brackets schema (light validation)
-    br = exec.get("brackets", {}) if isinstance(exec.get("brackets", {}), dict) else {}
-    if br:
-        for key in ("atr_mult_stop", "atr_mult_target", "time_stop_minutes", "atr_period", "min_rr"):
-            if key in br and not isinstance(br.get(key), (int, float)):
-                errs.append(f"execution.brackets.{key} must be a number")
-        for key in ("enabled", "regime_adjust"):
-            if key in br and not isinstance(br.get(key), bool):
-                errs.append(f"execution.brackets.{key} must be a boolean")
-        if "entry_mode" in br and not isinstance(br.get("entry_mode"), str):
-            errs.append("execution.brackets.entry_mode must be a string")
-        if "mode" in br and not isinstance(br.get("mode"), str):
-            errs.append("execution.brackets.mode must be a string")
-    # Optional: options selection (stub validation)
-    opt = exec.get("options", {}) if isinstance(exec.get("options", {}), dict) else {}
-    if opt:
-        sel = opt.get("selection", {}) if isinstance(opt.get("selection", {}), dict) else {}
-        if sel:
-            for key in ("dte_target", "min_oi", "min_vol", "spread_width"):
-                if key in sel and not isinstance(sel.get(key), (int, float)):
-                    errs.append(f"execution.options.selection.{key} must be a number")
-            for key in ("target_delta",):
-                if key in sel and not isinstance(sel.get(key), (int, float)):
-                    errs.append(f"execution.options.selection.{key} must be a number")
-            for key in ("weekly_ok",):
-                if key in sel and not isinstance(sel.get(key), bool):
-                    errs.append(f"execution.options.selection.{key} must be a boolean")
-    return (len(errs) == 0), errs
+## policy validation now imported from api.services.policy
 
 
 
