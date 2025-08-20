@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 def _get_app():
     import importlib
-    spec = importlib.util.spec_from_file_location("sigma_api_app", ROOT / "api" / "app.py")
+    spec = importlib.util.spec_from_file_location("sigma_api_app", ROOT / "app.py")
     module = importlib.util.module_from_spec(spec)  # type: ignore
     assert spec and spec.loader
     spec.loader.exec_module(module)  # type: ignore

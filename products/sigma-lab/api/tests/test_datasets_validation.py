@@ -9,7 +9,7 @@ if str(ROOT) not in sys.path:
 
 def _get_app():
     import importlib
-    spec = importlib.util.spec_from_file_location("sigma_api_app", ROOT / "api" / "app.py")
+    spec = importlib.util.spec_from_file_location("sigma_api_app", ROOT / "app.py")
     module = importlib.util.module_from_spec(spec)
     assert spec and spec.loader
     spec.loader.exec_module(module)
@@ -26,4 +26,3 @@ def test_build_matrix_date_validation():
     }
     r = client.post("/build_matrix", json=payload)
     assert r.status_code in (400, 422)
-
