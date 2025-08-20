@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from fastapi import APIRouter, Query
 
-from api.services.model_cards import list_model_cards, load_model_card
+from sigma_platform.model_cards import list_model_cards, load_model_card
 
 router = APIRouter()
 

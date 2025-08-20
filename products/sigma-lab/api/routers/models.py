@@ -7,8 +7,8 @@ import shutil
 import yaml
 import pandas as pd
 
-from api.services.io import workspace_paths, load_config, resolve_indicator_set_path, PACKS_DIR
-from api.services.policy import ensure_policy_exists
+from sigma_platform.io import workspace_paths, load_config, resolve_indicator_set_path, PACKS_DIR
+from sigma_platform.policy import ensure_policy_exists
 from sigma_core.indicators.registry import registry as indicator_registry
 from sigma_core.data.datasets import build_matrix as build_matrix_range
 

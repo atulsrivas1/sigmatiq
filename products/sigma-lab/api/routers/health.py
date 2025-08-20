@@ -8,8 +8,8 @@ from sigma_core.storage.relational import get_db
 from sigma_core.indicators.registry import registry as indicator_registry
 from sigma_core.indicators.registry import get_load_errors as _get_indicator_load_errors
 from api.runtime import ROUTER_STATUS
-from api.services.model_cards import list_model_cards
-from api.services.io import workspace_paths
+from sigma_platform.model_cards import list_model_cards
+from sigma_platform.io import workspace_paths
 from sigma_core.data.sources.polygon import (
     get_polygon_hourly_bars,
     get_polygon_daily_bars,

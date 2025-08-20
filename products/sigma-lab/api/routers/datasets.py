@@ -7,11 +7,11 @@ import pandas as pd
 
 from sigma_core.data.datasets import build_matrix as build_matrix_range
 from sigma_core.data.stocks import build_stock_matrix as build_stock_matrix_range
-from api.services.io import workspace_paths, load_config, resolve_indicator_set_path, sanitize_out_path
+from sigma_platform.io import workspace_paths, load_config, resolve_indicator_set_path, sanitize_out_path
 from fastapi.responses import JSONResponse
-from api.services.policy import ensure_policy_exists
+from sigma_platform.policy import ensure_policy_exists
 try:
-    from api.services.model_cards import write_model_card
+    from sigma_platform.model_cards import write_model_card
 except Exception:
     write_model_card = None
 
