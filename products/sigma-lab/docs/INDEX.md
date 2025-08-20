@@ -41,6 +41,7 @@ Note: This workspace uses a product-first layout with Sigma Lab as the product a
 ## root
 
 - [AGENTS.md](AGENTS.md)
+- [ENGINEERING_STATUS.md](../../ENGINEERING_STATUS.md)
 - [CONTRACT.md](CONTRACT.md)
 - [DB_NAMING_AND_SEPARATION.md](DB_NAMING_AND_SEPARATION.md)
 - [SIGMA_REPOSITORIES.md](SIGMA_REPOSITORIES.md)
@@ -52,6 +53,10 @@ Note: This workspace uses a product-first layout with Sigma Lab as the product a
 - [policy_schema.md](policy_schema.md)
 - [Release_Summary.md](Release_Summary.md)
 - [STATUS_AND_PLANS.md](STATUS_AND_PLANS.md)
+
+## Dev Utilities
+
+- Mock API guide: [products/mock-api/README.md](../../mock-api/README.md)
 
 ## runbooks
 
