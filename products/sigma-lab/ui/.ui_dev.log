@@ -1,0 +1,152 @@
+
+> sigmatiq-sigma-lab-ui@1.0.0 dev
+> vite --port 3000
+
+
+  [32m[1mVITE[22m v7.1.3[39m  [2mready in [0m[1m321[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m7:21:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.css[22m
+[2m7:22:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.css[22m
+[2m7:22:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.css[22m
+[2m7:24:28 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx[22m
+[2m7:24:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.css[22m
+[2m7:24:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx[22m
+[2m7:24:53 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\github\claude\sigmatiq\products\sigma-lab\ui\src\pages\Dashboard.tsx: Expected corresponding JSX closing tag for <section>. (297:6)
+
+[0m [90m 295 |[31m           ))}
+ [90m 296 |[31m         [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[31m[1m>[22m[31m[90m 297 |[31m       [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m     |[31m       [31m[1m^[22m[31m
+ [90m 298 |[31m     [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m 299 |[31m   )
+ [90m 300 |[31m }[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/github/claude/sigmatiq/products/sigma-lab/ui/src/pages/Dashboard.tsx[39m:297:6
+[33m  295 |            ))}
+  296 |          </div>
+  297 |        </div>
+      |        ^
+  298 |      </div>
+  299 |    )[39m
+      at constructor (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:367:19)
+      at TypeScriptParserMixin.raise (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:6630:19)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4760:16)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4731:32)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4731:32)
+      at TypeScriptParserMixin.jsxParseElement (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4782:17)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4792:19)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9857:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10831:21)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9795:39
+      at TypeScriptParserMixin.tryParse (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:6938:20)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9795:18)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12432:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12499:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11679:28)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4797:20)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9857:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9806:20)
+      at TypeScriptParserMixin.parseExpressionBase (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10784:23)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10780:39
+      at TypeScriptParserMixin.allowInAnd (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12427:16)
+      at TypeScriptParserMixin.parseExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10780:17)
+      at TypeScriptParserMixin.parseReturnStatement (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13147:28)
+      at TypeScriptParserMixin.parseStatementContent (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12803:21)
+      at TypeScriptParserMixin.parseStatementContent (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9532:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12772:17)
+      at TypeScriptParserMixin.parseStatementListItem (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12752:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13321:61)
+      at TypeScriptParserMixin.parseBlockBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13314:10)
+      at TypeScriptParserMixin.parseBlock (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13302:10)
+      at TypeScriptParserMixin.parseFunctionBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12106:24)
+      at TypeScriptParserMixin.parseArrowExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12081:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11691:12)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11331:23)
+[2m7:25:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx[22m
+[2m7:25:01 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\github\claude\sigmatiq\products\sigma-lab\ui\src\pages\Dashboard.tsx: Expected corresponding JSX closing tag for <section>. (304:6)
+
+[0m [90m 302 |[31m           ))}
+ [90m 303 |[31m         [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[31m[1m>[22m[31m[90m 304 |[31m       [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m     |[31m       [31m[1m^[22m[31m
+ [90m 305 |[31m     [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m 306 |[31m   )
+ [90m 307 |[31m }[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/github/claude/sigmatiq/products/sigma-lab/ui/src/pages/Dashboard.tsx[39m:304:6
+[33m  302 |            ))}
+  303 |          </div>
+  304 |        </div>
+      |        ^
+  305 |      </div>
+  306 |    )[39m
+      at constructor (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:367:19)
+      at TypeScriptParserMixin.raise (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:6630:19)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4760:16)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4731:32)
+      at TypeScriptParserMixin.jsxParseElementAt (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4731:32)
+      at TypeScriptParserMixin.jsxParseElement (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4782:17)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4792:19)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9857:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10831:21)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9795:39
+      at TypeScriptParserMixin.tryParse (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:6938:20)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9795:18)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12432:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12499:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11679:28)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:4797:20)
+      at TypeScriptParserMixin.parseExprSubscripts (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9857:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9806:20)
+      at TypeScriptParserMixin.parseExpressionBase (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10784:23)
+      at C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10780:39
+      at TypeScriptParserMixin.allowInAnd (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12427:16)
+      at TypeScriptParserMixin.parseExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:10780:17)
+      at TypeScriptParserMixin.parseReturnStatement (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13147:28)
+      at TypeScriptParserMixin.parseStatementContent (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12803:21)
+      at TypeScriptParserMixin.parseStatementContent (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:9532:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12772:17)
+      at TypeScriptParserMixin.parseStatementListItem (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12752:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13321:61)
+      at TypeScriptParserMixin.parseBlockBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13314:10)
+      at TypeScriptParserMixin.parseBlock (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:13302:10)
+      at TypeScriptParserMixin.parseFunctionBody (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12106:24)
+      at TypeScriptParserMixin.parseArrowExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:12081:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11691:12)
+      at TypeScriptParserMixin.parseExprAtom (C:\github\claude\sigmatiq\products\sigma-lab\ui\node_modules\@babel\parser\lib\index.js:11331:23)
+[2m7:25:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx[22m
+[2m7:25:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.css[22m

@@ -120,22 +120,39 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="dashboard-page">
       <div className="container">
-        {/* Top Grid: Recent Models, Last Runs, Quick Actions, Health */}
-        <div className="dashboard-grid">
+        {/* Dashboard Section */}
+        <section className="section">
+          <div className="section-header">
+            <h2 className="section-title">Dashboard</h2>
+          </div>
+          
+          <div className="dashboard-grid">
           {/* Recent Models */}
           <div className="dashboard-card">
-            <div className="dashboard-card-title">Recent Models</div>
+            <h3 className="dashboard-card-title">Recent Models</h3>
             <div className="recent-models-list">
               {loading && <div className="text-muted">Loading…</div>}
-              {!loading && models.slice(0,5).map((m) => (
-                <div className="recent-model-item" key={m.model_id}>
-                  <div className="recent-model-info">
-                    <div className="recent-model-id">{m.model_id}</div>
-                    <div className="recent-model-meta">{m.pack_id || '—'} • {m.updated_at || 'recently'}</div>
+              {!loading && models.slice(0,3).map((m) => {
+                const packColors: Record<string, string> = {
+                  'zerosigma': 'var(--sigmatiq-bright-teal)',
+                  'swingsigma': 'var(--sigmatiq-golden)',
+                  'weeklysigma': 'var(--sigmatiq-teal-dark)',
+                };
+                const dotColor = packColors[m.pack_id?.toLowerCase() || ''] || 'var(--sigmatiq-bright-teal)';
+                
+                return (
+                  <div className="recent-model-item" key={m.model_id}>
+                    <div className="recent-model-info">
+                      <div className="recent-model-id-wrapper">
+                        <div className="recent-model-dot" style={{ background: dotColor }} />
+                        <span className="recent-model-id">{m.model_id}</span>
+                      </div>
+                      <span className="recent-model-meta">{m.pack_id || '—'} • Updated {m.updated_at ? '2h ago' : 'recently'}</span>
+                    </div>
+                    <button className="btn btn-small">Open</button>
                   </div>
-                  <Link to={`/models/${m.model_id}/designer`} className="btn btn-secondary btn-sm">Open</Link>
-                </div>
-              ))}
+                );
+              })}
               {!loading && models.length === 0 && (
                 <div className="text-muted">No recent models.</div>
               )}
@@ -207,9 +224,16 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+        </section>
 
-        {/* Controls bar */}
-        <div className="controls-bar">
+        {/* Models Section */}
+        <section className="section">
+          <div className="section-header">
+            <h2 className="section-title">Models</h2>
+          </div>
+
+          {/* Controls bar */}
+          <div className="controls-bar">
           <div className="search-box">
             <input className="search-input" placeholder="Search model_id…" value={search} onChange={e => setSearch(e.target.value)} />
             <span className="search-icon">🔎</span>
@@ -277,6 +301,7 @@ export const Dashboard: React.FC = () => {
             </Card>
           ))}
         </div>
+        </section>
       </div>
     </div>
   )

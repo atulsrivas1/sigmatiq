@@ -16,7 +16,7 @@ OUT ?= reports/test_indicators
 MOMENTUM_MIN ?= 0.0
 MOMENTUM_COLUMN ?= momentum_score_total
 
-.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview
+.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview lab-mock lab-mock-install lab-ui lab-ui-install lab-dev lab-dev-stop
 
 help:
 	@echo "Targets:"
@@ -65,6 +65,9 @@ help:
 	@echo "  ui-fe               Start UI dev server on 5173 (proxy /api → 8001)"
 	@echo "  ui-fe-build         Build UI for production"
 	@echo "  ui-fe-preview       Preview built UI (default port 4173)"
+	@echo "  lab-mock            Start Sigma Lab Mock API (port 8010)"
+	@echo "  lab-ui              Start Sigma Lab UI dev server (port 3000)"
+	@echo "  lab-dev             Start mock API (bg) then UI (fg)"
 	@echo "Vars: PACK_ID, MODEL_ID, TICKER, START, END, EXPIRY, ALLOWED_HOURS, THRESHOLDS, SPLITS, DISTANCE_MAX, BASE_URL, DB_*"
 
 ui:
@@ -197,6 +200,45 @@ ui-fe-build:
 
 ui-fe-preview:
 	cd $(FRONTEND_DIR) && npm run preview
+
+# --- Sigma Lab (Mock API + UI) ---
+LAB_MOCK_DIR ?= products/sigma-lab/mock-api
+LAB_UI_DIR ?= products/sigma-lab/ui
+LAB_MOCK_PORT ?= 8010
+LAB_UI_PORT ?= 3000
+
+lab-mock-install:
+	pip install -r $(LAB_MOCK_DIR)/requirements.txt
+
+lab-mock:
+	@echo "Starting Sigma Lab Mock API on http://localhost:$(LAB_MOCK_PORT) (Ctrl+C to stop)"
+	make -C $(LAB_MOCK_DIR) dev
+
+lab-ui-install:
+	cd $(LAB_UI_DIR) && npm install
+
+lab-ui:
+	@echo "Starting Sigma Lab UI on http://localhost:$(LAB_UI_PORT) (Ctrl+C to stop)"
+	@echo "Vite proxy maps /api → http://localhost:$(LAB_MOCK_PORT)"
+	cd $(LAB_UI_DIR) && npm run dev
+
+# Convenience: start mock in background, then UI in foreground
+lab-dev:
+	@echo "Starting Mock API (bg, port $(LAB_MOCK_PORT)) and UI (fg, port $(LAB_UI_PORT))"
+	@(cd $(LAB_MOCK_DIR) && uvicorn mock_api.app:app --reload --port $(LAB_MOCK_PORT) > .mock_api.log 2>&1 & echo $$! > .mock_api.pid)
+	@echo "Mock API PID: $$(cat $(LAB_MOCK_DIR)/.mock_api.pid) (log: $(LAB_MOCK_DIR)/.mock_api.log)"
+	cd $(LAB_UI_DIR) && npm run dev
+
+# Stop background mock started by lab-dev
+lab-dev-stop:
+	@if [ -f "$(LAB_MOCK_DIR)/.mock_api.pid" ]; then \
+		PID=$$(cat $(LAB_MOCK_DIR)/.mock_api.pid); \
+		echo "Stopping Mock API PID $$PID"; \
+		kill $$PID || true; \
+		rm -f $(LAB_MOCK_DIR)/.mock_api.pid; \
+	else \
+		echo "No PID file at $(LAB_MOCK_DIR)/.mock_api.pid"; \
+	fi
 
 
 preview:
