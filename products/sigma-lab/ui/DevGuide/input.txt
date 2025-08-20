@@ -1,0 +1,31 @@
+.logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .logo-card {
+            background: #0A1414;
+            border: 1px solid #2A3F3F;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+<div class="logo-card">
+                    <div class="logo-container">
+                        <svg width="200" height="100" viewBox="0 0 200 100">
+                            <g transform="translate(30, 35) rotate(45 15 15)">
+                                <!-- Diamond with lab accent -->
+                                <rect x="0" y="0" width="14" height="14" fill="#1ABC9C" rx="2"/>
+                                <rect x="16" y="0" width="14" height="14" fill="#1ABC9C" rx="2" opacity="0.6"/>
+                                <rect x="0" y="16" width="14" height="14" fill="#F59E0B" rx="2" opacity="0.8"/>
+                                <rect x="16" y="16" width="14" height="14" fill="#16A085" rx="2" opacity="0.6"/>
+                            </g>
+                            <text x="80" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="300" fill="#F5F5F7">SIGMA</text>
+                            <text x="80" y="60" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#1ABC9C">LAB</text>
+                        </svg>
+                    </div>
+                    <div class="logo-name">Edge Lab</div>
+                    <div class="logo-desc">Diamond with experimental opacity</div>
+                </div>
