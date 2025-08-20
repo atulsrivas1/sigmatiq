@@ -177,6 +177,11 @@ docs-preview:
 	@echo "Serving docs on http://localhost:$(DOCS_PORT) (Ctrl+C to stop)"
 	python -m http.server $(DOCS_PORT) --directory docs
 
+# --- Wiki ---
+.PHONY: wiki-sync
+wiki-sync:
+	./scripts/wiki-sync.sh
+
 # --- UI (Frontend) ---
 FRONTEND_DIR ?= edge_ui
 UI_PORT ?= 5173
