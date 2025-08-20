@@ -7,7 +7,7 @@ import logging
 
 # Establish both repo root and product root to keep packs (shared) at top-level
 # while writing product outputs (matrices, artifacts, live_data, reports) under the product folder.
-PRODUCT_DIR = Path(__file__).resolve().parents[2]  # products/sigma-lab
+PRODUCT_DIR = Path(__file__).resolve().parents[2] / 'sigma-lab'  # products/sigma-lab
 # Packs directory is configurable; defaults to product-local packs
 PACKS_DIR = Path(os.environ.get('PACKS_DIR', str(PRODUCT_DIR / 'packs')))
 ALLOWED_WRITE_ROOTS = [PRODUCT_DIR]
@@ -70,7 +70,6 @@ def sanitize_out_path(candidate: Optional[str], default_path: Path) -> Path:
         default_path.parent.mkdir(parents=True, exist_ok=True)
         return default_path
     p = Path(candidate)
-    # Disallow absolute paths that are not under allowed roots
     resolved = p.resolve(strict=False)
     allowed = any(_is_within(resolved, r) for r in ALLOWED_WRITE_ROOTS)
     if not allowed:
@@ -79,3 +78,4 @@ def sanitize_out_path(candidate: Optional[str], default_path: Path) -> Path:
         raise ValueError(msg)
     resolved.parent.mkdir(parents=True, exist_ok=True)
     return resolved
+

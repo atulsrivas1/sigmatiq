@@ -1,5 +1,9 @@
 import os
 import time
+import random
+import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import logging
 from datetime import date, datetime, timedelta
 from typing import List
 from pathlib import Path
@@ -26,6 +30,30 @@ from ..indicators.builtins.volatility import Volatility
 
 ET = pytz.timezone("US/Eastern")
 UTC = pytz.utc
+logger = logging.getLogger(__name__)
+
+
+def _with_retry(fn, *, attempts: int = 3, backoff: float = 0.5, jitter: float = 0.1):
+    """Return a callable that wraps `fn` with simple retry + exponential backoff."""
+    def _wrapped(*args, **kwargs):
+        delay = float(backoff)
+        last_exc = None
+        for i in range(int(max(1, attempts))):
+            try:
+                return fn(*args, **kwargs)
+            except Exception as e:
+                last_exc = e
+                if i == attempts - 1:
+                    break
+                try:
+                    time.sleep(delay + random.random() * float(jitter))
+                except Exception:
+                    pass
+                delay *= 2.0
+        if last_exc is not None:
+            raise last_exc
+        return None
+    return _wrapped
 
 
 def _daterange(start: date, end: date):
@@ -51,7 +79,7 @@ def _ensure_date_column(df: pd.DataFrame) -> pd.DataFrame:
     return df2
 
 
-def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", distance_max: int = 7) -> pd.DataFrame:
+def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", distance_max: int = 7, workers: int = 8, retries: int = 3, backoff: float = 0.5) -> pd.DataFrame:
     """
     Build raw 0DTE flow at per-strike, per-hour granularity:
     Returns columns: date, price_level, spy_prev_close, hour_et, calls_sold, puts_sold
@@ -71,10 +99,10 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
         ddf = ddf.set_index('date')
         ddf['prev_close'] = ddf['close'].shift(1)
         prev_close_map = ddf['prev_close'].dropna().to_dict()
-        print(f"Daily prev_close map size: {len(prev_close_map)} (min={min(prev_close_map) if prev_close_map else 'n/a'}, max={max(prev_close_map) if prev_close_map else 'n/a'})")
+        logger.info("Daily prev_close map size: %s", len(prev_close_map))
     else:
         # Fallback: use last hourly close from prior day
-        print("No day data found for SPY. Falling back to previous day's last hourly close for prev_close anchor…")
+        logger.warning("No day data found for %s. Falling back to previous day's last hourly close for prev_close anchor…", ticker)
         hourly_dict = get_multi_timeframe_data(
             ticker,
             (start_date - timedelta(days=5)).strftime("%Y-%m-%d"),
@@ -102,7 +130,7 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
             prev_day = dates_sorted[i-1]
             curr_day = dates_sorted[i]
             prev_close_map[curr_day] = float(last_per_day.loc[prev_day])
-        print(f"Hourly-based prev_close map size: {len(prev_close_map)}")
+        logger.info("Hourly-based prev_close map size: %s", len(prev_close_map))
 
     # If some dates in the requested range are missing in prev_close_map (common for 'today' intraday
     # because daily bars are not yet available), backfill using hourly data for the whole window.
@@ -139,69 +167,83 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
                         prev_close_map[d] = hourly_prev[d]
                         filled += 1
                 if filled:
-                    print(f"Filled {filled} missing prev_close anchors from hourly data (range {start_date}..{end_date})")
+                    logger.info("Filled %s missing prev_close anchors from hourly data (range %s..%s)", filled, start_date, end_date)
         except Exception as e:
             # Non-fatal: keep prev_close_map as-is and proceed
-            print(f"WARN: Failed to backfill prev_close from hourly for missing dates: {e}")
+            logger.warning("Failed to backfill prev_close from hourly for missing dates: %s", e)
 
     records: List[dict] = []
 
+    # Thread-pooled fetch per (date, strike, opt_type)
+    def _fetch_one(d: date, lvl: int, opt_type: str, prev_close_val: float):
+        try:
+            wrapped = _with_retry(get_polygon_options_aggs, attempts=retries, backoff=backoff)
+            df_min = wrapped(
+                underlying_ticker=ticker,
+                expiration_date=d,
+                strike_price=float(lvl),
+                option_type=opt_type,
+                from_date=d,
+                to_date=d,
+            )
+            if df_min is None or df_min.empty:
+                return []
+            ts = pd.to_datetime(df_min["timestamp"], utc=True).dt.tz_convert(ET)
+            hours = ts.dt.hour
+            minutes = ts.dt.minute
+            mins_total = hours * 60 + minutes
+            market_open = 9 * 60 + 30
+            market_close = 16 * 60
+            mask = (mins_total >= market_open) & (mins_total < market_close)
+            df_mkt = df_min.loc[mask].copy()
+            if df_mkt.empty:
+                return []
+            df_mkt["hour_et"] = pd.to_datetime(df_mkt["timestamp"], utc=True).dt.tz_convert(ET).dt.hour
+            px = df_mkt.get("vwap")
+            if px is None or px.isna().all():
+                px = df_mkt.get("close")
+            df_mkt["_premium"] = df_mkt["volume"].astype(float) * px.astype(float).fillna(0.0) * 100.0
+            grp = df_mkt.groupby("hour_et").agg(volume=("volume","sum"), premium=("_premium","sum"))
+            out = []
+            for hour_et, row in grp.iterrows():
+                vol = float(row.get("volume", 0.0) or 0.0)
+                prem = float(row.get("premium", 0.0) or 0.0)
+                out.append({
+                    "date": d,
+                    "price_level": lvl,
+                    "spy_prev_close": float(prev_close_val),
+                    "hour_et": int(hour_et),
+                    "calls_sold": float(vol) if opt_type == "call" else 0.0,
+                    "puts_sold": float(vol) if opt_type == "put" else 0.0,
+                    "calls_premium": float(prem) if opt_type == "call" else 0.0,
+                    "puts_premium": float(prem) if opt_type == "put" else 0.0,
+                })
+            return out
+        except Exception as e:
+            logger.warning("options_aggs fetch failed for %s %s %s: %s", d, lvl, opt_type, e)
+            return []
+
+    tasks = []
     for d in _daterange(start_date, end_date):
-        if d not in prev_close_map:
-            # If still missing, skip this day (likely holiday or data gap)
-            continue
         prev_close = prev_close_map.get(d)
-        if prev_close is None:
+        if d not in prev_close_map or prev_close is None:
             continue
         anchor = int(np.round(float(prev_close)))
-        # Use configurable +/- distance_max around anchor
         price_levels = [anchor + k for k in range(-abs(distance_max), abs(distance_max) + 1)]
-
         for lvl in price_levels:
-            for opt_type in ["call", "put"]:
-                df_min = get_polygon_options_aggs(
-                    underlying_ticker=ticker,
-                    expiration_date=d,
-                    strike_price=float(lvl),
-                    option_type=opt_type,
-                    from_date=d,
-                    to_date=d,
-                )
-                if df_min.empty:
-                    continue
-
-                # Ensure timezone-aware in ET
-                ts = pd.to_datetime(df_min["timestamp"], utc=True).dt.tz_convert(ET)
-                hours = ts.dt.hour
-                minutes = ts.dt.minute
-                mins_total = hours * 60 + minutes
-                market_open = 9 * 60 + 30
-                market_close = 16 * 60
-                mask = (mins_total >= market_open) & (mins_total < market_close)
-                df_mkt = df_min.loc[mask].copy()
-                if df_mkt.empty:
-                    continue
-                df_mkt["hour_et"] = pd.to_datetime(df_mkt["timestamp"], utc=True).dt.tz_convert(ET).dt.hour
-                # Compute minute-level premium ~ vwap * volume * 100 (contract multiplier)
-                px = df_mkt.get("vwap")
-                if px is None or px.isna().all():
-                    px = df_mkt.get("close")
-                df_mkt["_premium"] = df_mkt["volume"].astype(float) * px.astype(float).fillna(0.0) * 100.0
-                grp = df_mkt.groupby("hour_et").agg(volume=("volume","sum"), premium=("_premium","sum"))
-
-                for hour_et, row in grp.iterrows():
-                    vol = float(row.get("volume", 0.0) or 0.0)
-                    prem = float(row.get("premium", 0.0) or 0.0)
-                    records.append({
-                        "date": d,
-                        "price_level": lvl,
-                        "spy_prev_close": float(prev_close),
-                        "hour_et": int(hour_et),
-                        "calls_sold": float(vol) if opt_type == "call" else 0.0,
-                        "puts_sold": float(vol) if opt_type == "put" else 0.0,
-                        "calls_premium": float(prem) if opt_type == "call" else 0.0,
-                        "puts_premium": float(prem) if opt_type == "put" else 0.0,
-                    })
+            for opt_type in ("call", "put"):
+                tasks.append((d, lvl, opt_type, prev_close))
+    if tasks:
+        max_workers = max(1, int(workers))
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            futs = [ex.submit(_fetch_one, d, lvl, t, pv) for (d, lvl, t, pv) in tasks]
+            for fut in as_completed(futs):
+                try:
+                    rows = fut.result()
+                    if rows:
+                        records.extend(rows)
+                except Exception as e:
+                    logger.warning("task failed: %s", e)
 
     if not records:
         return pd.DataFrame(columns=["date", "price_level", "spy_prev_close", "hour_et", "calls_sold", "puts_sold"]) 
@@ -212,7 +254,7 @@ def fetch_0dte_flow(start_date: date, end_date: date, *, ticker: str = "SPY", di
         raw.groupby(["date", "price_level", "spy_prev_close", "hour_et"], as_index=False)
            .agg({"calls_sold": "sum", "puts_sold": "sum", "calls_premium":"sum", "puts_premium":"sum"})
     )
-    print(f"Collected raw 0DTE flow records: {len(raw)}")
+    logger.info("Collected raw 0DTE flow records: %s", len(raw))
     return raw
 
 
@@ -229,88 +271,103 @@ def fetch_0dte_trades_premium_inferred(
     Returns per-strike, per-hour records with calls_premium_inf_sold, puts_premium_inf_sold.
     """
     records: List[dict] = []
+    # Precompute prev_close per date similar to fetch_0dte_flow
+    prev_by_date: dict[date, float] = {}
     for d in _daterange(start_date, end_date):
-        # Approx anchor from daily/hourly as in fetch_0dte_flow
-        daily_dict = get_multi_timeframe_data(ticker, (d - timedelta(days=5)).strftime("%Y-%m-%d"), d.strftime("%Y-%m-%d"), ["day"])
         prev_close = None
-        if daily_dict.get('day') is not None and not daily_dict['day'].empty:
-            dd = _ensure_date_column(daily_dict['day']).copy()
-            dd['date'] = pd.to_datetime(dd['date']).dt.date
-            dd = dd.set_index('date')
-            if d in dd.index:
-                try:
+        try:
+            daily_dict = get_multi_timeframe_data(ticker, (d - timedelta(days=5)).strftime("%Y-%m-%d"), d.strftime("%Y-%m-%d"), ["day"])
+            if daily_dict.get('day') is not None and not daily_dict['day'].empty:
+                dd = _ensure_date_column(daily_dict['day']).copy()
+                dd['date'] = pd.to_datetime(dd['date']).dt.date
+                dd = dd.set_index('date')
+                if d in dd.index:
                     prev_close = float(dd.loc[d]['close'])
-                except Exception:
-                    prev_close = None
+        except Exception:
+            prev_close = None
         if prev_close is None:
-            # fallback: use previous day’s last hourly close
-            hourly_dict = get_multi_timeframe_data(ticker, (d - timedelta(days=5)).strftime("%Y-%m-%d"), d.strftime("%Y-%m-%d"), ["hour"])
-            hdf = hourly_dict.get('hour', pd.DataFrame())
-            if not hdf.empty:
-                hdf2 = _ensure_date_column(hdf)
-                hdf2['date'] = pd.to_datetime(hdf2['date'], utc=True).dt.tz_convert(ET).dt.date
-                last_prev = (
-                    hdf2.sort_values(['date'])
-                        .groupby('date')
-                        .tail(1)
-                        .set_index('date')['close']
-                )
-                prev_days = sorted(last_prev.index)
-                for i in range(1, len(prev_days)):
-                    if prev_days[i] == d:
-                        prev_close = float(last_prev.loc[prev_days[i-1]])
-                        break
-        if prev_close is None:
-            continue
+            try:
+                hourly_dict = get_multi_timeframe_data(ticker, (d - timedelta(days=5)).strftime("%Y-%m-%d"), d.strftime("%Y-%m-%d"), ["hour"])
+                hdf = hourly_dict.get('hour', pd.DataFrame())
+                if not hdf.empty:
+                    hdf2 = _ensure_date_column(hdf)
+                    hdf2['date'] = pd.to_datetime(hdf2['date'], utc=True).dt.tz_convert(ET).dt.date
+                    last_prev = (
+                        hdf2.sort_values(['date'])
+                            .groupby('date')
+                            .tail(1)
+                            .set_index('date')['close']
+                    )
+                    prev_days = sorted(last_prev.index)
+                    for i in range(1, len(prev_days)):
+                        if prev_days[i] == d:
+                            prev_close = float(last_prev.loc[prev_days[i-1]])
+                            break
+            except Exception:
+                prev_close = None
+        if prev_close is not None:
+            prev_by_date[d] = float(prev_close)
+
+    def _trades_one(d: date, lvl: int, opt_type: str, prev_close: float):
+        try:
+            trades = _with_retry(get_polygon_option_trades, attempts=retries, backoff=backoff)(ticker, d, float(lvl), opt_type, d, d)
+            if trades is None or trades.empty:
+                return []
+            quotes = _with_retry(get_polygon_option_quotes, attempts=retries, backoff=backoff)(ticker, d, float(lvl), opt_type, d, d)
+            tdf = trades.copy()
+            qdf = quotes.copy() if (quotes is not None and not quotes.empty) else pd.DataFrame(columns=['timestamp','bid','ask'])
+            tdf['ts'] = pd.to_datetime(tdf['timestamp'])
+            qdf['ts'] = pd.to_datetime(qdf.get('timestamp', pd.Series([], dtype='datetime64[ns]')))
+            tdf = tdf.sort_values('ts')
+            qdf = qdf.sort_values('ts')
+            merged = pd.merge_asof(tdf, qdf[['ts','bid','ask']], on='ts', direction='backward', tolerance=pd.Timedelta('5min'))
+            price = merged['price'].astype(float)
+            bid = merged.get('bid', pd.Series(np.nan))
+            ask = merged.get('ask', pd.Series(np.nan))
+            buyer = price >= (ask.astype(float).fillna(np.inf) - 1e-6)
+            mid = (bid.astype(float).fillna(0.0) + ask.astype(float).fillna(0.0)) / 2.0
+            buyer = buyer | (price > (mid + 1e-6))
+            prem = price * merged['size'].astype(float) * 100.0
+            merged['hour_et'] = merged['ts'].dt.tz_convert(ET).dt.hour
+            try:
+                sh = int(start_hour_et); eh = int(end_hour_et)
+                if sh <= eh:
+                    merged = merged[(merged['hour_et'] >= sh) & (merged['hour_et'] <= eh)]
+            except Exception:
+                pass
+            grp = merged.groupby('hour_et').apply(lambda g: float(prem[g.index][buyer[g.index]].sum()))
+            out = []
+            for hour_et, prem_sold in grp.items():
+                out.append({
+                    'date': d,
+                    'price_level': lvl,
+                    'spy_prev_close': float(prev_close),
+                    'hour_et': int(hour_et),
+                    'calls_premium_inf_sold': float(prem_sold) if opt_type=='call' else 0.0,
+                    'puts_premium_inf_sold': float(prem_sold) if opt_type=='put' else 0.0,
+                })
+            return out
+        except Exception as e:
+            logger.warning("trades/quotes fetch failed for %s %s %s: %s", d, lvl, opt_type, e)
+            return []
+
+    tasks2 = []
+    for d, prev_close in prev_by_date.items():
         anchor = int(np.round(prev_close))
         price_levels = [anchor + k for k in range(-abs(distance_max), abs(distance_max) + 1)]
         for lvl in price_levels:
-            for opt_type in ["call", "put"]:
-                trades = get_polygon_option_trades(ticker, d, float(lvl), opt_type, d, d)
-                quotes = get_polygon_option_quotes(ticker, d, float(lvl), opt_type, d, d)
-                if trades.empty:
-                    continue
-                # Align nearest prior quote per trade
+            for opt_type in ("call","put"):
+                tasks2.append((d, lvl, opt_type, prev_close))
+    if tasks2:
+        with ThreadPoolExecutor(max_workers=max(1, int(workers))) as ex:
+            futs = [ex.submit(_trades_one, d, lvl, t, pv) for (d, lvl, t, pv) in tasks2]
+            for fut in as_completed(futs):
                 try:
-                    tdf = trades.copy()
-                    qdf = quotes.copy() if not quotes.empty else pd.DataFrame(columns=['timestamp','bid','ask'])
-                    tdf['ts'] = pd.to_datetime(tdf['timestamp'])
-                    qdf['ts'] = pd.to_datetime(qdf.get('timestamp', pd.Series([], dtype='datetime64[ns]')))
-                    tdf = tdf.sort_values('ts')
-                    qdf = qdf.sort_values('ts')
-                    merged = pd.merge_asof(tdf, qdf[['ts','bid','ask']], on='ts', direction='backward', tolerance=pd.Timedelta('5min'))
-                    # Classify buyer-initiated if price >= ask - tiny eps; seller-initiated if price <= bid + eps
-                    eps = 1e-6
-                    price = merged['price'].astype(float)
-                    bid = merged.get('bid', pd.Series(np.nan))
-                    ask = merged.get('ask', pd.Series(np.nan))
-                    buyer = price >= (ask.astype(float).fillna(np.inf) - 1e-6)
-                    # If ask missing, fallback: price above midpoint by >0 may be buyer, else seller
-                    mid = (bid.astype(float).fillna(0.0) + ask.astype(float).fillna(0.0)) / 2.0
-                    buyer = buyer | (price > (mid + 1e-6))
-                    # Dealers are on the opposite side: buyer-initiated => dealers sold
-                    prem = price * merged['size'].astype(float) * 100.0
-                    merged['hour_et'] = merged['ts'].dt.tz_convert(ET).dt.hour
-                    # Filter to hour window if provided
-                    try:
-                        sh = int(start_hour_et)
-                        eh = int(end_hour_et)
-                        if sh <= eh:
-                            merged = merged[(merged['hour_et'] >= sh) & (merged['hour_et'] <= eh)]
-                    except Exception:
-                        pass
-                    grp = merged.groupby('hour_et').apply(lambda g: float(prem[g.index][buyer[g.index]].sum()))
-                    for hour_et, prem_sold in grp.items():
-                        records.append({
-                            'date': d,
-                            'price_level': lvl,
-                            'spy_prev_close': float(prev_close),
-                            'hour_et': int(hour_et),
-                            'calls_premium_inf_sold': float(prem_sold) if opt_type=='call' else 0.0,
-                            'puts_premium_inf_sold': float(prem_sold) if opt_type=='put' else 0.0,
-                        })
-                except Exception:
-                    continue
+                    rows = fut.result()
+                    if rows:
+                        records.extend(rows)
+                except Exception as e:
+                    logger.warning("task failed: %s", e)
     if not records:
         return pd.DataFrame(columns=['date','price_level','spy_prev_close','hour_et','calls_premium_inf_sold','puts_premium_inf_sold'])
     df = pd.DataFrame(records)
@@ -359,14 +416,14 @@ def build_matrix(
     sd = datetime.strptime(start_date, "%Y-%m-%d").date()
     ed = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    print(f"Fetching 0DTE flow for {ticker} {sd} -> {ed} using Polygon keys from .env")
+    logger.info("Fetching 0DTE flow for %s %s -> %s using Polygon keys from .env", ticker, sd, ed)
     raw = fetch_0dte_flow(sd, ed, ticker=ticker, distance_max=distance_max)
     if raw.empty:
         raise RuntimeError(f"No 0DTE flow data collected for {ticker} from {sd} to {ed}. Halting matrix build. Check API key and data availability.")
     if dump_raw:
         raw_path = raw_out or out_csv.replace(".csv", "_raw.csv")
         raw.to_csv(raw_path, index=False)
-        print(f"Saved raw 0DTE flow to {raw_path}")
+        logger.info("Saved raw 0DTE flow to %s", raw_path)
 
     # Load indicator set if provided
     indicator_set = None
@@ -374,7 +431,7 @@ def build_matrix(
         try:
             indicator_set = load_indicator_set(indicator_set_path)
         except Exception as e:
-            print(f"WARN: failed to load indicator set from {indicator_set_path}: {e}")
+            logger.warning("failed to load indicator set from %s: %s", indicator_set_path, e)
 
     fb = FeatureBuilder(distance_max=distance_max, indicator_set=indicator_set)
     feats = fb.add_base_features(raw)
@@ -394,7 +451,7 @@ def build_matrix(
             if not inferred.empty:
                 feats = pd.merge(feats, inferred, on=['date','price_level','spy_prev_close','hour_et'], how='left')
         except Exception as e:
-            print(f"WARN: failed to compute trade-level premium inferred: {e}")
+            logger.warning("failed to compute trade-level premium inferred: %s", e)
 
     # Merge hourly underlying ticker close for label and price-derived features
     hourly = fetch_hourly_ticker(ticker, start_date, end_date)
@@ -444,8 +501,8 @@ def build_matrix(
             num2 = m["puts_premium_inf_total"].fillna(0.0) - m["calls_premium_inf_total"].fillna(0.0)
             den2 = m["puts_premium_inf_total"].fillna(0.0) + m["calls_premium_inf_total"].fillna(0.0) + 1e-6
             m["dealer_sold_premium_inferred"] = (num2 / den2).astype(float)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("aggregation step failed; continuing with partial features: %s", e)
     # Dealer-driven divergence score & orientation (recompute with aggregated totals if available)
     if indicator_set and (indicator_set.name == 'zerosigma_v1'): # This is a hack, will be removed
         try:
@@ -514,5 +571,5 @@ def build_matrix(
 
     Path(out_csv).parent.mkdir(parents=True, exist_ok=True)
     m.to_csv(out_csv, index=False)
-    print(f"Saved training matrix to {out_csv} ({len(m)} rows)")
+    logger.info("Saved training matrix to %s (%s rows)", out_csv, len(m))
     return out_csv

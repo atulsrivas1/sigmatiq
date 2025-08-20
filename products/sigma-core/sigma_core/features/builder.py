@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import logging
 from typing import List, Optional
 from ..indicators.base import Indicator
 from ..indicators.registry import get_indicator
@@ -86,8 +87,8 @@ class FeatureBuilder:
                     indicator = indicator_class(**params)
                     df = pd.concat([df, indicator.calculate(df)], axis=1)
                 except Exception:
-                    # If indicator cannot be computed, skip gracefully
-                    pass
+                    # If indicator cannot be computed, skip gracefully but log
+                    logging.getLogger(__name__).warning("indicator compute failed: %s", getattr(spec, 'name', 'unknown'))
         return df
 
     def add_dealer_orientation(self, df: pd.DataFrame) -> pd.DataFrame:

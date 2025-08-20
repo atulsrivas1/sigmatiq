@@ -6,8 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from api.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
-from api.services.policy import ensure_policy_exists, load_policy, validate_policy_file
+from sigma_core.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
+from sigma_core.services.policy import ensure_policy_exists, load_policy, validate_policy_file
 
 
 def test_workspace_paths_and_indicator_resolution_tmp():
@@ -52,4 +52,3 @@ def test_policy_invalid_schema_detected():
     pol_path.write_text('policy: invalid')
     msg = ensure_policy_exists(model_id, 'zerosigma')
     assert isinstance(msg, str) and 'invalid' in msg
-

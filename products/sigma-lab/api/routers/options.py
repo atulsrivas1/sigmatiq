@@ -20,7 +20,7 @@ try:
 except Exception:
     db_fetch_option_signals = None
 from sigma_core.data.sources.polygon import get_polygon_option_chain_snapshot, get_polygon_option_quotes
-from api.services.io import workspace_paths as _ws_paths
+from sigma_core.services.io import workspace_paths as _ws_paths
 
 router = APIRouter()
 
@@ -63,7 +63,7 @@ def options_overlay_ep(payload: OptionsOverlayRequest):
             sig_rows = db_fetch_signals(model_id=payload.model_id, date_eq=d, limit=payload.limit) or []
         if not sig_rows:
             # CSV fallback
-            from api.services.io import workspace_paths as _ws
+            from sigma_core.services.io import workspace_paths as _ws
             ws = _ws(payload.model_id, payload.pack_id or 'swingsigma')
             csv_path = ws['live'] / 'signals.csv'
             if not csv_path.exists():
@@ -192,7 +192,7 @@ def options_overlay_ep(payload: OptionsOverlayRequest):
                 else:
                     written = db_upsert_option_signals(overlays)
             else:
-                from api.services.io import workspace_paths as _ws2
+                from sigma_core.services.io import workspace_paths as _ws2
                 ws2=_ws2(payload.model_id, payload.pack_id or 'swingsigma')
                 out_csv = ws2['live'] / 'options_signals.csv'
                 pd.DataFrame(overlays).to_csv(out_csv, index=False)

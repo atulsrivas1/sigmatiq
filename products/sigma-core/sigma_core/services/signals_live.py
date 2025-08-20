@@ -23,27 +23,13 @@ class LiveMetrics:
     freshness_sec: Optional[int] = None
 
 
-def _parse_date(s: Optional[str]) -> Optional[date]:
-    if not s:
-        return None
-    try:
-        return date.fromisoformat(s)
-    except Exception:
-        return None
-
-
 def load_signals_csv(root: Path, model_id: str) -> Optional[pd.DataFrame]:
-    """Load signals CSV if present under live_data/<model_id>/signals.csv.
-    Returns a DataFrame or None if missing/failed.
-    """
     csv_path = root / "live_data" / model_id / "signals.csv"
     if not csv_path.exists():
         return None
     try:
         df = pd.read_csv(csv_path)
-        # Normalize column names
         df.columns = [c.strip().lower() for c in df.columns]
-        # Parse ts if present
         if "ts" in df.columns:
             try:
                 df["ts"] = pd.to_datetime(df["ts"], errors="coerce", utc=True)
@@ -67,7 +53,6 @@ def _compute_sharpe(perf: pd.Series) -> Optional[float]:
     r = perf.dropna()
     if r.std(ddof=0) == 0 or r.empty:
         return None
-    # per-trade Sharpe scaled by sqrt(N) where N is trades per year proxy; scale=1 for simplicity
     return float(r.mean() / r.std(ddof=0) * math.sqrt(max(1, len(r))))
 
 
@@ -94,9 +79,7 @@ def compute_live_metrics(df: pd.DataFrame, *, now_ts: Optional[pd.Timestamp] = N
     m = LiveMetrics()
     if df is None or df.empty:
         return m
-    # Determine period subset if ts exists; caller should filter by date range as needed
     dff = df.copy()
-    # Compute per-trade pnl if available; otherwise use rr as proxy
     perf = None
     if "pnl" in dff.columns:
         perf = pd.to_numeric(dff["pnl"], errors="coerce")
@@ -105,7 +88,6 @@ def compute_live_metrics(df: pd.DataFrame, *, now_ts: Optional[pd.Timestamp] = N
     else:
         perf = pd.Series(dtype=float)
     m.trades = int((dff.get("status") == "filled").sum()) if "status" in dff.columns else int(len(dff))
-    # Equity curve from cumulative sum of pnl proxy
     equity = perf.cumsum() if not perf.empty else pd.Series(dtype=float)
     m.cum_return = float(perf.sum()) if not perf.empty else None
     m.sharpe = _compute_sharpe(perf) if not perf.empty else None
@@ -118,15 +100,12 @@ def compute_live_metrics(df: pd.DataFrame, *, now_ts: Optional[pd.Timestamp] = N
         m.fill_rate = (filled / considered) if considered > 0 else None
     if "slippage" in dff.columns:
         m.avg_slippage = _safe_mean(pd.to_numeric(dff["slippage"], errors="coerce"))
-    # Capacity: placeholder classification
     m.capacity = None
-    # Coverage and freshness
     if "ts" in dff.columns and pd.api.types.is_datetime64_any_dtype(dff["ts"]):
         idx = dff["ts"].sort_values()
         if not idx.empty:
             last_ts = idx.iloc[-1]
             first_ts = idx.iloc[0]
-            # coverage as share of calendar days with at least one signal
             try:
                 uniq_days = idx.dt.date.nunique()
                 total_days = max(1, (last_ts.normalize() - first_ts.normalize()).days + 1)
@@ -139,11 +118,11 @@ def compute_live_metrics(df: pd.DataFrame, *, now_ts: Optional[pd.Timestamp] = N
 
 
 def leaderboard_from_csv(root: Path, *, pack_filter: Optional[str], risk_profile: Optional[str], start: Optional[str], end: Optional[str], limit: int, offset: int) -> Dict[str, Any]:
-    """Build a simple leaderboard by scanning live_data/*/signals.csv and aggregating metrics."""
     live_dir = root / "live_data"
     rows: List[Dict[str, Any]] = []
     if not live_dir.exists():
         return {"rows": [], "total": 0}
+
     def _resolve_pack_for_model(mid: str) -> Optional[str]:
         packs_dir = root / "packs"
         if not packs_dir.exists():
@@ -160,7 +139,6 @@ def leaderboard_from_csv(root: Path, *, pack_filter: Optional[str], risk_profile
         if not model_dir.is_dir():
             continue
         model_id = model_dir.name
-        # Filter by pack if requested (best-effort by locating config file under packs/*/model_configs)
         if pack_filter:
             resolved_pack = _resolve_pack_for_model(model_id)
             if resolved_pack != pack_filter:
@@ -168,7 +146,6 @@ def leaderboard_from_csv(root: Path, *, pack_filter: Optional[str], risk_profile
         df = load_signals_csv(root, model_id)
         if df is None or df.empty:
             continue
-        # Filter by date range if provided
         if start or end:
             if "ts" in df.columns:
                 ts = pd.to_datetime(df["ts"], errors="coerce", utc=True)

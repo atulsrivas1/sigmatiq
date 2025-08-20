@@ -1,1 +1,1 @@
-from api.services.audit import *  # re-export for stable platform import
+from sigma_core.services.audit import *

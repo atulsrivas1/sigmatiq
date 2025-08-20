@@ -1,1 +1,1 @@
-from api.services.policy import *  # re-export for stable platform import
+from sigma_core.services.policy import *
