@@ -153,43 +153,7 @@ export const Dashboard: React.FC = () => {
     return () => { mounted = false }
   }, [])
 
-  const packs = useMemo(() => Array.from(new Set(models.map(m => m.pack_id).filter(Boolean))) as string[], [models])
-
-  // Synthesize a "models to display" list using leaderboard rows for metrics
-  const modelRows = useMemo(() => {
-    const list = runs.map(r => ({
-      model_id: r.model_id,
-      pack_id: r.pack_id,
-      sharpe: r.sharpe ?? 0,
-      win_rate: r.win_rate ?? 0,
-      trades: r.trades ?? 0,
-      cum_ret: r.cum_ret ?? 0,
-      updated_at: r.started_at,
-    }))
-    return list
-  }, [runs])
-
-  const filtered = useMemo(() => {
-    return modelRows.filter(r =>
-      (!search || r.model_id.toLowerCase().includes(search.toLowerCase())) &&
-      (!packFilter || r.pack_id === packFilter)
-    )
-  }, [modelRows, search, packFilter])
-
-  const sorted = useMemo(() => {
-    const arr = [...filtered]
-    switch (sortBy) {
-      case 'sharpe':
-        arr.sort((a, b) => (b.sharpe || 0) - (a.sharpe || 0)); break
-      case 'ret':
-        arr.sort((a, b) => (b.cum_ret || 0) - (a.cum_ret || 0)); break
-      case 'trades':
-        arr.sort((a, b) => (b.trades || 0) - (a.trades || 0)); break
-      default:
-        arr.sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''))
-    }
-    return arr
-  }, [filtered, sortBy])
+  // (Filters and sorting will be added when wiring interactive controls.)
 
   return (
     <div className="dashboard-page">
