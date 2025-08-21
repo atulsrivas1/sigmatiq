@@ -15,6 +15,9 @@ Codex
 - [[Indicators Map|codex-indicators-map]]
 - [[Open Questions|codex-open-questions]]
 
+Legacy
+- [[Legacy Archive|Legacy_Archive]]
+
 Suite
 - [[Overview|suite-overview]]
 
