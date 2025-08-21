@@ -18,6 +18,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 15000,
 })
 
 // Request interceptor
@@ -44,7 +45,8 @@ api.interceptors.response.use(
       localStorage.removeItem('auth_token')
       window.location.href = '/login'
     }
-    return Promise.reject(error)
+    const msg = (error?.response?.data?.error as string) || error?.message || 'Unknown error'
+    return Promise.reject(new Error(msg))
   }
 )
 

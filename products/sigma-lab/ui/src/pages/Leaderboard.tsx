@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { apiService } from '../services/api'
 import './Leaderboard.css'
+import { ErrorBanner } from '../components/common/ErrorBanner'
 
 interface LeaderboardEntry {
   model_id: string
@@ -19,6 +20,7 @@ interface LeaderboardEntry {
 export const Leaderboard: React.FC = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState({
     pack: '',
     riskProfile: '',
@@ -33,6 +35,7 @@ export const Leaderboard: React.FC = () => {
   const fetchLeaderboard = async () => {
     try {
       setLoading(true)
+      setError(null)
       const params: any = {}
       if (filters.pack) params.pack_id = filters.pack
       if (filters.riskProfile) params.risk_profile = filters.riskProfile
@@ -40,8 +43,9 @@ export const Leaderboard: React.FC = () => {
       
       const response = await apiService.getLeaderboard(params)
       setEntries(response.data.rows || [])
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error)
+    } catch (err: any) {
+      console.error('Error fetching leaderboard:', err)
+      setError(err?.message || 'Failed to fetch leaderboard')
     } finally {
       setLoading(false)
     }
@@ -85,6 +89,12 @@ export const Leaderboard: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div style={{ marginBottom: 12 }}>
+          <ErrorBanner message={error} />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="leaderboard-filters">

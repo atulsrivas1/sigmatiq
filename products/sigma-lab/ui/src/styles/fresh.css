@@ -84,6 +84,9 @@
 .model-id-link { font-family: Monaco, monospace; color: var(--sigmatiq-bright-teal); text-decoration: none; }
 .model-id-link:hover { text-decoration: underline; }
 
+/* Error banner */
+.error-banner { background: rgba(255,87,87,0.15); color: var(--status-error); border: 1px solid var(--status-error); border-radius: 8px; padding: 10px 12px; }
+
 /* Controls bar layout to keep everything on a single row */
 .controls-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: nowrap; }
 .search-box { flex: 1 1 auto; min-width: 240px; position: relative; }

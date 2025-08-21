@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import ReactDOM from 'react-dom'
 import { Logo } from '../components/Logo'
 import { Icon } from '../components/Icon'
 import { menu as menuConfig, MenuItem, implementedPaths } from '../config/menu'
@@ -283,7 +284,9 @@ export const AppShell: React.FC = () => {
 
         {/* Main Content */}
         <main className="main-content" role="main" id="main-content">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 
@@ -336,4 +339,28 @@ const QuickAccessDrawer: React.FC = () => {
       </div>
     </div>
   )
+}
+
+// Minimal error boundary to catch render errors and show a friendly message
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message?: string }>{
+  constructor(props: any) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, message: error?.message || 'Something went wrong.' }
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('ErrorBoundary caught:', error, errorInfo)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error-banner" role="alert" style={{ margin: 12 }}>
+          <strong>Unexpected error:</strong> <span style={{ marginLeft: 6 }}>{this.state.message}</span>
+        </div>
+      )
+    }
+    return this.props.children as any
+  }
 }
