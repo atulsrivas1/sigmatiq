@@ -3,7 +3,8 @@ import React from 'react'
 export type IconName =
   | 'grid' | 'cube' | 'nodes' | 'barChart' | 'dollarSign' | 'fileText'
   | 'trendUp' | 'trendCheck' | 'clock' | 'spinner' | 'alertCircle'
-  | 'chevronLeft' | 'chevronRight' | 'rows'
+  | 'chevronLeft' | 'chevronRight' | 'rows' | 'globe' | 'database' | 'shield'
+  | 'play' | 'search'
 
 export const FreshIcon: React.FC<{ name: IconName; size?: number; className?: string; stroke?: string; fill?: string; }> = ({
   name, size = 18, className, stroke = 'currentColor', fill = 'none'
@@ -38,8 +39,17 @@ export const FreshIcon: React.FC<{ name: IconName; size?: number; className?: st
       return (<svg {...common} className={className}><polyline points="9 18 15 12 9 6"/></svg>)
     case 'rows':
       return (<svg {...common} className={className}><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>)
+    case 'globe':
+      return (<svg {...common} className={className}><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>)
+    case 'database':
+      return (<svg {...common} className={className}><path d="M3 12h18M3 6h18M3 18h18"/></svg>)
+    case 'shield':
+      return (<svg {...common} className={className}><path d="M12 2L4 7v5c0 5.5 3.5 10.26 8 11 4.5-.74 8-5.5 8-11V7l-8-5z"/></svg>)
+    case 'play':
+      return (<svg {...common} className={className}><path d="M5 3l14 9-14 9V3z"/></svg>)
+    case 'search':
+      return (<svg {...common} className={className}><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>)
     default:
       return null
   }
 }
-
