@@ -1,7 +1,7 @@
-# Sigmatix Edge – Developer Makefile
+# Sigma Lab – Developer Makefile
 
 # Configurable vars (can be overridden on the command line)
-PACK_ID ?= zeroedge
+PACK_ID ?= zerosigma
 MODEL_ID ?=
 TICKER ?= SPY
 START ?=
@@ -88,7 +88,7 @@ help:
 	@echo "Vars: PACK_ID, MODEL_ID, TICKER, START, END, EXPIRY, ALLOWED_HOURS, THRESHOLDS, SPLITS, DISTANCE_MAX, BASE_URL, DB_*"
 
 ui:
-	uvicorn edge_api.app:app --host 0.0.0.0 --port 8001 --reload
+	python products/sigma-lab/api/run_api.py --host 0.0.0.0 --port 8001 --reload
 
 health:
 	@[ -n "$(TICKER)" ] || (echo "TICKER is required"; exit 1)
@@ -97,16 +97,24 @@ health:
 models:
 	curl -sS "$(BASE_URL)/models?pack_id=$(PACK_ID)" | jq .
 
+# Create model via API so policy and config are scaffolded under packs/$(PACK_ID)
 init:
 	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
-	python scripts/create_model.py --pack_id $(PACK_ID) --model_id $(MODEL_ID) --ticker $(TICKER)
+	@[ -n "$(TICKER)" ] || (echo "TICKER is required"; exit 1)
+	@echo "Creating model $(MODEL_ID) in pack $(PACK_ID) via API $(BASE_URL)"
+	curl -sS -X POST "$(BASE_URL)/models" \
+	 -H "Content-Type: application/json" \
+	 -d "{\"ticker\":\"$(TICKER)\",\"asset_type\":\"$${ASSET:-opt}\",\"horizon\":\"$${HORIZON:-0dte}\",\"cadence\":\"$${CADENCE:-hourly}\",\"algo\":\"$${ALGO:-gbm}\",\"variant\":\"$${VARIANT:-}\",\"pack_id\":\"$(PACK_ID)\"}" | jq .
 
 init-auto:
 	@[ -n "$(TICKER)" ] || (echo "TICKER is required"; exit 1)
 	@[ -n "$(ASSET)" ] || (echo "ASSET=opt|eq is required"; exit 1)
 	@[ -n "$(HORIZON)" ] || (echo "HORIZON=0dte|intraday|swing|long is required"; exit 1)
 	@[ -n "$(CADENCE)" ] || (echo "CADENCE=5m|15m|hourly|daily is required"; exit 1)
-	python scripts/create_model.py --pack_id $(PACK_ID) --ticker $(TICKER) --asset $(ASSET) --horizon $(HORIZON) --cadence $(CADENCE) --algo $(ALGO) --variant $(VARIANT)
+	@echo "Creating model (auto) in pack $(PACK_ID) via API $(BASE_URL)"
+	curl -sS -X POST "$(BASE_URL)/models" \
+	 -H "Content-Type: application/json" \
+	 -d "{\"ticker\":\"$(TICKER)\",\"asset_type\":\"$(ASSET)\",\"horizon\":\"$(HORIZON)\",\"cadence\":\"$(CADENCE)\",\"algo\":\"$${ALGO:-gbm}\",\"variant\":\"$${VARIANT:-}\",\"pack_id\":\"$(PACK_ID)\"}" | jq .
 
 build:
 	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
