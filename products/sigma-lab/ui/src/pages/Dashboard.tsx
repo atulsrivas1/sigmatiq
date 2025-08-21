@@ -9,6 +9,7 @@ import { ModelsContainer } from '../components/models/ModelsContainer'
 import { Pagination } from '../components/models/Pagination'
 import { apiService } from '../services/api'
 import type { ModelCardModel } from '../components/models/ModelCard'
+import { ErrorBanner } from '../components/common/ErrorBanner'
 
 interface ModelItem {
   id?: string
@@ -163,6 +164,7 @@ export const Dashboard: React.FC = () => {
           <div className="section-header">
             <h2 className="section-title">Dashboard</h2>
           </div>
+          {error && <ErrorBanner message={error} />}
           
           <div className="dashboard-grid">
             <RecentModels items={recentItems} />
@@ -177,6 +179,7 @@ export const Dashboard: React.FC = () => {
           <div className="section-header">
             <h2 className="section-title">Models</h2>
           </div>
+          {error && <ErrorBanner message={error} />}
 
           <ControlsBar view={view} setView={setView} />
           <ModelsContainer view={view} models={modelsData} />
