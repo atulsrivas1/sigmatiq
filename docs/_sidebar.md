@@ -24,6 +24,8 @@
 
 ### Sigma Lab
 - [[Overview|sigma-lab]]
+  - [[Makefile Guide|makefile_guide]]
+  - [[Modeling Pipeline Guide|modeling_pipeline_guide]]
 - API Specs
   - [[Admin API|sigma-lab-api-admin-api-spec-v1]]
   - [[Assistant API|sigma-lab-api-assistant-api-spec-v1]]
@@ -92,3 +94,6 @@
 
 ### Quick Links
 - [[Architecture.md|Architecture]]
+- [[Modeling Pipeline Guide|modeling_pipeline_guide]]
+- [[Modeling Reference|modeling_reference]]
+- [[Start Here|start_here]]

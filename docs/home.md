@@ -1,5 +1,16 @@
 # Sigmatiq Documentation
 
+## Start Here
+- Modeling pipeline: [[Modeling Pipeline Guide|modeling_pipeline_guide]]
+- Concepts and allowed values: [[Modeling Reference|modeling_reference]]
+- Make targets overview: [[Makefile Guide|makefile_guide]]
+- Indicators catalog: [[INDICATORS_REFERENCE.md|INDICATORS_REFERENCE]]
+
+Quick start
+- Configure `.env` (DB_* and POLYGON_API_KEY) and run `make db-migrate`.
+- Start API: `uvicorn products.sigma-lab.api.app:app --host 0.0.0.0 --port 8001`.
+- Run the smoke: `make check-backend BASE_URL=http://localhost:8001 TICKER=SPY PACK_ID=zerosigma MODEL_ID=spy_opt_0dte_hourly START=2024-01-01 END=2024-03-31`.
+
 Welcome to the Sigmatiq documentation hub. Brand-level docs live at the root; product docs live under `Sigma/` and mirror `products/` in the codebase.
 
 ## Brand Docs
@@ -17,6 +28,8 @@ Welcome to the Sigmatiq documentation hub. Brand-level docs live at the root; pr
 - Pilot: [[Sigma Pilot|sigma-pilot]]
 
 ## Getting Started
+- Start here: [[Modeling Pipeline Guide|modeling_pipeline_guide]] (end‑to‑end modeling workflow)
+- Reference: [[Modeling Reference|modeling_reference]] (packs, models, policies, indicators, features)
 - Code roots: see `products/` for the corresponding implementations.
 - Conventions: [[CONVENTIONS.md|CONVENTIONS]]
 - Architecture: see [[Architecture.md|Architecture]] for rendered diagrams.

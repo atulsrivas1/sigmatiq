@@ -5,6 +5,9 @@
 /.smoke
 /.vs
 /.claude/settings.local.json
+/.wiki_build/
+/.wiki_flat/
+/.wiki_repo/
 /products/sigma-core/sigma_core/indicators/builtins/__pycache__
 /products/sigma-core/sigma_core/indicators/__pycache__
 /products/sigma-core/sigma_core/labels/__pycache__

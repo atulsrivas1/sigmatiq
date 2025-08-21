@@ -3,6 +3,10 @@ Sigma Lab Docs
 Scope
 - Primary product/API, migrations, runbooks, operational plans, and app UI.
 
+Start Here
+- [[Modeling Pipeline Guide|modeling_pipeline_guide]] — end‑to‑end modeling workflow using Make targets
+- [[Modeling Reference|modeling_reference]] — concepts, properties, and allowed values
+
 Code
 - Product code: `products/sigma-lab/`
 

@@ -10,6 +10,7 @@ from sigma_core.data.stocks import build_stock_matrix as build_stock_matrix_rang
 from sigma_core.services.io import workspace_paths, load_config, resolve_indicator_set_path, sanitize_out_path
 from fastapi.responses import JSONResponse
 from sigma_core.services.policy import ensure_policy_exists
+from sigma_core.storage.relational import get_db
 try:
     from sigma_core.services.model_cards import write_model_card
 except Exception:
@@ -73,6 +74,8 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         return {"ok": False, "error": "start and end are required"}
     paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
     cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
+    from datetime import datetime
+    started_at = datetime.utcnow()
     try:
         out_csv = str(sanitize_out_path(payload.out_csv, paths['matrices'] / 'training_matrix_built.csv'))
     except ValueError as ve:
@@ -95,15 +98,14 @@ def build_matrix_ep(payload: BuildMatrixRequest):
             label_config=(cfgm.get('labels') or cfgm.get('label') or None),
         )
         # Write model card for build
+        # Basic metrics for model card and DB row
+        cols = []
         try:
             if write_model_card is not None:
                 # Basic metrics: rows and columns
-                try:
-                    import pandas as _pd
-                    _df = _pd.read_csv(out_csv, nrows=5)
-                    cols = list(_df.columns)
-                except Exception:
-                    cols = []
+                import pandas as _pd
+                _df = _pd.read_csv(out_csv, nrows=5)
+                cols = list(_df.columns)
                 write_model_card(
                     pack_id=(payload.pack_id or 'zerosigma'),
                     model_id=model_id,
@@ -121,6 +123,80 @@ def build_matrix_ep(payload: BuildMatrixRequest):
                         'columns_count': len(cols),
                     },
                 )
+        except Exception:
+            pass
+        # Store build run in DB (best-effort)
+        try:
+            metrics_store = {'columns_count': len(cols)}
+            # lineage
+            lineage_vals = None
+            try:
+                if write_model_card is not None:
+                    from sigma_core.services.lineage import compute_lineage as _compute_lineage  # type: ignore
+                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+                    from sigma_core.services.io import PACKS_DIR as _PACKS_DIR  # type: ignore
+                    lineage_vals = _compute_lineage(pack_dir=_PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
+            except Exception:
+                pass
+            # snapshot policy for reproducibility
+            try:
+                from sigma_core.services.policy import load_policy as _load_policy  # type: ignore
+                pol_snap = _load_policy(model_id, payload.pack_id or 'zerosigma')
+            except Exception:
+                pol_snap = None
+            params_store = {
+                'start': start,
+                'end': end,
+                'k_sigma': float(payload.k_sigma),
+                'fixed_bp': payload.fixed_bp,
+                'distance_max': int(payload.distance_max),
+                'dump_raw': bool(payload.dump_raw),
+                'ticker': (payload.ticker or cfgm.get('ticker', 'SPY')),
+                'policy_snapshot': pol_snap,
+            }
+            finished_at = datetime.utcnow()
+            build_run_id = None
+            with get_db() as conn:  # type: ignore
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO build_runs (pack_id, model_id, started_at, finished_at, params, metrics, out_csv_uri, lineage)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                        RETURNING id
+                        """,
+                        (
+                            (payload.pack_id or 'zerosigma'),
+                            model_id,
+                            started_at,
+                            finished_at,
+                            params_store,
+                            metrics_store,
+                            out_csv,
+                            lineage_vals,
+                        ),
+                    )
+                    row = cur.fetchone()
+                    build_run_id = int(row[0]) if row else None
+                    # Insert artifact for matrix CSV
+                    try:
+                        cur.execute(
+                            """
+                            INSERT INTO artifacts (pack_id, model_id, kind, uri, sha256, size_bytes, build_run_id)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s)
+                            """,
+                            (
+                                (payload.pack_id or 'zerosigma'),
+                                model_id,
+                                'matrix',
+                                out_csv,
+                                None,
+                                None,
+                                build_run_id,
+                            ),
+                        )
+                    except Exception:
+                        pass
+                conn.commit()
         except Exception:
             pass
         return {"ok": True, "out_csv": out_csv}

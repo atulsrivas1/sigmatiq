@@ -116,6 +116,26 @@ def upsert_indicator_set_ep(payload: IndicatorSetUpsertRequest):
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
+
+@router.get('/models')
+def list_models(pack_id: Optional[str] = Query(None)):
+    """List available model configs under packs/<pack_id>/model_configs.
+
+    If pack_id is omitted, returns all models across packs.
+    """
+    out: List[Dict[str, Any]] = []
+    try:
+        packs = [pack_id] if pack_id else [p.name for p in PACKS_DIR.iterdir() if p.is_dir()]
+        for pid in sorted(packs):
+            cfg_dir = PACKS_DIR / pid / 'model_configs'
+            if not cfg_dir.exists():
+                continue
+            for f in sorted(cfg_dir.glob('*.yaml')):
+                out.append({'id': f.stem, 'pack_id': pid, 'path': str(f)})
+        return {'ok': True, 'models': out, 'count': len(out)}
+    except Exception as e:
+        return {'ok': False, 'error': str(e)}
+
 class PreviewMatrixRequest(BaseModel):
     model_id: str
     start: str
