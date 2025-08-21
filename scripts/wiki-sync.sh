@@ -26,6 +26,7 @@ mkdir -p "$BUILD_DIR"
 if command -v rsync >/dev/null 2>&1; then
   rsync -a --delete \
     --exclude '_archive/' \
+    --exclude 'v1-archive/' \
     --exclude '.git/' \
     --exclude '.DS_Store' \
     "$DOCS_DIR"/ "$BUILD_DIR"/
@@ -35,7 +36,7 @@ import os, shutil, sys
 src, dst = sys.argv[1:3]
 def ignore(dir, files):
     ig = set()
-    if os.path.basename(dir) == '_archive':
+    if os.path.basename(dir) in {'_archive','v1-archive'}:
         return set(files)
     for f in files:
         if f in {'.git', '.DS_Store'}:
@@ -59,7 +60,7 @@ src, dst = sys.argv[1:3]
 
 def flatten_name(rel):
     rel = rel.replace('\\', '/').lstrip('./')
-    if rel.startswith('_archive/'):
+    if rel.startswith('_archive/') or rel.startswith('v1-archive/'):
         return None
     base = os.path.basename(rel)
     # Preserve Home and _Sidebar at root
@@ -204,6 +205,26 @@ if [[ -d "$WIKI_DIR/.git" ]]; then
 else
   rm -rf "$WIKI_DIR"
   git clone "$WIKI_URL" "$WIKI_DIR"
+fi
+
+# Archive existing wiki contents into archive/v1-archive-<timestamp>/ before syncing
+ts="$(date -u +%Y%m%d_%H%M%S)"
+ARCHIVE_DIR="$WIKI_DIR/archive/v1-archive-$ts"
+mkdir -p "$WIKI_DIR/archive"
+# If there are files (other than .git and archive) at root, move them
+shopt -s nullglob dotglob
+to_move=("$WIKI_DIR"/*)
+shopt -u dotglob
+if (( ${#to_move[@]} > 0 )); then
+  mkdir -p "$ARCHIVE_DIR"
+  for p in "${to_move[@]}"; do
+    name="$(basename "$p")"
+    if [[ "$name" == ".git" || "$name" == "archive" ]]; then
+      continue
+    fi
+    mv "$p" "$ARCHIVE_DIR"/
+  done
+  echo "Archived existing wiki pages to archive/$(basename "$ARCHIVE_DIR")"
 fi
 
 # Sync FLAT_DIR files into wiki root (rsync or Python fallback)
