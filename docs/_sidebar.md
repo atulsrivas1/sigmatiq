@@ -24,6 +24,7 @@
 
 ### Sigma Lab
 - [[Overview|sigma-lab]]
+  - [[Makefile Guide|makefile_guide]]
 - API Specs
   - [[Admin API|sigma-lab-api-admin-api-spec-v1]]
   - [[Assistant API|sigma-lab-api-assistant-api-spec-v1]]

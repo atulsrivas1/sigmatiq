@@ -25,6 +25,10 @@ Creates `models/<PACK_ID>/<MODEL_ID>/README.md` and `policy.yaml`.
 - Standard: `make backtest MODEL_ID=spy_opt_0dte_hourly THRESHOLDS=0.55,0.60,0.65 SPLITS=5`
 - Gated: `make backtest-gated MODEL_ID=spy_opt_0dte_hourly MOMENTUM_MIN=0.1`
 
+## Leaderboard
+`make leaderboard MODEL_ID=spy_opt_0dte_hourly SPLITS=5`
+- Calls GET `/leaderboard` with `limit=SPLITS` (default 5). Omit `MODEL_ID` to list by `PACK_ID`.
+
 ## Pipelines
 - `make pipeline MODEL_ID=... START=... END=... TICKER=...`
 - `make pipeline-gated ...`
@@ -35,3 +39,11 @@ Creates `models/<PACK_ID>/<MODEL_ID>/README.md` and `policy.yaml`.
 
 Use `make help` for a full target list.
 
+## Model discovery and policy validation
+- List models (by pack): `make models PACK_ID=zerosigma` (GET `/models?pack_id=$(PACK_ID)`).
+- Validate policy (alias to policy explain): `make validate-policy MODEL_ID=spy_opt_0dte_hourly PACK_ID=zerosigma` (GET `/validate_policy`).
+
+## Backend smoke test
+End-to-end against the real API:
+`make check-backend BASE_URL=http://<api> TICKER=SPY PACK_ID=zerosigma MODEL_ID=spy_opt_0dte_hourly START=2024-01-01 END=2024-03-31`
+Runs: health → build → train → backtest → leaderboard.
