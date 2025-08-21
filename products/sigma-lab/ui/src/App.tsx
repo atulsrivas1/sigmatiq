@@ -11,6 +11,7 @@ import { Signals } from './pages/Signals'
 import { Health } from './pages/Health'
 import { Overlay } from './pages/Overlay'
 import { ComponentShowcase } from './pages/ComponentShowcase'
+import { ComponentsDemo } from './pages/ComponentsDemo'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="overlay" element={<Overlay />} />
         <Route path="health" element={<Health />} />
         <Route path="showcase" element={<ComponentShowcase />} />
+        <Route path="demo" element={<ComponentsDemo />} />
       </Route>
     </Routes>
   )
