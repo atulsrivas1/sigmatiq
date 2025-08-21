@@ -25,52 +25,52 @@
   display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px; margin-bottom: 32px;
 }
-.dashboard-card {
+.dashboard-card, .panel {
   background: var(--color-surface-1);
   border: 1px solid var(--color-border);
   border-radius: 12px; padding: 20px; display: flex; flex-direction: column; min-height: 260px;
 }
-.dashboard-card-title {
+.dashboard-card-title, .panel-title {
   font-size: 13px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.5px; color: var(--color-text-2);
   margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border);
 }
 
 /* Recent Models */
-.recent-models-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.recent-model-item {
+.recent-models-list, .list-vertical { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.recent-model-item, .list-item {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 12px; background: var(--color-surface-2);
   border-radius: 8px; transition: all 0.2s;
 }
-.recent-model-item:hover { background: var(--color-surface-3); }
-.recent-model-info { display: flex; flex-direction: column; gap: 4px; }
-.recent-model-id { font-weight: 500; color: var(--color-text-1); font-size: 14px; }
-.recent-model-meta { font-size: 11px; color: var(--color-text-3); padding-left: 12px; }
+.recent-model-item:hover, .list-item:hover { background: var(--color-surface-3); }
+.recent-model-info, .list-item-info { display: flex; flex-direction: column; gap: 4px; }
+.recent-model-id, .item-title { font-weight: 500; color: var(--color-text-1); font-size: 14px; }
+.recent-model-meta, .item-meta { font-size: 11px; color: var(--color-text-3); padding-left: 12px; }
 
 /* Quick Actions */
-.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.quick-action-btn {
+.quick-actions, .action-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quick-action-btn, .action-tile {
   padding: 16px; background: var(--color-surface-2); border: 1px solid var(--color-border);
   border-radius: 10px; color: var(--color-text-1); font-weight: 500; font-size: 13px;
   cursor: pointer; transition: all 0.2s; display: flex; align-items: center;
   justify-content: center; gap: 8px; min-height: 48px;
 }
-.quick-action-btn:hover { background: var(--color-surface-3); border-color: var(--sigmatiq-bright-teal); transform: translateY(-1px); }
-.quick-action-btn.primary { background: rgba(0, 196, 167, 0.1); border-color: var(--sigmatiq-bright-teal); color: var(--sigmatiq-bright-teal); }
-.quick-action-btn.primary:hover { background: var(--sigmatiq-bright-teal); color: var(--color-bg); }
+.quick-action-btn:hover, .action-tile:hover { background: var(--color-surface-3); border-color: var(--sigmatiq-bright-teal); transform: translateY(-1px); }
+.quick-action-btn.primary, .action-tile.primary { background: rgba(0, 196, 167, 0.1); border-color: var(--sigmatiq-bright-teal); color: var(--sigmatiq-bright-teal); }
+.quick-action-btn.primary:hover, .action-tile.primary:hover { background: var(--sigmatiq-bright-teal); color: var(--color-bg); }
 
 /* Health */
-.health-status { display: flex; gap: 12px; flex: 1; }
-.health-item {
+.health-status, .health-tiles { display: flex; gap: 12px; flex: 1; }
+.health-item, .health-tile {
   flex: 1; display: flex; flex-direction: column; align-items: center;
   padding: 16px 12px; background: var(--color-surface-2); border-radius: 10px; gap: 8px;
 }
-.health-label { font-size: 10px; color: var(--color-text-3); text-transform: uppercase; letter-spacing: 0.5px; }
-.health-value { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
-.health-value.ok { color: var(--status-success); }
-.health-value.warn { color: var(--status-warning); }
-.health-value.error { color: var(--status-error); }
+.health-label, .tile-label { font-size: 10px; color: var(--color-text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+.health-value, .tile-value { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+.health-value.ok, .tile-value.ok { color: var(--status-success); }
+.health-value.warn, .tile-value.warn { color: var(--status-warning); }
+.health-value.error, .tile-value.error { color: var(--status-error); }
 
 /* Buttons / Badges */
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-1); font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 13px; }
