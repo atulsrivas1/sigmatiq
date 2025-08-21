@@ -1,6 +1,49 @@
 # Modeling Pipeline Guide (End‑to‑End)
 
-This guide explains the core domain concepts (packs, models, policies, indicators, features, sweeps) and provides a practical, step‑by‑step workflow to build, backtest, sweep, train, and iterate toward profitable alerts using the Makefile pipeline and the Sigma Lab API.
+This guide explains the core ideas in plain English and gives you a simple, repeatable set of steps to go from “I want alerts on SPY” to a working model that produces profitable alerts. It intentionally avoids jargon where possible and tells you exactly which buttons/commands to run and what “good” looks like.
+
+## Non‑Technical Quickstart (Plain English)
+
+What you’re doing
+- Pick a “strategy pack” (pre‑set rules for how we trade).
+- Create a “model” for your market (e.g., SPY options, hourly).
+- Build a clean history (a spreadsheet of inputs and outcomes).
+- Replay the strategy on history (backtest) to see how well it worked.
+- Let the system try a bunch of settings for you (sweeps) and show a scoreboard (leaderboard).
+- Train (lock‑in) the best setup and start producing alerts.
+
+Key words in simple terms
+- Pack: A bundle of ready‑made settings we trust (think “strategy template”).
+- Model: A named strategy for one market and timeframe (e.g., SPY options, hourly).
+- Build: Make a clean spreadsheet from history (inputs + what happened).
+- Backtest: Replay the rules on the spreadsheet to score goodness.
+- Leaderboard: A scoreboard of your runs with best ones on top.
+- Sweep: Autopilot to try different “settings” (thresholds/hours) and report what wins.
+- Train: Freeze the winning setup into a reusable model file that can issue alerts.
+
+Do this (copy/paste, adjust only CAPITALS)
+1) Make sure the API is running and database is ready
+   - `make db-migrate`
+   - Start API: `uvicorn products.sigma-lab.api.app:app --host 0.0.0.0 --port 8001`
+2) Create a model (example: SPY options, intraday hourly)
+   - `make init-auto TICKER=SPY ASSET=opt HORIZON=0dte CADENCE=hourly PACK_ID=zerosigma`
+3) Build a clean history
+   - `make build MODEL_ID=spy_opt_0dte_hourly START=2024-01-01 END=2024-03-31 TICKER=SPY PACK_ID=zerosigma`
+   - Success looks like: a CSV saved and a green `"ok": true` in the output.
+4) Backtest (get a first score)
+   - `make backtest MODEL_ID=spy_opt_0dte_hourly THRESHOLDS=0.55,0.60,0.65 SPLITS=5`
+   - Success looks like: the response includes best sharpe/cum_ret; `make leaderboard MODEL_ID=...` shows a row.
+5) Try many settings automatically (sweeps)
+   - Generate a sweep grid you can edit: `make sweep-config MODEL_ID=spy_opt_0dte_hourly START=2024-01-01 END=2024-03-31`
+   - Run your sweep via client/API; then list sweeps: `make sweeps PACK_ID=zerosigma MODEL_ID=spy_opt_0dte_hourly`
+6) Train the best version (turn on alerts)
+   - Pick hours/thresholds from the scoreboard and retrain: `make train MODEL_ID=spy_opt_0dte_hourly ALLOWED_HOURS=13,14,15`
+   - The trained model bundle is saved and ready to power alerts.
+
+What “good” looks like
+- Backtest shows a positive Sharpe and reasonable trade count.
+- Leaderboard has runs that repeat success across different days/splits.
+- After training, live alerts (or simulated alerts) behave similarly to the backtest.
  
 ```mermaid
 flowchart LR
@@ -14,15 +57,15 @@ flowchart LR
   G --> H[Alerts / Live Signals]
 ```
 
-## Core Concepts
+## Core Concepts (Light Jargon)
 
-- Pack: A productized strategy namespace under `packs/<pack_id>` containing:
+- Pack: A pre‑packaged strategy setup: trusted indicator bundles + policy defaults you can reuse.
   - model_configs/: YAML files per model (`<model_id>.yaml`) – ticker, horizon, cadence, feature flags, label config, etc.
   - indicator_sets/: YAML files listing indicators and params to compute during builds.
   - policy_templates/: YAML files describing execution policy (slippage, sizing, momentum gate, brackets, options selection).
   - model_templates/: Optional starter templates for new models (metadata + recommended settings).
-- Model: A named configuration (e.g., `spy_opt_0dte_hourly`) that couples a ticker, horizon, cadence, features/labels and an execution policy for building, training, and evaluation.
-- Policy (Execution): Controls how predictions translate to trades/alerts at runtime.
+- Model: A named strategy for one market/timeframe (e.g., `spy_opt_0dte_hourly`).
+- Policy (Execution): Safety rails + how to size/enter/exit; keeps trades disciplined.
   - Effective fields (via `/policy/explain`):
     - slippage_bps: float (default 1.0)
     - size_by_conf: bool (default false)
@@ -32,10 +75,10 @@ flowchart LR
     - momentum_column: str (default `momentum_score_total`)
     - brackets: enabled, mode, entry_mode, atr_period, atr_mult_stop, atr_mult_target, time_stop_minutes, min_rr, regime_adjust
     - options.selection: target_delta (0–1), dte_target (>0), min_oi (>=0), min_vol (~0–5), spread_width, weekly_ok
-- Indicators: Computed signals and transforms (hundreds available) that feed feature sets.
+- Indicators: Raw signals like RSI, moving averages, volatility. You don’t need to pick them all — packs/templates do.
   - List all via: `make indicators` or grouped: `make indicators-groups`.
   - Examples (from `sigma_core/indicators/builtins`): rsi_14, ema_20, atr_14, macd, momentum_score, iv_realized_spread, options_smile, bollinger, stoch_rsi, vix_term_slope, etc.
-- Features: Selected columns used by the model (auto‑selected or driven by pack model config feature flags).
+- Features: The inputs the model actually uses (auto‑picked from indicators).
   - The training service builds features from the built matrix using `sigma_core.features.builder` and optional flags in `model_configs/<model_id>.yaml`.
 - Build (Matrix): Fetches raw market/option data and computes indicators/features across the requested period. Output is a training matrix CSV.
 - Backtest: Cross‑validated evaluation over historical data (splits + embargo) to quantify performance (Sharpe, cum_ret, trades, etc.).
