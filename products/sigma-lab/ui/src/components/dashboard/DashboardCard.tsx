@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const FreshDashboardCard: React.FC<{ title: string; children: React.ReactNode; }>= ({ title, children }) => {
+export const DashboardCard: React.FC<{ title: string; children: React.ReactNode; }>= ({ title, children }) => {
   return (
     <div className="dashboard-card">
       <h3 className="dashboard-card-title">{title}</h3>

@@ -1,7 +1,7 @@
 import React from 'react'
-import { FreshIcon } from '../common/Icon'
+import { FreshIcon } from '../common/FreshIcon'
 
-export const FreshControlsBar: React.FC<{view: 'card'|'row'; setView: (v:'card'|'row')=>void;}> = ({ view, setView }) => {
+export const ControlsBar: React.FC<{view: 'card'|'row'; setView: (v:'card'|'row')=>void;}> = ({ view, setView }) => {
   return (
     <div className="controls-bar">
       <div className="search-box">
@@ -54,3 +54,4 @@ export const FreshControlsBar: React.FC<{view: 'card'|'row'; setView: (v:'card'|
     </div>
   )
 }
+

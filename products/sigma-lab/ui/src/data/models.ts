@@ -1,6 +1,6 @@
-import type { FreshModel } from '../components/models/ModelCard'
+import type { ModelCardModel } from '../components/models/ModelCard'
 
-export const freshModels: FreshModel[] = [
+export const modelsData: ModelCardModel[] = [
   {
     id: 'spy_opt_0dte_hourly',
     title: 'SPY 0DTE (Hourly)',

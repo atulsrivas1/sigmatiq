@@ -1,11 +1,11 @@
 import React from 'react'
-import { FreshDashboardCard } from './DashboardCard'
+import { DashboardCard } from './DashboardCard'
 
 type Run = { name: string; sub: string; type: 'success' | 'running' | 'failed' }
 
-export const FreshLastRuns: React.FC<{ runs: Run[] }>= ({ runs }) => {
+export const LastRuns: React.FC<{ runs: Run[] }>= ({ runs }) => {
   return (
-    <FreshDashboardCard title="Last Runs">
+    <DashboardCard title="Last Runs">
       <div className="recent-models-list">
         {runs.map((r, idx) => (
           <div className="recent-model-item" key={idx}>
@@ -38,7 +38,7 @@ export const FreshLastRuns: React.FC<{ runs: Run[] }>= ({ runs }) => {
           </div>
         ))}
       </div>
-    </FreshDashboardCard>
+    </DashboardCard>
   )
 }
 

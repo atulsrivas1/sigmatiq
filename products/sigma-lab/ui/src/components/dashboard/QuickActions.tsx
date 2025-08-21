@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FreshDashboardCard } from './DashboardCard'
+import { DashboardCard } from './DashboardCard'
 
-export const FreshQuickActions: React.FC = () => {
+export const QuickActions: React.FC = () => {
   const actions = [
     { label: 'Create Model', primary: true, icon: 'plus', to: '/models/new' },
     { label: 'Run Backtest', primary: false, icon: 'play', to: '/composer/backtest' },
@@ -11,7 +11,7 @@ export const FreshQuickActions: React.FC = () => {
   ] as const
 
   return (
-    <FreshDashboardCard title="Quick Actions">
+    <DashboardCard title="Quick Actions">
       <div className="quick-actions">
         {actions.map((a, i) => (
           <Link className={`quick-action-btn ${a.primary ? 'primary' : ''}`} key={i} to={a.to}>
@@ -44,7 +44,7 @@ export const FreshQuickActions: React.FC = () => {
           </Link>
         ))}
       </div>
-    </FreshDashboardCard>
+    </DashboardCard>
   )
 }
 

@@ -1,12 +1,12 @@
 import React from 'react'
-import { FreshDashboardCard } from './DashboardCard'
+import { DashboardCard } from './DashboardCard'
 import { Link } from 'react-router-dom'
 
 type Item = { label: string; value: string; className: 'ok' | 'warn' | 'error'; color: string; icon: 'shield' | 'rows' | 'globe' }
 
-export const FreshSystemHealth: React.FC<{ items: Item[] }>= ({ items }) => {
+export const SystemHealth: React.FC<{ items: Item[] }>= ({ items }) => {
   return (
-    <FreshDashboardCard title="System Health">
+    <DashboardCard title="System Health">
       <div className="health-status">
         {items.map((it, idx) => (
           <div className="health-item" key={idx}>
@@ -34,7 +34,7 @@ export const FreshSystemHealth: React.FC<{ items: Item[] }>= ({ items }) => {
       <div style={{ marginTop: 12 }}>
         <Link to="/health" className="btn btn-small" style={{ width: '100%' }}>View Details →</Link>
       </div>
-    </FreshDashboardCard>
+    </DashboardCard>
   )
 }
 

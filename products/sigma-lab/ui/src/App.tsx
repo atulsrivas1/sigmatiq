@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from './layouts/AppShell'
-import { DashboardFresh as Dashboard } from './pages/DashboardFresh'
+import { Dashboard } from './pages/Dashboard'
 import { Models } from './pages/Models'
 import { ModelCreate } from './pages/ModelCreate'
 import { ModelDesigner } from './pages/ModelDesigner'

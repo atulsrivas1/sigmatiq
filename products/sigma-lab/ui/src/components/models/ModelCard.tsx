@@ -1,7 +1,7 @@
 import React from 'react'
-import { FreshIcon } from '../common/Icon'
+import { FreshIcon } from '../common/FreshIcon'
 
-export type FreshModel = {
+export type ModelCardModel = {
   id: string
   title: string
   subtitle: string
@@ -16,7 +16,7 @@ export type FreshModel = {
   actions: string[]
 }
 
-const Chart: React.FC<{ kind: FreshModel['chart'] }> = ({ kind }) => {
+const Chart: React.FC<{ kind: ModelCardModel['chart'] }> = ({ kind }) => {
   if (kind === 'g1') {
     return (
       <svg className="mini-chart" viewBox="0 0 200 40">
@@ -69,7 +69,7 @@ const Chart: React.FC<{ kind: FreshModel['chart'] }> = ({ kind }) => {
   return null
 }
 
-export const FreshModelCard: React.FC<{ model: FreshModel; view: 'card'|'row' }> = ({ model, view }) => {
+export const ModelCard: React.FC<{ model: ModelCardModel; view: 'card'|'row' }> = ({ model, view }) => {
   return (
     <div className="model-card">
       <div className="card-header">
@@ -111,3 +111,4 @@ export const FreshModelCard: React.FC<{ model: FreshModel; view: 'card'|'row' }>
     </div>
   )
 }
+

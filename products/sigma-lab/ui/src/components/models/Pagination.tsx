@@ -1,7 +1,7 @@
 import React from 'react'
-import { FreshIcon } from '../common/Icon'
+import { FreshIcon } from '../common/FreshIcon'
 
-export const FreshPagination: React.FC<{ total?: number }>= ({ total }) => {
+export const Pagination: React.FC<{ total?: number }>= ({ total }) => {
   return (
     <div className="pagination-container">
       <div className="pagination-info">Showing 1-6 of {total ?? 42} models</div>
@@ -28,3 +28,4 @@ export const FreshPagination: React.FC<{ total?: number }>= ({ total }) => {
     </div>
   )
 }
+
