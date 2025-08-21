@@ -1,0 +1,19 @@
+pack_id: zerosigma
+model_id: spy_opt_0dte_hourly_xgb_v1
+description: |
+  SPY 0DTE options model using hourly bars with focus on intraday reversals,
+  volatility spreads, and options flow indicators. Designed for high-probability
+  short-duration trades during regular market hours.
+data:
+  ticker: SPY
+  cadence: hourly
+  horizon: 0dte
+features:
+  sets: [spy_opt_0dte_hourly]
+labels:
+  name: hourly_direction
+train:
+  calibration: sigmoid
+backtest:
+  thresholds: [0.55, 0.60, 0.65]
+  splits: 5

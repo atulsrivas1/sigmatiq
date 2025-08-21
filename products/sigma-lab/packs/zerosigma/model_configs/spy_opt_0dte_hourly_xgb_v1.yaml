@@ -1,0 +1,21 @@
+model_id: spy_opt_0dte_hourly_xgb_v1
+ticker: SPY
+model: xgb
+task: classification
+hyperparams:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+features:
+- rsi__period=14
+- iv_realized_spread__window=20
+- sold_flow_ratio__window=5
+label:
+  type: next_bar_updown
+  horizon: 1
+train_window:
+  start: '2023-01-01'
+  end: '2024-12-31'
+asset_type: opt
+horizon: 0dte
+cadence: hourly

@@ -1,0 +1,28 @@
+# packs/zerosigma/policy_templates/spy_opt_0dte_hourly_xgb_v1.yaml
+name: spy_opt_0dte_hourly_xgb_v1
+version: 1
+description: "SPY 0DTE options model using XGBoost with hourly bars"
+risk:
+  max_drawdown: 0.15
+  max_exposure: 10000
+execution:
+  slippage_bps: 2.0
+  size_by_conf: true
+  conf_cap: 0.8
+  momentum_gate: true
+  momentum_min: 5.0
+  momentum_column: momentum_score_total
+alerting:
+  cooldown_minutes: 15
+  max_trades_per_day: 5
+options:
+  strategy_type: "0dte"
+  delta_target: 0.30
+  dte_max: 0
+  min_open_interest: 100
+  max_spread_pct: 0.05
+brackets:
+  use_atr: true
+  atr_mult_stop: 1.5
+  atr_mult_target: 2.0
+  time_stop_minutes: 180
