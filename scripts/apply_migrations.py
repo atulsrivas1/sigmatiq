@@ -15,6 +15,20 @@ import os
 from pathlib import Path
 import sys
 
+# Load .env if available (repo root or product api dir)
+try:
+    from dotenv import load_dotenv  # type: ignore
+    # Try repo root .env
+    root_env = Path(__file__).resolve().parents[1] / '.env'
+    if root_env.exists():
+        load_dotenv(dotenv_path=root_env)
+    # Try product api .env (products/sigma-lab/.env)
+    prod_env = Path(__file__).resolve().parents[2] / 'products' / 'sigma-lab' / '.env'
+    if prod_env.exists():
+        load_dotenv(dotenv_path=prod_env, override=False)
+except Exception:
+    pass
+
 def get_conn():
     import psycopg2
     url = os.getenv('DATABASE_URL')
@@ -70,4 +84,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

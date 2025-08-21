@@ -17,6 +17,13 @@ Scope: Track actionable items to move from documentation to implementation. No c
 - [ ] Optionally add `check-backend` smoke target docs (health → build → train → backtest → leaderboard) and link from wiki.
 
 ## Medium Priority
+### DB Integration — Persistence Coverage
+- [ ] Sweeps: add `backtest_sweeps` (spec/status/timestamps) and `sweep_results` (params/metrics/csv_uri) tables; persist from sweep route; add list/detail endpoints.
+- [ ] Policy snapshots: persist effective policy on every build/train/backtest (simple: `policy_snapshot` JSONB on run tables; normalized: `policy_snapshots` with FK).
+- [ ] Artifacts: add `artifacts` table (kind|uri|sha256|size|created_at|run_id FK); persist matrix CSV, model pkl, plots; return URIs, not local paths.
+- [ ] Object storage: wire S3/MinIO writers and store stable URIs in DB (env-configured buckets); document creds/envs.
+- [ ] Read endpoints: list/detail for `build_runs` and `training_runs` (filters: pack_id, model_id, tag, dates, paging).
+- [ ] Schema versioning: add `schema_migrations` table to track applied migration ids/checksums.
 - [ ] Add DB views for leaderboard summaries (optional) to simplify Assistant queries.
 - [ ] Logging/metrics plan: request IDs, structured logs, counters for gate pass rate, cache hit rate, concurrent jobs.
 - [ ] Error catalog wiring: map exceptions → codes from `api/Error_Catalog_v1.md` (docs-only plan).
