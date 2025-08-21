@@ -88,6 +88,16 @@
 .view-toggle { display: flex; gap: 2px; white-space: nowrap; }
 .controls-bar > * { flex-shrink: 0; }
 
+/* Generic Filters Row */
+.filters-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.filters-left { display: flex; align-items: center; gap: 8px; min-width: 200px; }
+.filters-center { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+.filters-right { display: flex; align-items: center; gap: 8px; }
+.compact-select { padding: 8px 12px; background: var(--color-surface-1); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-1); font-size: 13px; }
+.chip { padding: 8px 16px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 20px; color: var(--color-text-2); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.chip:hover { border-color: var(--sigmatiq-bright-teal); }
+.chip.active { background: var(--sigmatiq-bright-teal); border-color: var(--sigmatiq-bright-teal); color: var(--color-bg); }
+
 /* Pills (jobs/status) */
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
 .pill-success { background: rgba(0,196,167,0.2); color: var(--status-success); }
