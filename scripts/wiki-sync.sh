@@ -229,16 +229,17 @@ fi
 
 # Sync FLAT_DIR files into wiki root (rsync or Python fallback)
 if command -v rsync >/dev/null 2>&1; then
-  rsync -a --delete "$FLAT_DIR"/ "$WIKI_DIR"/
+  # Preserve the archive/ folder created above
+  rsync -a --delete --exclude 'archive/' "$FLAT_DIR"/ "$WIKI_DIR"/
 else
   python - "$FLAT_DIR" "$WIKI_DIR" << 'PY'
 import os, shutil, sys
 src, dst = sys.argv[1:3]
 for root, dirs, files in os.walk(dst):
     pass
-# Clear destination except .git
+# Clear destination except .git and archive
 for name in os.listdir(dst):
-    if name == '.git':
+    if name in ('.git', 'archive'):
         continue
     p = os.path.join(dst, name)
     if os.path.isfile(p) or os.path.islink(p):
@@ -262,6 +263,21 @@ PY
 fi
 
 pushd "$WIKI_DIR" >/dev/null
+# Write a simple Legacy_Archive page linking to the latest archived Home
+if [[ -d "$ARCHIVE_DIR" ]]; then
+  LATEST_BASENAME="$(basename "$ARCHIVE_DIR")"
+  WEB_WIKI_URL="${WIKI_URL%.git}"
+  cat > Legacy_Archive.md <<EOF
+# Legacy Documentation Archive
+
+Looking for the previous wiki? Start here:
+- [[archive/$LATEST_BASENAME/Home|Browse Archived Home]]
+
+Or browse the folder on GitHub:
+- $WEB_WIKI_URL/tree/master/archive/$LATEST_BASENAME
+EOF
+fi
+
 git add -A
 if git diff --cached --quiet; then
   echo "No changes to publish to wiki."
