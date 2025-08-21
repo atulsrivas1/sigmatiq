@@ -1,0 +1,370 @@
+{
+  "flow": {
+    "name": "Sigma Suite Non-Technical User Journey",
+    "version": "1.0.0",
+    "total_steps": 6,
+    "estimated_time_minutes": 10
+  },
+  "steps": [
+    {
+      "id": "step_1",
+      "name": "Pick a Strategy Pack",
+      "display_name": "Choose Your Starter Kit",
+      "description": "Browse pre-built strategies that work out of the box",
+      "inputs": [
+        {
+          "type": "selection",
+          "name": "pack_choice",
+          "options": ["SwingSigma", "ZeroSigma", "GapSigma", "GammaSigma"],
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "type": "confirmation",
+          "name": "selected_pack",
+          "display": "✅ Pack selected with description"
+        }
+      ],
+      "ui_elements": [
+        "pack_cards",
+        "hover_descriptions",
+        "selection_highlight"
+      ],
+      "help_text": "Each pack is like a recipe - it has all the ingredients ready",
+      "next": "step_2",
+      "can_skip": false
+    },
+    {
+      "id": "step_2",
+      "name": "Create Your Model",
+      "display_name": "Name Your Strategy",
+      "description": "Make a personal copy of the strategy to customize",
+      "inputs": [
+        {
+          "type": "text",
+          "name": "model_name",
+          "placeholder": "My_First_Strategy",
+          "validation": "alphanumeric_underscore",
+          "required": true
+        },
+        {
+          "type": "radio",
+          "name": "risk_profile",
+          "options": [
+            {"value": "conservative", "label": "Conservative", "color": "green", "icon": "🟢"},
+            {"value": "balanced", "label": "Balanced", "color": "yellow", "icon": "🟡"},
+            {"value": "aggressive", "label": "Aggressive", "color": "red", "icon": "🔴"}
+          ],
+          "default": "conservative",
+          "required": true
+        },
+        {
+          "type": "dropdown",
+          "name": "time_frame",
+          "options": [
+            {"value": "day", "label": "Day trades"},
+            {"value": "week", "label": "Week holds"},
+            {"value": "month", "label": "Month positions"}
+          ],
+          "default": "week",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "type": "model",
+          "name": "created_model",
+          "display": "Model created and ready to configure"
+        }
+      ],
+      "ui_elements": [
+        "name_input_field",
+        "risk_selector_chips",
+        "timeframe_dropdown"
+      ],
+      "help_text": "Give it a name you'll remember and choose how much risk you want",
+      "next": "step_3",
+      "can_skip": false
+    },
+    {
+      "id": "step_3",
+      "name": "Configure Settings",
+      "display_name": "Adjust Your Dials",
+      "description": "Fine-tune when your strategy buys and sells",
+      "inputs": [
+        {
+          "type": "slider",
+          "name": "confidence_threshold",
+          "min": 50,
+          "max": 70,
+          "default": 60,
+          "unit": "%",
+          "label": "How sure before trading?",
+          "help": "Higher = fewer, better trades"
+        },
+        {
+          "type": "checkbox_group",
+          "name": "trading_hours",
+          "options": [
+            {"value": "morning", "label": "Morning (9:30-11:30)", "icon": "☀️"},
+            {"value": "midday", "label": "Midday (11:30-2:00)", "icon": "🌤️"},
+            {"value": "power", "label": "Power Hour (3:00-4:00)", "icon": "⚡"}
+          ],
+          "default": ["morning"]
+        },
+        {
+          "type": "slider",
+          "name": "position_size",
+          "min": 1,
+          "max": 5,
+          "default": 1,
+          "unit": "% of account",
+          "label": "How much per trade?",
+          "help": "Start small while learning"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "config",
+          "name": "sweep_config",
+          "display": "Configuration saved and ready to test"
+        }
+      ],
+      "ui_elements": [
+        "simple_sliders",
+        "preset_buttons",
+        "advanced_toggle"
+      ],
+      "presets": [
+        {
+          "name": "Conservative",
+          "confidence": 65,
+          "hours": ["morning"],
+          "size": 1
+        },
+        {
+          "name": "Balanced",
+          "confidence": 60,
+          "hours": ["morning", "power"],
+          "size": 2
+        },
+        {
+          "name": "Aggressive",
+          "confidence": 55,
+          "hours": ["morning", "midday", "power"],
+          "size": 3
+        }
+      ],
+      "help_text": "Use the preset buttons or adjust sliders yourself",
+      "next": "step_4",
+      "can_skip": false
+    },
+    {
+      "id": "step_4",
+      "name": "Run Backtest",
+      "display_name": "Test Your Strategy",
+      "description": "See if your strategy would have worked on past data",
+      "inputs": [
+        {
+          "type": "date_range",
+          "name": "test_period",
+          "default": "last_2_years",
+          "auto_set": true,
+          "display": "Testing on 2022-2024 data"
+        },
+        {
+          "type": "button",
+          "name": "run_test",
+          "label": "Run Test",
+          "style": "primary",
+          "icon": "▶️"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "results",
+          "name": "backtest_results",
+          "fields": [
+            {"name": "status", "display": "Overall", "values": ["🟢 PASS", "🟡 MARGINAL", "🔴 FAIL"]},
+            {"name": "score", "display": "Score", "format": "stars", "max": 5},
+            {"name": "win_rate", "display": "Win Rate", "format": "percentage"},
+            {"name": "return", "display": "Return", "format": "percentage_signed"},
+            {"name": "risk_level", "display": "Risk Level", "values": ["Low", "Medium", "High"]}
+          ]
+        }
+      ],
+      "ui_elements": [
+        "progress_bar",
+        "results_card",
+        "traffic_light_indicators"
+      ],
+      "loading_states": [
+        {"time": 0, "message": "🔵 Preparing data..."},
+        {"time": 30, "message": "🟡 Running simulation..."},
+        {"time": 90, "message": "🟢 Calculating results..."},
+        {"time": 120, "message": "✅ Complete!"}
+      ],
+      "help_text": "This tests your strategy on 2 years of real market data",
+      "next": "step_5",
+      "can_skip": false
+    },
+    {
+      "id": "step_5",
+      "name": "View Leaderboard",
+      "display_name": "Compare Strategies",
+      "description": "See how your strategy ranks against others",
+      "inputs": [
+        {
+          "type": "filter",
+          "name": "leaderboard_filter",
+          "options": ["All", "My Strategies", "Same Pack", "Same Risk"],
+          "default": "All"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "ranking",
+          "name": "leaderboard_position",
+          "display_format": "table",
+          "columns": [
+            {"key": "rank", "label": "#", "width": "10%"},
+            {"key": "name", "label": "Strategy", "width": "30%"},
+            {"key": "score", "label": "Score", "width": "20%"},
+            {"key": "return", "label": "Return", "width": "20%"},
+            {"key": "status", "label": "Status", "width": "20%"}
+          ],
+          "row_styling": {
+            "user_model": "highlight_teal",
+            "pass": "bg_green_light",
+            "marginal": "bg_yellow_light",
+            "fail": "bg_red_light"
+          }
+        }
+      ],
+      "ui_elements": [
+        "sortable_table",
+        "filter_chips",
+        "rank_badges"
+      ],
+      "badges": [
+        {"rank": 1, "icon": "🥇", "label": "Top Strategy"},
+        {"rank": 2, "icon": "🥈", "label": "Runner Up"},
+        {"rank": 3, "icon": "🥉", "label": "Third Place"},
+        {"rank": "top_10", "icon": "⭐", "label": "Top 10"},
+        {"rank": "pass", "icon": "✅", "label": "Passing"},
+        {"rank": "fail", "icon": "❌", "label": "Needs Work"}
+      ],
+      "help_text": "Green rows are strategies that passed all tests",
+      "next": "step_6",
+      "can_skip": true
+    },
+    {
+      "id": "step_6",
+      "name": "Start Training",
+      "display_name": "Go Live",
+      "description": "Turn on your strategy with real market data",
+      "inputs": [
+        {
+          "type": "confirmation",
+          "name": "confirm_training",
+          "title": "Ready to Train?",
+          "message": "This will lock your settings and begin training. You cannot change settings once training starts.",
+          "confirm_button": "Yes, Start Training",
+          "cancel_button": "Not Yet",
+          "style": "warning"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "status",
+          "name": "training_status",
+          "stages": [
+            {"id": "setup", "label": "Setting up...", "icon": "🔵", "duration": 60},
+            {"id": "learning", "label": "Learning patterns...", "icon": "🟡", "duration": 300},
+            {"id": "validating", "label": "Validating model...", "icon": "🟠", "duration": 180},
+            {"id": "finalizing", "label": "Almost ready...", "icon": "🟢", "duration": 60},
+            {"id": "complete", "label": "Ready to trade!", "icon": "✅", "duration": 0}
+          ]
+        }
+      ],
+      "ui_elements": [
+        "confirmation_modal",
+        "progress_stepper",
+        "status_card"
+      ],
+      "notifications": [
+        {"trigger": "start", "message": "Training started for {model_name}"},
+        {"trigger": "complete", "message": "🎉 {model_name} is ready to trade!"},
+        {"trigger": "error", "message": "⚠️ Training failed. Please try again."}
+      ],
+      "help_text": "Training typically takes 10-15 minutes",
+      "next": null,
+      "can_skip": true
+    }
+  ],
+  "error_handling": {
+    "step_failures": [
+      {
+        "step": "step_4",
+        "error": "backtest_failed",
+        "message": "Test couldn't complete. Try adjusting your settings.",
+        "action": "return_to_step_3"
+      },
+      {
+        "step": "step_6",
+        "error": "training_failed",
+        "message": "Training failed. Our team has been notified.",
+        "action": "show_support_contact"
+      }
+    ]
+  },
+  "analytics_events": [
+    {"event": "flow_started", "step": "step_1"},
+    {"event": "pack_selected", "step": "step_1", "data": ["pack_id"]},
+    {"event": "model_created", "step": "step_2", "data": ["model_name", "risk_profile"]},
+    {"event": "config_saved", "step": "step_3", "data": ["confidence", "position_size"]},
+    {"event": "backtest_completed", "step": "step_4", "data": ["pass_fail", "sharpe", "return"]},
+    {"event": "leaderboard_viewed", "step": "step_5", "data": ["rank", "filter"]},
+    {"event": "training_started", "step": "step_6", "data": ["model_id"]},
+    {"event": "flow_completed", "step": "step_6"},
+    {"event": "flow_abandoned", "data": ["last_step", "time_spent"]}
+  ],
+  "a_b_tests": [
+    {
+      "test_name": "slider_vs_preset",
+      "step": "step_3",
+      "variant_a": "show_sliders_first",
+      "variant_b": "show_presets_first",
+      "metric": "completion_rate"
+    },
+    {
+      "test_name": "results_display",
+      "step": "step_4",
+      "variant_a": "traffic_lights",
+      "variant_b": "numerical_scores",
+      "metric": "proceed_to_training_rate"
+    }
+  ],
+  "mobile_adaptations": [
+    {
+      "step": "step_1",
+      "change": "Stack pack cards vertically, swipe to browse"
+    },
+    {
+      "step": "step_3",
+      "change": "Full-screen sliders with haptic feedback"
+    },
+    {
+      "step": "step_5",
+      "change": "Simplified table with horizontal scroll"
+    }
+  ],
+  "accessibility": {
+    "aria_labels": true,
+    "keyboard_navigation": true,
+    "screen_reader_support": true,
+    "high_contrast_mode": true,
+    "minimum_touch_target": 44
+  }
+}

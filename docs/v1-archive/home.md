@@ -1,6 +1,7 @@
 # Sigmatiq Documentation
 
 ## Start Here
+- Start Here page: [[Start Here|start_here]] (curated quick links)
 - Modeling pipeline: [[Modeling Pipeline Guide|modeling_pipeline_guide]]
 - Concepts and allowed values: [[Modeling Reference|modeling_reference]]
 - Make targets overview: [[Makefile Guide|makefile_guide]]
