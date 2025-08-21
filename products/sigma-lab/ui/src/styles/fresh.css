@@ -104,3 +104,20 @@
 .gate-reasons { list-style: none; padding: 0; margin: 0; color: var(--color-text-2); font-size: 12px; }
 .gate-reasons li { margin: 2px 0; }
 .gate-badge:hover .gate-tooltip, .gate-badge:focus .gate-tooltip, .gate-badge:focus-visible .gate-tooltip { display: block; }
+
+/* Templates (gallery) */
+.templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.template-card { background: var(--color-surface-2); border: 2px solid var(--color-border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.template-card:hover { border-color: var(--sigmatiq-bright-teal); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,196,167,0.2); }
+.template-card.featured { border-color: var(--sigmatiq-golden); }
+.template-card.featured::before { content: 'FEATURED'; position: absolute; top: 10px; right: -30px; background: var(--sigmatiq-golden); color: var(--color-bg); padding: 4px 40px; font-size: 10px; font-weight: 600; transform: rotate(45deg); }
+.template-icon { width: 48px; height: 48px; margin-bottom: 16px; color: var(--sigmatiq-bright-teal); display: flex; align-items: center; justify-content: center; }
+.template-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--color-text-1); }
+.template-description { font-size: 13px; color: var(--color-text-2); margin-bottom: 16px; line-height: 1.5; }
+.template-meta { display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+.template-meta-item { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.template-meta-label { font-size: 10px; color: var(--color-text-3); text-transform: uppercase; }
+.template-meta-value { font-size: 12px; font-weight: 600; color: var(--color-text-1); }
+.template-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.template-tag { padding: 2px 8px; background: var(--color-surface-3); border-radius: 4px; font-size: 10px; color: var(--color-text-2); }
+.template-actions { display: flex; gap: 8px; margin-top: 16px; }
