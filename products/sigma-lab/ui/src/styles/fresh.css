@@ -94,3 +94,13 @@
 .pill-warning { background: rgba(255,184,0,0.2); color: var(--status-warning); }
 .pill-error { background: rgba(255,87,87,0.2); color: var(--status-error); }
 .pill-info { background: rgba(59,130,246,0.2); color: var(--status-info); }
+
+/* Trust Gate Badge + Tooltip */
+.gate-badge { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; cursor: default; }
+.gate-badge.pass { background: rgba(0,196,167,0.2); color: var(--status-success); }
+.gate-badge.fail { background: rgba(255,87,87,0.2); color: var(--status-error); }
+.gate-tooltip { display: none; position: absolute; z-index: 20; left: 0; top: calc(100% + 8px); min-width: 220px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.gate-tooltip-title { font-weight: 600; color: var(--color-text-1); margin-bottom: 6px; }
+.gate-reasons { list-style: none; padding: 0; margin: 0; color: var(--color-text-2); font-size: 12px; }
+.gate-reasons li { margin: 2px 0; }
+.gate-badge:hover .gate-tooltip, .gate-badge:focus .gate-tooltip, .gate-badge:focus-visible .gate-tooltip { display: block; }
