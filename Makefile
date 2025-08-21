@@ -15,6 +15,8 @@ BASE_URL ?= http://localhost:8001
 OUT ?= reports/test_indicators
 MOMENTUM_MIN ?= 0.0
 MOMENTUM_COLUMN ?= momentum_score_total
+LIMIT ?= 20
+OFFSET ?= 0
 
 .PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated sweep-config check-backend test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview wiki-clean wiki-clean-all
 
@@ -37,6 +39,10 @@ help:
 	@echo "  test-indicators-csv Generate CSV with all indicators + summary"
 	@echo "  validate-policy     Validate policy YAML for MODEL_ID/PACK_ID"
 	@echo "  leaderboard         Query DB leaderboard (PACK_ID optional, MODEL_ID optional)"
+	@echo "  runs-build          List build runs (PACK_ID/MODEL_ID optional)"
+	@echo "  runs-train          List training runs (PACK_ID/MODEL_ID optional)"
+	@echo "  sweeps              List backtest sweeps (PACK_ID/MODEL_ID optional)"
+	@echo "  sweep               Get sweep detail (SWEEP_ID required)"
 	@echo "  import-catalog      Parse Excel indicator catalog into docs/indicators/*.json"
 	@echo "  indicators          List registered indicators (flat)"
 	@echo "  indicators-groups   List registered indicators grouped by category"
@@ -56,8 +62,8 @@ help:
 	@echo "  scan-nasdaq200      Run breakout scanner on nasdaq200 preset"
 	@echo "  scan-sp100          Run breakout scanner on sp100 preset"
 	@echo "  scan-sp500          Run breakout scanner on sp500 preset"
-	@echo "  scan-russell1000    Run breakout scanner on russell1000 preset
-	@echo "  expirations         List upcoming option expirations via API""
+		@echo "  scan-russell1000    Run breakout scanner on russell1000 preset"
+		@echo "  expirations         List upcoming option expirations via API"
 	@echo "  db-migrate          Apply SQL migrations (products/sigma-lab/api/migrations)"
 	@echo "  db-migrate-dry      List SQL migrations without applying"
 	@echo "  db-seed             Seed DB with minimal sample rows (signals, option_signals, backtest_runs)"
@@ -127,29 +133,29 @@ sweep-config:
 	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
 	@mkdir -p sweeps
 	@echo "writing sweeps/$(MODEL_ID)_sweep.yaml"
-	@cat > sweeps/$(MODEL_ID)_sweep.yaml <<EOF
-model_id: $(MODEL_ID)
-pack_id: $(PACK_ID)
-ticker: $(TICKER)
+	@cat > sweeps/$(MODEL_ID)_sweep.yaml <<-EOF
+	model_id: $(MODEL_ID)
+	pack_id: $(PACK_ID)
+	ticker: $(TICKER)
 
-build:
-  start: "$(START)"         # e.g., 2024-01-01
-  end: "$(END)"             # e.g., 2024-06-30
-  distance_max: [5, 7, 9]
+	build:
+	  start: "$(START)"         # e.g., 2024-01-01
+	  end: "$(END)"             # e.g., 2024-06-30
+	  distance_max: [5, 7, 9]
 
-train:
-  calibration: [sigmoid, isotonic]
-  allowed_hours: ["$(ALLOWED_HOURS)"]
+	train:
+	  calibration: [sigmoid, isotonic]
+	  allowed_hours: ["$(ALLOWED_HOURS)"]
 
-backtest:
-  thresholds: [[0.55,0.60,0.65], [0.60,0.65,0.70]]
-  splits: [3, 5]
-  allowed_hours: ["$(ALLOWED_HOURS)"]
+	backtest:
+	  thresholds: [[0.55,0.60,0.65], [0.60,0.65,0.70]]
+	  splits: [3, 5]
+	  allowed_hours: ["$(ALLOWED_HOURS)"]
 
-notes: |
-  Edit this file to adjust the parameter grid. Each list defines sweep values.
-  A runner (not included) can iterate over the cartesian product.
-EOF
+	notes: |
+	  Edit this file to adjust the parameter grid. Each list defines sweep values.
+	  A runner (not included) can iterate over the cartesian product.
+	EOF
 
 # Wiki clean utilities
 wiki-clean:
@@ -200,6 +206,20 @@ validate-policy:
 
 leaderboard:
 	curl -sS "$(BASE_URL)/leaderboard?pack_id=$(PACK_ID)&model_id=$(MODEL_ID)&limit=$(SPLITS)" | jq .
+
+# --- Runs & Sweeps (DB readers) ---
+runs-build:
+	curl -sS "$(BASE_URL)/build_runs?pack_id=$(PACK_ID)&model_id=$(MODEL_ID)&limit=$(LIMIT)&offset=$(OFFSET)" | jq .
+
+runs-train:
+	curl -sS "$(BASE_URL)/training_runs?pack_id=$(PACK_ID)&model_id=$(MODEL_ID)&limit=$(LIMIT)&offset=$(OFFSET)" | jq .
+
+sweeps:
+	curl -sS "$(BASE_URL)/sweeps?pack_id=$(PACK_ID)&model_id=$(MODEL_ID)&status=$(STATUS)&tag=$(TAG)&limit=$(LIMIT)&offset=$(OFFSET)" | jq .
+
+sweep:
+	@[ -n "$(SWEEP_ID)" ] || (echo "SWEEP_ID is required"; exit 1)
+	curl -sS "$(BASE_URL)/sweeps/$(SWEEP_ID)" | jq .
 
 import-catalog:
 	@if [ -f "AlgoTraderAI_Indicators_Polygon_First.md" ]; then \

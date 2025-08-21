@@ -118,6 +118,7 @@ _include_router('api.routers.backtest')
 _include_router('api.routers.leaderboard')
 _include_router('api.routers.datasets')
 _include_router('api.routers.sweep')
+_include_router('api.routers.runs')
 _include_router('api.routers.admin')
 _include_router('api.routers.packs')
 

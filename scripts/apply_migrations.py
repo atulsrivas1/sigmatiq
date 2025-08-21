@@ -23,7 +23,8 @@ try:
     if root_env.exists():
         load_dotenv(dotenv_path=root_env)
     # Try product api .env (products/sigma-lab/.env)
-    prod_env = Path(__file__).resolve().parents[2] / 'products' / 'sigma-lab' / '.env'
+    # parents[1] is the repo root when this script lives under <repo>/scripts/
+    prod_env = Path(__file__).resolve().parents[1] / 'products' / 'sigma-lab' / '.env'
     if prod_env.exists():
         load_dotenv(dotenv_path=prod_env, override=False)
 except Exception:
@@ -34,10 +35,11 @@ def get_conn():
     url = os.getenv('DATABASE_URL')
     if url:
         return psycopg2.connect(url)
-    host = os.getenv('DB_HOST', 'localhost')
-    port = int(os.getenv('DB_PORT', '5432'))
-    user = os.getenv('DB_USER', 'postgres')
-    password = os.getenv('DB_PASSWORD', '')
+    # Fallback to PG* envs if DB_* not provided
+    host = os.getenv('DB_HOST') or os.getenv('PGHOST', 'localhost')
+    port = int(os.getenv('DB_PORT') or os.getenv('PGPORT', '5432'))
+    user = os.getenv('DB_USER') or os.getenv('PGUSER', 'postgres')
+    password = os.getenv('DB_PASSWORD') or os.getenv('PGPASSWORD', '')
     dbname = os.getenv('DB_NAME') or os.getenv('DB_DATABASE') or os.getenv('PGDATABASE') or 'postgres'
     return psycopg2.connect(host=host, port=port, user=user, password=password, dbname=dbname)
 
