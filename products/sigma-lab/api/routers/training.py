@@ -10,9 +10,9 @@ from sigma_core.features.builder import select_features as select_features_train
 from xgboost import XGBClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
-from sigma_core.services.io import workspace_paths, load_config, sanitize_out_path
+from sigma_core.services.io import workspace_paths, load_config, sanitize_out_path, resolve_indicator_set_path, PACKS_DIR
 from sigma_core.services.policy import ensure_policy_exists
-from sigma_core.services.io import resolve_indicator_set_path, PACKS_DIR
+from sigma_core.storage.relational import get_db
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
@@ -103,6 +103,8 @@ def train_ep(payload: TrainRequest):
         return {'ok': False, 'error': str(ve)}
     cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
     fcfg = cfgm.get('features') or {}
+    from datetime import datetime
+    started_at = datetime.utcnow()
     try:
         df_tmp = pd.read_csv(csv, nrows=1000)
         cols = set(df_tmp.columns)
@@ -171,6 +173,46 @@ def train_ep(payload: TrainRequest):
                     features=feats,
                     lineage=lineage_vals,
                 )
+        except Exception:
+            pass
+        # Store training run in DB (best-effort)
+        try:
+            lineage_vals = None
+            try:
+                from sigma_core.services.lineage import compute_lineage as _compute_lineage  # type: ignore
+                ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+                lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
+            except Exception:
+                pass
+            params_store = {'csv': csv, 'allowed_hours': allowed_hours, 'calibration': calib, 'target': payload.target}
+            metrics_store = {'rows': res.get('rows')}
+            features = None
+            try:
+                bundle = joblib.load(out_path)
+                features = bundle.get('features') if isinstance(bundle, dict) else None
+            except Exception:
+                features = selected or None
+            finished_at = datetime.utcnow()
+            with get_db() as conn:  # type: ignore
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO training_runs (pack_id, model_id, started_at, finished_at, params, metrics, model_out_uri, features, lineage)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                        """,
+                        (
+                            (payload.pack_id or 'zerosigma'),
+                            model_id,
+                            started_at,
+                            finished_at,
+                            params_store,
+                            metrics_store,
+                            str(out_path),
+                            features,
+                            lineage_vals,
+                        ),
+                    )
+                conn.commit()
         except Exception:
             pass
         return res
