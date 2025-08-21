@@ -1,0 +1,62 @@
+import type { FreshModel } from '../components/models/ModelCard'
+
+export const freshModels: FreshModel[] = [
+  {
+    id: 'spy_opt_0dte_hourly',
+    title: 'SPY 0DTE (Hourly)',
+    subtitle: 'zerosigma • Options • Hourly',
+    iconName: 'cube',
+    iconBg: 'var(--sigmatiq-bright-teal)',
+    badge: 'Active',
+    badgeClass: 'success',
+    stats: [
+      { label: 'Sharpe', value: '1.92', trend: 'positive' },
+      { label: 'Win Rate', value: '57%' },
+      { label: 'Trades', value: '234' },
+      { label: 'Max DD', value: '-12%', trend: 'negative' },
+    ],
+    chart: 'g1',
+    updated: '2h ago',
+    risk: 'Balanced',
+    actions: ['Open', 'Backtest'],
+  },
+  {
+    id: 'aapl_eq_swing_daily',
+    title: 'AAPL Swing (Daily)',
+    subtitle: 'swingsigma • Equity • Daily',
+    iconName: 'barChart',
+    iconBg: 'var(--sigmatiq-golden)',
+    badge: 'Training',
+    badgeClass: 'warning',
+    stats: [
+      { label: 'Sharpe', value: '1.41', trend: 'positive' },
+      { label: 'Win Rate', value: '54%' },
+      { label: 'Trades', value: '88' },
+      { label: 'Max DD', value: '-8%', trend: 'negative' },
+    ],
+    chart: 'g2',
+    updated: '1h ago',
+    risk: 'Conservative',
+    actions: ['Open', 'Backtest'],
+  },
+  {
+    id: 'tsla_opt_weekly',
+    title: 'TSLA Weekly',
+    subtitle: 'weeklysigma • Options • Weekly',
+    iconName: 'dollarSign',
+    iconBg: 'var(--sigmatiq-teal-dark)',
+    badge: 'Failed',
+    badgeClass: 'error',
+    stats: [
+      { label: 'Sharpe', value: '0.88' },
+      { label: 'Win Rate', value: '49%' },
+      { label: 'Trades', value: '62' },
+      { label: 'Max DD', value: '-15%', trend: 'negative' },
+    ],
+    chart: 'line-red',
+    updated: 'recently',
+    risk: 'Aggressive',
+    actions: ['Open', 'Backtest'],
+  },
+]
+

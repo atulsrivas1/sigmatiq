@@ -1,0 +1,1 @@
+import React from 'react'; export const ModelGrid: React.FC = ({children}: any) => <div>{children}</div>;

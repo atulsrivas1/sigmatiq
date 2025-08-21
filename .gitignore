@@ -15,3 +15,12 @@
 /products/sigma-lab/api/services/__pycache__
 /products/sigma-lab/api/tests/__pycache__
 /products/sigma-lab/api/__pycache__
+/branding/sigma-lab-ui/src/node_modules
+/branding/sigmatiq-fresh
+/branding/sigma-lab-ui-vite
+
+# Dev runtime artifacts
+.ui_dev.pid
+products/sigma-lab/ui/.ui_dev.pid
+products/sigma-lab/ui/*.log
+products/sigma-lab/mock-api/*.log

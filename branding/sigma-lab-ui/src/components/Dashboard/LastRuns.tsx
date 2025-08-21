@@ -1,0 +1,1 @@
+import React from 'react'; export const LastRuns: React.FC = () => null;

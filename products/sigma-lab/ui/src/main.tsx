@@ -5,6 +5,7 @@ import App from './App'
 import './styles/theme.css'
 import './styles/themes.css'
 import './styles/global.css'
+import './styles/fresh.css'
 import { UIProvider } from './contexts/UIContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 
