@@ -81,6 +81,10 @@ help:
 	@echo "  ui-fe-preview       Preview built UI (default port 4173)"
 	@echo "  wiki-clean          Remove local wiki build dirs (.wiki_*)"
 	@echo "  wiki-clean-all      Remove wiki build dirs and local wiki clone"
+	@echo "  lab-mock            Start Sigma Lab Mock API (port 8010)"
+	@echo "  lab-ui              Start Sigma Lab UI dev server (port 3000)"
+	@echo "  lab-dev             Start mock API (bg) then UI (fg)"
+	@echo "  ui-compare-cards    Compare current vs mock images for dashboard cards"
 	@echo "Vars: PACK_ID, MODEL_ID, TICKER, START, END, EXPIRY, ALLOWED_HOURS, THRESHOLDS, SPLITS, DISTANCE_MAX, BASE_URL, DB_*"
 
 ui:
@@ -169,6 +173,46 @@ wiki-clean:
 
 wiki-clean-all:
 	rm -rf .wiki_build .wiki_flat .wiki_repo
+
+# --- Sigma Lab (Mock API + UI) ---
+LAB_MOCK_DIR ?= products/sigma-lab/mock-api
+LAB_UI_DIR ?= products/sigma-lab/ui
+LAB_MOCK_PORT ?= 8010
+LAB_UI_PORT ?= 3000
+
+lab-mock-install:
+	pip install -r $(LAB_MOCK_DIR)/requirements.txt
+
+lab-mock:
+	@echo "Starting Sigma Lab Mock API on http://localhost:$(LAB_MOCK_PORT) (Ctrl+C to stop)"
+	make -C $(LAB_MOCK_DIR) dev
+
+lab-ui-install:
+	cd $(LAB_UI_DIR) && npm install
+
+lab-ui:
+	@echo "Starting Sigma Lab UI on http://localhost:$(LAB_UI_PORT) (Ctrl+C to stop)"
+	@echo "Vite proxy maps /api → http://localhost:$(LAB_MOCK_PORT)"
+	cd $(LAB_UI_DIR) && npm run dev
+
+lab-dev:
+	@echo "Starting Mock API (bg, port $(LAB_MOCK_PORT)) and UI (fg, port $(LAB_UI_PORT))"
+	@(cd $(LAB_MOCK_DIR) && uvicorn mock_api.app:app --reload --port $(LAB_MOCK_PORT) > .mock_api.log 2>&1 & echo $$! > .mock_api.pid)
+	@echo "Mock API PID: $$(cat $(LAB_MOCK_DIR)/.mock_api.pid) (log: $(LAB_MOCK_DIR)/.mock_api.log)"
+	cd $(LAB_UI_DIR) && npm run dev
+
+lab-dev-stop:
+	@if [ -f "$(LAB_MOCK_DIR)/.mock_api.pid" ]; then \
+		PID=$$(cat $(LAB_MOCK_DIR)/.mock_api.pid); \
+		echo "Stopping Mock API PID $$PID"; \
+		kill $$PID || true; \
+		rm -f $(LAB_MOCK_DIR)/.mock_api.pid; \
+	else \
+		echo "No PID file at $(LAB_MOCK_DIR)/.mock_api.pid"; \
+	fi
+
+ui-compare-cards:
+	@python scripts/compare_components.py
 
 # --- Backend smoke test (real API) ---
 check-backend:
