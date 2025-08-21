@@ -16,7 +16,7 @@ OUT ?= reports/test_indicators
 MOMENTUM_MIN ?= 0.0
 MOMENTUM_COLUMN ?= momentum_score_total
 
-.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated sweep-config test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview wiki-clean wiki-clean-all
+.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated sweep-config check-backend test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview wiki-clean wiki-clean-all
 
 help:
 	@echo "Targets:"
@@ -32,6 +32,7 @@ help:
 	@echo "  pipeline            build -> train -> backtest"
 	@echo "  pipeline-gated      build -> train -> backtest-gated (uses momentum gate)"
 	@echo "  sweep-config        Generate sweep YAML for MODEL_ID (grid params)"
+	@echo "  check-backend       Smoke test real API (health, build, train, backtest, leaderboard)"
 	@echo "  test-indicators     Run live Polygon indicator test script"
 	@echo "  test-indicators-csv Generate CSV with all indicators + summary"
 	@echo "  validate-policy     Validate policy YAML for MODEL_ID/PACK_ID"
@@ -156,6 +157,30 @@ wiki-clean:
 
 wiki-clean-all:
 	rm -rf .wiki_build .wiki_flat .wiki_repo
+
+# --- Backend smoke test (real API) ---
+check-backend:
+	@[ -n "$(TICKER)" ] || (echo "TICKER is required"; exit 1)
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@[ -n "$(START)" ] || (echo "START=YYYY-MM-DD is required"; exit 1)
+	@[ -n "$(END)" ] || (echo "END=YYYY-MM-DD is required"; exit 1)
+	@echo "[1/5] Health → $(BASE_URL)/healthz"; \
+	curl -fsS "$(BASE_URL)/healthz?ticker=$(TICKER)" | jq . >/dev/null && echo "OK" || (echo "Health check failed"; exit 1)
+	@echo "[2/5] Build → $(BASE_URL)/build_matrix"; \
+	curl -fsS -X POST "$(BASE_URL)/build_matrix" -H "Content-Type: application/json" \
+	  -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"start\":\"$(START)\",\"end\":\"$(END)\",\"ticker\":\"$(TICKER)\",\"distance_max\":$(DISTANCE_MAX)}" \
+	  | jq .ok >/dev/null && echo "OK" || (echo "Build failed"; exit 1)
+	@echo "[3/5] Train → $(BASE_URL)/train"; \
+	curl -fsS -X POST "$(BASE_URL)/train" -H "Content-Type: application/json" \
+	  -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"allowed_hours\":\"$(ALLOWED_HOURS)\",\"calibration\":\"sigmoid\"}" \
+	  | jq .ok >/dev/null && echo "OK" || (echo "Train failed"; exit 1)
+	@echo "[4/5] Backtest → $(BASE_URL)/backtest"; \
+	curl -fsS -X POST "$(BASE_URL)/backtest" -H "Content-Type: application/json" \
+	  -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"thresholds\":\"$(THRESHOLDS)\",\"splits\":$(SPLITS),\"allowed_hours\":\"$(ALLOWED_HOURS)\"}" \
+	  | jq .ok >/dev/null && echo "OK" || (echo "Backtest failed"; exit 1)
+	@echo "[5/5] Leaderboard → $(BASE_URL)/leaderboard"; \
+	curl -fsS "$(BASE_URL)/leaderboard?pack_id=$(PACK_ID)&model_id=$(MODEL_ID)&limit=$(SPLITS)" | jq .rows >/dev/null && echo "OK" || (echo "Leaderboard failed"; exit 1)
+	@echo "All checks passed against $(BASE_URL)."
 
 test-indicators:
 	@[ -n "$(START)" ] || (echo "START=YYYY-MM-DD is required"; exit 1)
