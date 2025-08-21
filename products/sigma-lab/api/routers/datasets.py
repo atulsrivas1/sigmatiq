@@ -138,6 +138,12 @@ def build_matrix_ep(payload: BuildMatrixRequest):
                     lineage_vals = _compute_lineage(pack_dir=_PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
             except Exception:
                 pass
+            # snapshot policy for reproducibility
+            try:
+                from sigma_core.services.policy import load_policy as _load_policy  # type: ignore
+                pol_snap = _load_policy(model_id, payload.pack_id or 'zerosigma')
+            except Exception:
+                pol_snap = None
             params_store = {
                 'start': start,
                 'end': end,
@@ -146,14 +152,17 @@ def build_matrix_ep(payload: BuildMatrixRequest):
                 'distance_max': int(payload.distance_max),
                 'dump_raw': bool(payload.dump_raw),
                 'ticker': (payload.ticker or cfgm.get('ticker', 'SPY')),
+                'policy_snapshot': pol_snap,
             }
             finished_at = datetime.utcnow()
+            build_run_id = None
             with get_db() as conn:  # type: ignore
                 with conn.cursor() as cur:
                     cur.execute(
                         """
                         INSERT INTO build_runs (pack_id, model_id, started_at, finished_at, params, metrics, out_csv_uri, lineage)
                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                        RETURNING id
                         """,
                         (
                             (payload.pack_id or 'zerosigma'),
@@ -166,6 +175,27 @@ def build_matrix_ep(payload: BuildMatrixRequest):
                             lineage_vals,
                         ),
                     )
+                    row = cur.fetchone()
+                    build_run_id = int(row[0]) if row else None
+                    # Insert artifact for matrix CSV
+                    try:
+                        cur.execute(
+                            """
+                            INSERT INTO artifacts (pack_id, model_id, kind, uri, sha256, size_bytes, build_run_id)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s)
+                            """,
+                            (
+                                (payload.pack_id or 'zerosigma'),
+                                model_id,
+                                'matrix',
+                                out_csv,
+                                None,
+                                None,
+                                build_run_id,
+                            ),
+                        )
+                    except Exception:
+                        pass
                 conn.commit()
         except Exception:
             pass

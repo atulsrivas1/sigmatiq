@@ -184,7 +184,13 @@ def train_ep(payload: TrainRequest):
                 lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
             except Exception:
                 pass
-            params_store = {'csv': csv, 'allowed_hours': allowed_hours, 'calibration': calib, 'target': payload.target}
+            # policy snapshot
+            try:
+                from sigma_core.services.policy import load_policy as _load_policy  # type: ignore
+                pol_snap = _load_policy(model_id, payload.pack_id or 'zerosigma')
+            except Exception:
+                pol_snap = None
+            params_store = {'csv': csv, 'allowed_hours': allowed_hours, 'calibration': calib, 'target': payload.target, 'policy_snapshot': pol_snap}
             metrics_store = {'rows': res.get('rows')}
             features = None
             try:
@@ -193,12 +199,14 @@ def train_ep(payload: TrainRequest):
             except Exception:
                 features = selected or None
             finished_at = datetime.utcnow()
+            train_run_id = None
             with get_db() as conn:  # type: ignore
                 with conn.cursor() as cur:
                     cur.execute(
                         """
                         INSERT INTO training_runs (pack_id, model_id, started_at, finished_at, params, metrics, model_out_uri, features, lineage)
                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                        RETURNING id
                         """,
                         (
                             (payload.pack_id or 'zerosigma'),
@@ -212,6 +220,27 @@ def train_ep(payload: TrainRequest):
                             lineage_vals,
                         ),
                     )
+                    row = cur.fetchone()
+                    train_run_id = int(row[0]) if row else None
+                    # Insert artifact row for model bundle
+                    try:
+                        cur.execute(
+                            """
+                            INSERT INTO artifacts (pack_id, model_id, kind, uri, sha256, size_bytes, training_run_id)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s)
+                            """,
+                            (
+                                (payload.pack_id or 'zerosigma'),
+                                model_id,
+                                'model',
+                                str(out_path),
+                                None,
+                                None,
+                                train_run_id,
+                            ),
+                        )
+                    except Exception:
+                        pass
                 conn.commit()
         except Exception:
             pass

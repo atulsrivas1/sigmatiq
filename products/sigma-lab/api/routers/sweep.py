@@ -10,6 +10,7 @@ from sigma_core.services.policy import load_policy
 from api.routers.backtest import _parity_bracket_next_session_open
 from sigma_core.backtest.engine import run_backtest
 from sigma_core.registry.backtest_registry import create_backtest_run, create_backtest_folds
+from sigma_core.storage.relational import get_db
 
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
@@ -64,6 +65,30 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
     mcol = str(exec_pol.get('momentum_column', 'momentum_score_total'))
 
     started_global = datetime.utcnow()
+    # Create sweep record
+    sweep_id = None
+    try:
+        with get_db() as conn:  # type: ignore
+            with conn.cursor() as cur:
+                spec = {
+                    'thresholds_variants': variants_thr,
+                    'allowed_hours_variants': variants_hours,
+                    'top_pct_variants': variants_top,
+                    'splits': int(payload.splits),
+                    'embargo': float(payload.embargo),
+                }
+                cur.execute(
+                    """
+                    INSERT INTO backtest_sweeps (pack_id, model_id, spec, tag, status, started_at)
+                    VALUES (%s,%s,%s,%s,%s,%s)
+                    RETURNING id
+                    """,
+                    (pack_id, model_id, spec, payload.tag, 'running', started_global),
+                )
+                row = cur.fetchone(); sweep_id = int(row[0]) if row else None
+            conn.commit()
+    except Exception:
+        sweep_id = None
     runs: List[Dict[str, Any]] = []
 
     def run_one(params: Dict[str, Any]) -> Dict[str, Any]:
@@ -96,6 +121,7 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
             parity = None
 
         # store in DB (optional)
+        run_row_id = None
         if bool(payload.save):
             try:
                 params_store = {k: v for k, v in params.items() if k not in ('target_col',)}
@@ -130,6 +156,7 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
                     trades_total=None,
                     tag=payload.tag,
                 )
+                run_row_id = int(run_row['id'])
                 folds = res.get('threshold_results') or []
                 rows = []
                 for i, r in enumerate(folds):
@@ -138,6 +165,33 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
                     create_backtest_folds(int(run_row['id']), rows)
             except Exception:
                 pass
+        # Persist sweep result row
+        try:
+            if sweep_id is not None:
+                metrics = {
+                    'best_sharpe_hourly': res.get('best_sharpe_hourly'),
+                    'best_cum_ret': res.get('best_cum_ret'),
+                    'summary': res.get('_summary'),
+                }
+                with get_db() as conn:  # type: ignore
+                    with conn.cursor() as cur:
+                        cur.execute(
+                            """
+                            INSERT INTO sweep_results (sweep_id, kind, params, metrics, csv_uri, backtest_run_id)
+                            VALUES (%s,%s,%s,%s,%s,%s)
+                            """,
+                            (
+                                sweep_id,
+                                ('thresholds' if 'thresholds' in params else ('top_pct' if 'top_pct' in params else 'other')),
+                                {k: v for k, v in params.items() if k != 'target_col'},
+                                metrics,
+                                csv,
+                                run_row_id,
+                            ),
+                        )
+                    conn.commit()
+        except Exception:
+            pass
         # attach quick summary fields for the client
         try:
             th = res.get('threshold_results') or []
@@ -215,4 +269,17 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
     except Exception:
         report_path = None
 
-    return {"ok": True, "runs": ranked[:10], "count": len(runs), "filtered": len(filtered), "report_path": report_path}
+    # mark sweep completed
+    try:
+        if sweep_id is not None:
+            with get_db() as conn:  # type: ignore
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "UPDATE backtest_sweeps SET status=%s, finished_at=%s WHERE id=%s",
+                        ('completed', datetime.utcnow(), sweep_id),
+                    )
+                conn.commit()
+    except Exception:
+        pass
+
+    return {"ok": True, "runs": ranked[:10], "count": len(runs), "filtered": len(filtered), "report_path": report_path, "sweep_id": sweep_id}

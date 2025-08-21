@@ -184,6 +184,13 @@ def backtest_ep(payload: BacktestRequest):
                 metrics_store = {'best_sharpe_hourly': best_sharpe, 'best_cum_ret': best_cum}
                 if parity is not None:
                     metrics_store['parity'] = parity
+                # include policy snapshot in params for reproducibility
+                try:
+                    from sigma_core.services.policy import load_policy as _load_policy  # type: ignore
+                    pol_snap = _load_policy(model_id, pack_id)
+                    params_store['policy_snapshot'] = pol_snap
+                except Exception:
+                    pass
                 run_row = create_backtest_run(
                     pack_id=pack_id,
                     model_id=model_id,
@@ -198,6 +205,29 @@ def backtest_ep(payload: BacktestRequest):
                     trades_total=None,
                     tag=payload.tag,
                 )
+                # Normalize artifacts (plots directory only pointer available); optional report CSVs could be added by engine
+                try:
+                    from sigma_core.storage.relational import get_db as _get_db  # type: ignore
+                    with _get_db() as conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO artifacts (pack_id, model_id, kind, uri, sha256, size_bytes, backtest_run_id)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s)
+                                """,
+                                (
+                                    pack_id,
+                                    model_id,
+                                    'plot',
+                                    str(paths['plots']),
+                                    None,
+                                    None,
+                                    int(run_row['id']),
+                                ),
+                            )
+                        conn.commit()
+                except Exception:
+                    pass
                 folds = res.get('threshold_results') or []
                 rows = []
                 for i, r in enumerate(folds):
