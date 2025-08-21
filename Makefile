@@ -16,7 +16,7 @@ OUT ?= reports/test_indicators
 MOMENTUM_MIN ?= 0.0
 MOMENTUM_COLUMN ?= momentum_score_total
 
-.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview lab-mock lab-mock-install lab-ui lab-ui-install lab-dev lab-dev-stop
+.PHONY: help ui health models init init-auto build train backtest backtest-gated pipeline pipeline-gated sweep-config test-indicators validate-policy import-catalog leaderboard db-migrate db-migrate-dry db-seed docs-index docs-preview ui-fe ui-fe-install ui-fe-build ui-fe-preview lab-mock lab-mock-install lab-ui lab-ui-install lab-dev lab-dev-stop wiki-clean wiki-clean-all
 
 help:
 	@echo "Targets:"
@@ -31,6 +31,7 @@ help:
 	@echo "  backtest-gated      Backtest with momentum gate overrides"
 	@echo "  pipeline            build -> train -> backtest"
 	@echo "  pipeline-gated      build -> train -> backtest-gated (uses momentum gate)"
+	@echo "  sweep-config        Generate sweep YAML for MODEL_ID (grid params)"
 	@echo "  test-indicators     Run live Polygon indicator test script"
 	@echo "  test-indicators-csv Generate CSV with all indicators + summary"
 	@echo "  validate-policy     Validate policy YAML for MODEL_ID/PACK_ID"
@@ -120,6 +121,42 @@ backtest-gated:
 pipeline: build train backtest
 
 pipeline-gated: build train backtest-gated
+
+# Generate a sweep configuration YAML for the given model
+sweep-config:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@mkdir -p sweeps
+	@echo "writing sweeps/$(MODEL_ID)_sweep.yaml"
+	@cat > sweeps/$(MODEL_ID)_sweep.yaml <<EOF
+model_id: $(MODEL_ID)
+pack_id: $(PACK_ID)
+ticker: $(TICKER)
+
+build:
+  start: "$(START)"         # e.g., 2024-01-01
+  end: "$(END)"             # e.g., 2024-06-30
+  distance_max: [5, 7, 9]
+
+train:
+  calibration: [sigmoid, isotonic]
+  allowed_hours: ["$(ALLOWED_HOURS)"]
+
+backtest:
+  thresholds: [[0.55,0.60,0.65], [0.60,0.65,0.70]]
+  splits: [3, 5]
+  allowed_hours: ["$(ALLOWED_HOURS)"]
+
+notes: |
+  Edit this file to adjust the parameter grid. Each list defines sweep values.
+  A runner (not included) can iterate over the cartesian product.
+EOF
+
+# Wiki clean utilities
+wiki-clean:
+	rm -rf .wiki_build .wiki_flat
+
+wiki-clean-all:
+	rm -rf .wiki_build .wiki_flat .wiki_repo
 
 test-indicators:
 	@[ -n "$(START)" ] || (echo "START=YYYY-MM-DD is required"; exit 1)
