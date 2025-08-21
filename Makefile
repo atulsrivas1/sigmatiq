@@ -43,6 +43,11 @@ help:
 	@echo "  runs-train          List training runs (PACK_ID/MODEL_ID optional)"
 	@echo "  sweeps              List backtest sweeps (PACK_ID/MODEL_ID optional)"
 	@echo "  sweep               Get sweep detail (SWEEP_ID required)"
+	@echo "  packs               List available packs"
+	@echo "  pack-detail         Show pack detail (PACK_ID required)"
+	@echo "  pack-templates      List pack templates (PACK_ID required)"
+	@echo "  pack-models         List models in a pack (PACK_ID required)"
+	@echo "  pack-indicators     List pack indicator sets (PACK_ID required)"
 	@echo "  import-catalog      Parse Excel indicator catalog into docs/indicators/*.json"
 	@echo "  indicators          List registered indicators (flat)"
 	@echo "  indicators-groups   List registered indicators grouped by category"
@@ -69,6 +74,7 @@ help:
 	@echo "  db-seed             Seed DB with minimal sample rows (signals, option_signals, backtest_runs)"
 	@echo "  docs-index          Generate docs/INDEX.md listing docs files"
 	@echo "  docs-preview        Serve docs/ directory on localhost (port 8008 by default)"
+	@echo "  docs-indicators-ref Regenerate indicators catalog (docs/INDICATORS_REFERENCE.md)"
 	@echo "  ui-fe-install       Install UI deps (edge-ui)"
 	@echo "  ui-fe               Start UI dev server on 5173 (proxy /api → 8001)"
 	@echo "  ui-fe-build         Build UI for production"
@@ -221,6 +227,26 @@ sweep:
 	@[ -n "$(SWEEP_ID)" ] || (echo "SWEEP_ID is required"; exit 1)
 	curl -sS "$(BASE_URL)/sweeps/$(SWEEP_ID)" | jq .
 
+# --- Packs helpers ---
+packs:
+	curl -sS "$(BASE_URL)/packs" | jq .
+
+pack-detail:
+	@[ -n "$(PACK_ID)" ] || (echo "PACK_ID is required"; exit 1)
+	curl -sS "$(BASE_URL)/packs/$(PACK_ID)" | jq .
+
+pack-templates:
+	@[ -n "$(PACK_ID)" ] || (echo "PACK_ID is required"; exit 1)
+	curl -sS "$(BASE_URL)/packs/$(PACK_ID)/templates" | jq .
+
+pack-indicators:
+	@[ -n "$(PACK_ID)" ] || (echo "PACK_ID is required"; exit 1)
+	curl -sS "$(BASE_URL)/packs/$(PACK_ID)/indicator_sets" | jq .
+
+pack-models:
+	@[ -n "$(PACK_ID)" ] || (echo "PACK_ID is required"; exit 1)
+	curl -sS "$(BASE_URL)/models?pack_id=$(PACK_ID)" | jq .
+
 import-catalog:
 	@if [ -f "AlgoTraderAI_Indicators_Polygon_First.md" ]; then \
 		python scripts/import_indicator_catalog_md.py --md AlgoTraderAI_Indicators_Polygon_First.md; \
@@ -262,6 +288,10 @@ docs-index:
 docs-preview:
 	@echo "Serving docs on http://localhost:$(DOCS_PORT) (Ctrl+C to stop)"
 	python -m http.server $(DOCS_PORT) --directory docs
+
+# Regenerate Indicators Catalog
+docs-indicators-ref:
+	python scripts/generate_indicators_reference.py --out docs/INDICATORS_REFERENCE.md
 
 # --- Wiki ---
 .PHONY: wiki-sync
