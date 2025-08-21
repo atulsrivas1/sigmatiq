@@ -58,7 +58,7 @@ help:
 	@echo "  scan-sp500          Run breakout scanner on sp500 preset"
 	@echo "  scan-russell1000    Run breakout scanner on russell1000 preset
 	@echo "  expirations         List upcoming option expirations via API""
-	@echo "  db-migrate          Apply SQL migrations in ./migrations to DB (DB_* envs)"
+	@echo "  db-migrate          Apply SQL migrations (products/sigma-lab/api/migrations)"
 	@echo "  db-migrate-dry      List SQL migrations without applying"
 	@echo "  db-seed             Seed DB with minimal sample rows (signals, option_signals, backtest_runs)"
 	@echo "  docs-index          Generate docs/INDEX.md listing docs files"
@@ -223,12 +223,14 @@ alerts:
 	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
 	@python scripts/generate_live_alerts.py --model_id $(MODEL_ID) --csv matrices/$(MODEL_ID)/training_matrix_built.csv --threshold 0.60 --allowed_hours $(ALLOWED_HOURS)
 
+MIGRATIONS_DIR ?= products/sigma-lab/api/migrations
+
 db-migrate:
-	@echo "Applying migrations in ./migrations"
-	python scripts/apply_migrations.py --dir migrations
+	@echo "Applying migrations in $(MIGRATIONS_DIR)"
+	python scripts/apply_migrations.py --dir $(MIGRATIONS_DIR)
 
 db-migrate-dry:
-	@python scripts/apply_migrations.py --dir migrations --dry-run
+	@python scripts/apply_migrations.py --dir $(MIGRATIONS_DIR) --dry-run
 
 db-seed:
 	python scripts/seed_sample_data.py
