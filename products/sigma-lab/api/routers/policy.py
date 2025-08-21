@@ -115,3 +115,9 @@ def policy_explain(model_id: str = Query(...), pack_id: str = Query('zerosigma')
         }
     except Exception as e:
         return {'ok': False, 'error': str(e)}
+
+
+@router.get('/validate_policy')
+def validate_policy_alias(model_id: str = Query(...), pack_id: str = Query('zerosigma')):
+    """Compatibility alias for Makefile: proxies to /policy/explain."""
+    return policy_explain(model_id=model_id, pack_id=pack_id)
