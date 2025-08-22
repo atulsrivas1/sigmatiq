@@ -7,8 +7,8 @@ import pandas as pd
 
 from sigma_core.backtest.engine import run_backtest
 from sigma_core.registry.backtest_registry import create_backtest_run, leaderboard as db_leaderboard, create_backtest_folds
-from sigma_core.services.io import workspace_paths, resolve_indicator_set_path, PACKS_DIR
-from sigma_core.services.policy import load_policy
+from sigma_core.services.io import workspace_paths, PACKS_DIR
+from api.services.store_db import get_policy_db
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
 except Exception:
@@ -116,7 +116,7 @@ def backtest_ep(payload: BacktestRequest):
         allowed_hours = payload.allowed_hours
         if isinstance(allowed_hours, str) and allowed_hours:
             allowed_hours = [int(x) for x in allowed_hours.split(',')]
-        pol = load_policy(model_id, pack_id)
+        pol = (get_policy_db(pack_id, model_id) or {})
         exec_pol = pol.get('execution', {}) if isinstance(pol.get('execution', {}), dict) else {}
         mgate = payload.momentum_gate if payload.momentum_gate is not None else bool(exec_pol.get('momentum_gate', False))
         mmin = float(payload.momentum_min) if payload.momentum_min is not None else float(exec_pol.get('momentum_min', 0.0))

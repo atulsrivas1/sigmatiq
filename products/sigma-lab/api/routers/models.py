@@ -7,8 +7,8 @@ import shutil
 import yaml
 import pandas as pd
 
-from sigma_core.services.io import workspace_paths, load_config, resolve_indicator_set_path, PACKS_DIR
-from api.services.store_db import upsert_model_config_db, upsert_indicator_set_db
+from sigma_core.services.io import workspace_paths, PACKS_DIR
+from api.services.store_db import upsert_model_config_db, upsert_indicator_set_db, upsert_policy_db, list_models_db
 from sigma_core.services.policy import ensure_policy_exists
 from sigma_core.indicators.registry import registry as indicator_registry
 from sigma_core.data.datasets import build_matrix as build_matrix_range
@@ -108,16 +108,9 @@ def list_models(pack_id: Optional[str] = Query(None)):
 
     If pack_id is omitted, returns all models across packs.
     """
-    out: List[Dict[str, Any]] = []
     try:
-        packs = [pack_id] if pack_id else [p.name for p in PACKS_DIR.iterdir() if p.is_dir()]
-        for pid in sorted(packs):
-            cfg_dir = PACKS_DIR / pid / 'model_configs'
-            if not cfg_dir.exists():
-                continue
-            for f in sorted(cfg_dir.glob('*.yaml')):
-                out.append({'id': f.stem, 'pack_id': pid, 'path': str(f)})
-        return {'ok': True, 'models': out, 'count': len(out)}
+        rows = list_models_db(pack_id)
+        return {'ok': True, 'models': rows, 'count': len(rows)}
     except Exception as e:
         return {'ok': False, 'error': str(e)}
 

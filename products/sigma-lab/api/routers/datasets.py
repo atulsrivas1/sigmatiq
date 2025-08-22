@@ -7,12 +7,10 @@ import pandas as pd
 
 from sigma_core.data.datasets import build_matrix as build_matrix_range
 from sigma_core.data.stocks import build_stock_matrix as build_stock_matrix_range
-from sigma_core.services.io import workspace_paths, load_config, resolve_indicator_set_path, sanitize_out_path
+from sigma_core.services.io import workspace_paths, sanitize_out_path
 from fastapi.responses import JSONResponse
-from sigma_core.services.policy import ensure_policy_exists
+from api.services.store_db import get_model_config_db, get_indicator_set_model_db, get_indicator_set_pack_db, get_policy_db
 from sigma_core.storage.relational import get_db
-from api.services.store_db import get_model_config_db
-from api.services.store_db import get_indicator_set_model_db, get_indicator_set_pack_db
 import yaml as _yaml
 try:
     from sigma_core.services.model_cards import write_model_card
@@ -69,14 +67,16 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         return {"ok": False, "error": "model_id is required"}
     if build_matrix_range is None:
         return {"ok": False, "error": "Shared core missing: data.datasets"}
-    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zerosigma')
-    if pol_err:
-        return {"ok": False, "error": pol_err}
+    # Ensure policy exists in DB
+    if get_policy_db(payload.pack_id or 'zerosigma', model_id) is None:
+        return {"ok": False, "error": "missing policy in DB; use PUT /policy to create"}
     start = payload.start; end = payload.end
     if not start or not end:
         return {"ok": False, "error": "start and end are required"}
     paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
-    cfgm = (get_model_config_db(payload.pack_id or 'zerosigma', model_id) or load_config(model_id, payload.pack_id or 'zerosigma'))
+    cfgm = get_model_config_db(payload.pack_id or 'zerosigma', model_id)
+    if cfgm is None:
+        return {"ok": False, "error": "missing model_config in DB; use PUT /model_config to create"}
     from datetime import datetime
     started_at = datetime.utcnow()
     try:
@@ -102,7 +102,7 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         tmp_ind.write_text(_yaml.safe_dump(to_write, sort_keys=False), encoding='utf-8')
         indicator_set_path = str(tmp_ind)
     else:
-        indicator_set_path = str(resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id))
+        return {"ok": False, "error": "missing indicator_set in DB; use PUT /indicator_set"}
     try:
         paths['matrices'].mkdir(parents=True, exist_ok=True)
         build_matrix_range(

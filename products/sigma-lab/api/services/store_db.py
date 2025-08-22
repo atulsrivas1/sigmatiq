@@ -77,6 +77,20 @@ def upsert_model_config_db(pack_id: str, model_id: str, config: Dict[str, Any]) 
     return {"ok": True}
 
 
+def list_models_db(pack_id: Optional[str] = None) -> list[Dict[str, Any]]:
+    q = "SELECT pack_id, model_id FROM model_configs"
+    args: tuple = ()
+    if pack_id:
+        q += " WHERE pack_id=%s"
+        args = (pack_id,)
+    q += " ORDER BY pack_id, model_id"
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(q, args)
+            rows = cur.fetchall()
+    return [{"id": r["model_id"], "pack_id": r["pack_id"]} for r in rows]
+
+
 # --- Indicator sets (pack or model scope) ---
 
 def upsert_indicator_set_db(
