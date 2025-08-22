@@ -77,6 +77,7 @@ help:
 		@echo "  expirations         List upcoming option expirations via API"
 	@echo "  db-migrate          Apply SQL migrations (products/sigma-lab/api/migrations)"
 	@echo "  db-migrate-dry      List SQL migrations without applying"
+	@echo "  db-import-policies  Import YAML policies/configs into DB"
 	@echo "  db-seed             Seed DB with minimal sample rows (signals, option_signals, backtest_runs)"
 	@echo "  docs-index          Generate docs/INDEX.md listing docs files"
 	@echo "  docs-preview        Serve docs/ directory on localhost (port 8008 by default)"
@@ -425,6 +426,14 @@ db-migrate-dry:
 
 db-seed:
 	python scripts/seed_sample_data.py
+
+db-import-policies:
+	@[ -n "$(PACK_ID)" ] || (echo "PACK_ID is required (or use PACK_ID=all)"; exit 1)
+	@if [ "$(PACK_ID)" = "all" ]; then \
+		python scripts/migrate_yaml_to_db.py --all; \
+	else \
+		python scripts/migrate_yaml_to_db.py --pack_id $(PACK_ID); \
+	fi
 
 DOCS_PORT ?= 8008
 docs-index:

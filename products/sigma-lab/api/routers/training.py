@@ -10,8 +10,10 @@ from sigma_core.features.builder import select_features as select_features_train
 from xgboost import XGBClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
-from sigma_core.services.io import workspace_paths, load_config, sanitize_out_path, resolve_indicator_set_path, PACKS_DIR
-from sigma_core.services.policy import ensure_policy_exists
+from sigma_core.services.io import workspace_paths, sanitize_out_path, PACKS_DIR
+from api.services.store_db import get_model_config_db, get_indicator_set_model_db, get_indicator_set_pack_db, get_policy_db
+import yaml as _yaml
+from api.services.indicator_cache import materialize_indicator_set
 from sigma_core.storage.relational import get_db
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
@@ -87,9 +89,8 @@ def train_ep(payload: TrainRequest):
         return {'ok': False, 'error': 'model_id is required'}
     if select_features_train is None or XGBClassifier is None:
         return {'ok': False, 'error': 'Training deps missing'}
-    pol_err = ensure_policy_exists(model_id, payload.pack_id or 'zerosigma')
-    if pol_err:
-        return {'ok': False, 'error': pol_err}
+    if get_policy_db(payload.pack_id or 'zerosigma', model_id) is None:
+        return {'ok': False, 'error': 'missing policy in DB; use PUT /policy to create'}
     paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
     csv = payload.csv or str(paths['matrices'] / 'training_matrix_built.csv')
     allowed_hours = payload.allowed_hours
@@ -101,7 +102,9 @@ def train_ep(payload: TrainRequest):
         out_path = _Path(sanitize_out_path(payload.model_out, paths['artifacts'] / 'gbm.pkl'))
     except ValueError as ve:
         return {'ok': False, 'error': str(ve)}
-    cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
+    cfgm = get_model_config_db(payload.pack_id or 'zerosigma', model_id)
+    if cfgm is None:
+        return {'ok': False, 'error': 'missing model_config in DB; use PUT /model_config to create'}
     fcfg = cfgm.get('features') or {}
     from datetime import datetime
     started_at = datetime.utcnow()
@@ -159,7 +162,21 @@ def train_ep(payload: TrainRequest):
             lineage_vals = None
             if _compute_lineage is not None:
                 try:
-                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+        # Prefer indicator set from DB
+        ind_data = (get_indicator_set_model_db(payload.pack_id or 'zerosigma', model_id) or None)
+        if ind_data is None and cfgm:
+            name = None
+            try:
+                name = (cfgm.get('indicator_set_name') or cfgm.get('indicator_set') or cfgm.get('features', {}).get('indicator_set'))
+            except Exception:
+                name = None
+            if name:
+                ind_data = get_indicator_set_pack_db(payload.pack_id or 'zerosigma', str(name))
+        if ind_data is not None:
+            tmp_ind = materialize_indicator_set(paths['reports'], model_id, ind_data)
+            ind_path = tmp_ind
+        else:
+            return {'ok': False, 'error': 'missing indicator_set in DB; use PUT /indicator_set'}
                     lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
                 except Exception:
                     pass
@@ -180,7 +197,7 @@ def train_ep(payload: TrainRequest):
             lineage_vals = None
             try:
                 from sigma_core.services.lineage import compute_lineage as _compute_lineage  # type: ignore
-                ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
                 lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
             except Exception:
                 pass
