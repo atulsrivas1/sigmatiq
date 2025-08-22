@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 import hashlib
 from pathlib import Path
+import os
 from typing import Dict, Any
 import yaml  # type: ignore
 
@@ -27,7 +28,9 @@ def materialize_indicator_set(base_reports_dir: Path, model_id: str, ind_data: D
     - Cleans up older cache files for the same model_id to avoid clutter.
     Returns the Path to the cached YAML.
     """
-    cache_dir = base_reports_dir / 'indicator_cache'
+    # Allow override via env: INDICATOR_CACHE_DIR or SIGMA_INDICATOR_CACHE_DIR
+    override = os.environ.get('INDICATOR_CACHE_DIR') or os.environ.get('SIGMA_INDICATOR_CACHE_DIR')
+    cache_dir = Path(override).expanduser() if override else (base_reports_dir / 'indicator_cache')
     cache_dir.mkdir(parents=True, exist_ok=True)
     h = _hash_indicator_set(ind_data)
     target = cache_dir / f'{model_id}_{h}.yaml'
@@ -44,4 +47,3 @@ def materialize_indicator_set(base_reports_dir: Path, model_id: str, ind_data: D
         except Exception:
             pass
     return target
-
