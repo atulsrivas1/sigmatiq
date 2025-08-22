@@ -93,6 +93,21 @@ def backtest_ep(payload: BacktestRequest):
     try:
         df = pd.read_csv(csv)
         target_col = payload.target or ('y' if 'y' in df.columns and df['y'].notna().any() else 'y_syn')
+        # Normalize numeric targets to textual 'UP'/'DOWN' expected by engine
+        try:
+            if target_col in df.columns:
+                s = pd.to_numeric(df[target_col], errors='ignore')
+                if pd.api.types.is_numeric_dtype(s):
+                    uniq = set([v for v in pd.Series(s).dropna().unique().tolist()])
+                    # Map {0,1} → DOWN/UP; {-1,0,1} → DOWN/FLAT/UP (map FLAT to DOWN)
+                    if uniq.issubset({0,1}):
+                        df['_y_txt'] = df[target_col].map(lambda v: 'UP' if float(v) == 1.0 else 'DOWN')
+                        target_col = '_y_txt'
+                    elif uniq.issubset({-1,0,1}):
+                        df['_y_txt'] = df[target_col].map(lambda v: 'UP' if float(v) > 0 else 'DOWN')
+                        target_col = '_y_txt'
+        except Exception:
+            pass
         thr_raw = payload.thresholds or '0.55,0.60,0.65,0.70'
         if isinstance(thr_raw, str):
             thresholds = [float(x) for x in thr_raw.split(',')]

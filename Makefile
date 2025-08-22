@@ -31,8 +31,11 @@ help:
 	@echo "  train               Train model via API (needs MODEL_ID)"
 	@echo "  backtest            Backtest via API (needs MODEL_ID)"
 	@echo "  backtest-gated      Backtest with momentum gate overrides"
+	@echo "  qb                  Quick backtest (alias to backtest)"
+	@echo "  backtest-adv        Backtest with optional TARGET= and TOP_PCT="
 	@echo "  pipeline            build -> train -> backtest"
 	@echo "  pipeline-gated      build -> train -> backtest-gated (uses momentum gate)"
+	@echo "  sweep-run           Run backtest sweep variants (server-side)"
 	@echo "  sweep-config        Generate sweep YAML for MODEL_ID (grid params)"
 	@echo "  check-backend       Smoke test real API (health, build, train, backtest, leaderboard)"
 	@echo "  test-indicators     Run live Polygon indicator test script"
@@ -142,6 +145,16 @@ backtest-gated:
 	 -H "Content-Type: application/json" \
 	 -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"thresholds\":\"$(THRESHOLDS)\",\"splits\":$(SPLITS),\"allowed_hours\":\"$(ALLOWED_HOURS)\",\"momentum_gate\":true,\"momentum_min\":$(MOMENTUM_MIN),\"momentum_column\":\"$(MOMENTUM_COLUMN)\"}" | jq .
 
+qb: backtest
+
+# Advanced backtest supporting TARGET and TOP_PCT (either thresholds or top_pct)
+backtest-adv:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@python scripts/make_bt_payload.py --out bt_payload.json
+	@cat bt_payload.json 2>/dev/null || type bt_payload.json || more bt_payload.json
+	curl -sS -X POST "$(BASE_URL)/backtest" -H "Content-Type: application/json" --data-binary @bt_payload.json | jq .
+	@rm -f bt_payload.json || true
+
 pipeline: build train backtest
 
 pipeline-gated: build train backtest-gated
@@ -174,6 +187,16 @@ sweep-config:
 	  Edit this file to adjust the parameter grid. Each list defines sweep values.
 	  A runner (not included) can iterate over the cartesian product.
 	EOF
+
+# Run a sweep on the server (variants of thresholds/hours/top_pct)
+# Vars: MODEL_ID (req), PACK_ID (default: $(PACK_ID)), ALLOWED_HOURS (optional), SPLITS (default: $(SPLITS)), TAG (default: sweep)
+# Uses default thresholds variants if THR_VARIANTS is not provided.
+sweep-run:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@echo "Running sweep for $(MODEL_ID) (pack=$(PACK_ID))"
+	curl -sS -X POST "$(BASE_URL)/backtest_sweep" \
+	 -H "Content-Type: application/json" \
+	 -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"thresholds_variants\":[\"0.50,0.55,0.60\",\"0.55,0.60,0.65\"],\"allowed_hours_variants\":[\"$(ALLOWED_HOURS)\"],\"splits\":$(SPLITS),\"embargo\":0.0,\"save\":true,\"tag\":\"$${TAG:-sweep}\"}" | jq .
 
 # Wiki clean utilities
 wiki-clean:
