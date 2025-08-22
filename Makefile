@@ -35,7 +35,10 @@ help:
 	@echo "  backtest-adv        Backtest with optional TARGET= and TOP_PCT="
 	@echo "  pipeline            build -> train -> backtest"
 	@echo "  pipeline-gated      build -> train -> backtest-gated (uses momentum gate)"
-	@echo "  sweep-run           Run backtest sweep variants (server-side)"
+	@echo "  sweep-run           Run backtest sweep (thresholds)"
+	@echo "  sweep-run-toppct    Run backtest sweep (top% x hours)"
+	@echo "  sweep-run-thrhours  Run backtest sweep (thresholds x hours)"
+	@echo "  sweep-run-momentum  Run two sweeps (momentum gate off vs on)"
 	@echo "  sweep-config        Generate sweep YAML for MODEL_ID (grid params)"
 	@echo "  check-backend       Smoke test real API (health, build, train, backtest, leaderboard)"
 	@echo "  test-indicators     Run live Polygon indicator test script"
@@ -197,6 +200,73 @@ sweep-run:
 	curl -sS -X POST "$(BASE_URL)/backtest_sweep" \
 	 -H "Content-Type: application/json" \
 	 -d "{\"model_id\":\"$(MODEL_ID)\",\"pack_id\":\"$(PACK_ID)\",\"thresholds_variants\":[\"0.50,0.55,0.60\",\"0.55,0.60,0.65\"],\"allowed_hours_variants\":[\"$(ALLOWED_HOURS)\"],\"splits\":$(SPLITS),\"embargo\":0.0,\"save\":true,\"tag\":\"$${TAG:-sweep}\"}" | jq .
+
+# Top% x Hours sweep helper
+# Vars:
+#   MODEL_ID (required), PACK_ID (default: $(PACK_ID))
+#   TOP_PCTS="0.04,0.06,0.08,0.10,0.12"
+#   HOURS_SETS="13,14,15;9,10,11,12,13,14,15,16"
+#   SPLITS, TAG
+sweep-run-toppct:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@python scripts/make_sweep_payload.py --out sweep_payload.json
+	@cat sweep_payload.json 2>/dev/null || type sweep_payload.json || more sweep_payload.json
+	curl -sS -X POST "$(BASE_URL)/backtest_sweep" -H "Content-Type: application/json" --data-binary @sweep_payload.json | jq .
+	@rm -f sweep_payload.json || true
+
+# Thresholds x Hours sweep helper
+# Vars:
+#   MODEL_ID (required), PACK_ID (default: $(PACK_ID))
+#   THR_VARIANTS="0.50,0.52,0.54;0.55,0.60,0.65" (semicolon-separated threshold CSVs)
+#   HOURS_SETS="10,11,14,15;9,10,11,12,13,14,15,16"
+#   SPLITS, TAG
+sweep-run-thrhours:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@python scripts/make_sweep_payload.py --out sweep_payload.json
+	@cat sweep_payload.json 2>/dev/null || type sweep_payload.json || more sweep_payload.json
+	curl -sS -X POST "$(BASE_URL)/backtest_sweep" -H "Content-Type: application/json" --data-binary @sweep_payload.json | jq .
+	@rm -f sweep_payload.json || true
+
+# Momentum gate sweep helper
+# Runs two sweeps: momentum_gate=false, then momentum_gate=true (with MOMENTUM_MIN and optional MOMENTUM_COLUMN)
+# Vars:
+#   MODEL_ID (required), PACK_ID (default: $(PACK_ID))
+#   TOP_PCTS or THR_VARIANTS and HOURS_SETS, SPLITS, TAG
+#   MOMENTUM_MIN (default: 0.1), MOMENTUM_COLUMN (default: momentum_score_total)
+sweep-run-momentum:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	@echo "[1/2] Momentum gate OFF"
+	python scripts/update_policy_exec.py --pack_id $(PACK_ID) --model_id $(MODEL_ID) --momentum_gate false
+	@TAG=$${TAG:-sweep}-mg0 TOP_PCTS="$(TOP_PCTS)" HOURS_SETS="$(HOURS_SETS)" THR_VARIANTS="$(THR_VARIANTS)" \
+	 python scripts/make_sweep_payload.py --out sweep_payload.json
+	@cat sweep_payload.json 2>/dev/null || type sweep_payload.json || more sweep_payload.json
+	curl -sS -X POST "$(BASE_URL)/backtest_sweep" -H "Content-Type: application/json" --data-binary @sweep_payload.json | jq .
+	@rm -f sweep_payload.json || true
+	@echo "[2/2] Momentum gate ON (min=$(or $(MOMENTUM_MIN),0.1), col=$(or $(MOMENTUM_COLUMN),momentum_score_total))"
+	python scripts/update_policy_exec.py --pack_id $(PACK_ID) --model_id $(MODEL_ID) --momentum_gate true --momentum_min $${MOMENTUM_MIN:-0.1} --momentum_column $${MOMENTUM_COLUMN:-momentum_score_total}
+	@TAG=$${TAG:-sweep}-mg1 TOP_PCTS="$(TOP_PCTS)" HOURS_SETS="$(HOURS_SETS)" THR_VARIANTS="$(THR_VARIANTS)" \
+	 python scripts/make_sweep_payload.py --out sweep_payload.json
+	@cat sweep_payload.json 2>/dev/null || type sweep_payload.json || more sweep_payload.json
+	curl -sS -X POST "$(BASE_URL)/backtest_sweep" -H "Content-Type: application/json" --data-binary @sweep_payload.json | jq .
+	@rm -f sweep_payload.json || true
+
+# Update execution policy sizing/parameters
+# Examples:
+#   make policy-sizing PACK_ID=zerosigma MODEL_ID=qqq_opt_0dte_hourly_v1 SIZE_BY_CONF=true CONF_CAP=1.0
+#   make policy-exec PACK_ID=zerosigma MODEL_ID=qqq_opt_0dte_hourly_v1 MOMENTUM_GATE=true MOMENTUM_MIN=0.1
+policy-sizing:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	python scripts/update_policy_exec.py --pack_id $(PACK_ID) --model_id $(MODEL_ID) --size_by_conf $${SIZE_BY_CONF:-true} --conf_cap $${CONF_CAP:-1.0}
+
+policy-exec:
+	@[ -n "$(MODEL_ID)" ] || (echo "MODEL_ID is required"; exit 1)
+	python scripts/update_policy_exec.py --pack_id $(PACK_ID) --model_id $(MODEL_ID) \
+	 $$( [ -n "$(SIZE_BY_CONF)" ] && echo --size_by_conf $(SIZE_BY_CONF) ) \
+	 $$( [ -n "$(CONF_CAP)" ] && echo --conf_cap $(CONF_CAP) ) \
+	 $$( [ -n "$(SLIPPAGE_BPS)" ] && echo --slippage_bps $(SLIPPAGE_BPS) ) \
+	 $$( [ -n "$(MOMENTUM_GATE)" ] && echo --momentum_gate $(MOMENTUM_GATE) ) \
+	 $$( [ -n "$(MOMENTUM_MIN)" ] && echo --momentum_min $(MOMENTUM_MIN) ) \
+	 $$( [ -n "$(MOMENTUM_COLUMN)" ] && echo --momentum_column $(MOMENTUM_COLUMN) )
 
 # Wiki clean utilities
 wiki-clean:

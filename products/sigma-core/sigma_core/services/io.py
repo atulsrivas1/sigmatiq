@@ -7,9 +7,25 @@ import logging
 
 # Establish both repo root and product root to keep packs (shared) at top-level
 # while writing product outputs (matrices, artifacts, live_data, reports) under the product folder.
-PRODUCT_DIR = Path(__file__).resolve().parents[2] / 'sigma-lab'  # products/sigma-lab
-# Packs directory is configurable; defaults to product-local packs
-PACKS_DIR = Path(os.environ.get('PACKS_DIR', str(PRODUCT_DIR / 'packs')))
+#
+# Config precedence (env):
+#   - SIGMA_PRODUCT_DIR (preferred)
+#   - PRODUCT_DIR
+#   - default: products/sigma-lab (relative to this package)
+_default_product_dir = Path(__file__).resolve().parents[2] / 'sigma-lab'
+_product_dir_env = os.environ.get('SIGMA_PRODUCT_DIR') or os.environ.get('PRODUCT_DIR')
+try:
+    PRODUCT_DIR = Path(_product_dir_env).resolve() if _product_dir_env else _default_product_dir
+except Exception:
+    PRODUCT_DIR = _default_product_dir
+
+# Packs directory is configurable; defaults to product-local packs under PRODUCT_DIR
+# Config precedence (env): SIGMA_PACKS_DIR -> PACKS_DIR -> PRODUCT_DIR/packs
+_packs_dir_env = os.environ.get('SIGMA_PACKS_DIR') or os.environ.get('PACKS_DIR')
+try:
+    PACKS_DIR = Path(_packs_dir_env).resolve() if _packs_dir_env else (PRODUCT_DIR / 'packs')
+except Exception:
+    PACKS_DIR = PRODUCT_DIR / 'packs'
 ALLOWED_WRITE_ROOTS = [PRODUCT_DIR]
 
 logger = logging.getLogger(__name__)
