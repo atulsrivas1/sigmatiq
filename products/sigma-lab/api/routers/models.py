@@ -8,6 +8,7 @@ import yaml
 import pandas as pd
 
 from sigma_core.services.io import workspace_paths, load_config, resolve_indicator_set_path, PACKS_DIR
+from api.services.store_db import upsert_model_config_db, upsert_indicator_set_db
 from sigma_core.services.policy import ensure_policy_exists
 from sigma_core.indicators.registry import registry as indicator_registry
 from sigma_core.data.datasets import build_matrix as build_matrix_range
@@ -36,15 +37,7 @@ def create_model_ep(payload: CreateModelRequest):
         suffix = f"_{payload.variant}" if payload.variant else ''
         model_id = f"{ticker.lower()}_{asset}_{horizon}_{cadence}{suffix}"
         ws = workspace_paths(model_id, payload.pack_id or 'zerosigma')
-        cfg_dir = ws['config'].parent
-        pol_dir = ws['policy'].parent
-        ind_dir = cfg_dir.parent / 'indicator_sets'
-        cfg_dir.mkdir(parents=True, exist_ok=True)
-        pol_dir.mkdir(parents=True, exist_ok=True)
-        ind_dir.mkdir(parents=True, exist_ok=True)
         cfg_path = ws['config']
-        if cfg_path.exists():
-            return {"ok": False, "error": f"Model config already exists: {cfg_path}"}
         cfg = {
             'model_id': model_id,
             'ticker': ticker,
@@ -58,19 +51,18 @@ def create_model_ep(payload: CreateModelRequest):
             'horizon': horizon,
             'cadence': cadence,
         }
-        cfg_path.write_text(yaml.safe_dump(cfg, sort_keys=False))
-        default_pol = pol_dir / 'default.yaml'
-        pol_out = ws['policy']
-        if default_pol.exists():
-            shutil.copyfile(default_pol, pol_out)
-        else:
-            pol_out.write_text(yaml.safe_dump({'policy': {'execution': {}, 'risk': {}, 'alerting': {}}}, sort_keys=False))
-        if payload.indicator_set_name:
-            src = ind_dir / f"{payload.indicator_set_name}.yaml"
-            if src.exists():
-                dst = ind_dir / f"{model_id}.yaml"
-                shutil.copyfile(src, dst)
-        return {"ok": True, "model_id": model_id, "paths": {"config": str(cfg_path), "policy": str(pol_out)}, "message": "created"}
+        # Store in DB only (YAML deprecated)
+        try:
+            upsert_model_config_db(payload.pack_id or 'zerosigma', model_id, cfg)
+        except Exception:
+            pass
+        # Seed a minimal policy in DB
+        try:
+            from api.services.store_db import upsert_policy_db
+            upsert_policy_db(payload.pack_id or 'zerosigma', model_id, {'execution': {}, 'risk': {}, 'alerting': {}}, bump_version=False)
+        except Exception:
+            pass
+        return {"ok": True, "model_id": model_id, "message": "created"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
@@ -103,16 +95,9 @@ def upsert_indicator_set_ep(payload: IndicatorSetUpsertRequest):
                 raise ValueError(f"invalid params for {nm}: {e}")
             d = {'name': nm}; d.update(params)
             valid.append(d)
-        base = workspace_paths('dummy', pack_id)['config'].parent / 'indicator_sets'
-        base.mkdir(parents=True, exist_ok=True)
-        if scope == 'model':
-            model_id = payload.model_id or name
-            target = base / f"{model_id}.yaml"
-        else:
-            target = base / f"{name}.yaml"
         data = {'name': name, 'version': 1, 'indicators': valid}
-        target.write_text(yaml.safe_dump(data, sort_keys=False))
-        return {"ok": True, "path": str(target), "count": len(valid), "message": "written"}
+        upsert_indicator_set_db(pack_id, scope, model_id=(payload.model_id if scope == 'model' else None), name=(name if scope == 'pack' else None), data=data, version=1)
+        return {"ok": True, "count": len(valid), "message": "written"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
 

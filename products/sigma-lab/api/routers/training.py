@@ -12,6 +12,9 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
 from sigma_core.services.io import workspace_paths, load_config, sanitize_out_path, resolve_indicator_set_path, PACKS_DIR
 from sigma_core.services.policy import ensure_policy_exists
+from api.services.store_db import get_model_config_db
+from api.services.store_db import get_indicator_set_model_db, get_indicator_set_pack_db
+import yaml as _yaml
 from sigma_core.storage.relational import get_db
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
@@ -101,7 +104,7 @@ def train_ep(payload: TrainRequest):
         out_path = _Path(sanitize_out_path(payload.model_out, paths['artifacts'] / 'gbm.pkl'))
     except ValueError as ve:
         return {'ok': False, 'error': str(ve)}
-    cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
+    cfgm = (get_model_config_db(payload.pack_id or 'zerosigma', model_id) or load_config(model_id, payload.pack_id or 'zerosigma'))
     fcfg = cfgm.get('features') or {}
     from datetime import datetime
     started_at = datetime.utcnow()
@@ -159,7 +162,24 @@ def train_ep(payload: TrainRequest):
             lineage_vals = None
             if _compute_lineage is not None:
                 try:
-                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+        # Prefer indicator set from DB
+        ind_data = (get_indicator_set_model_db(payload.pack_id or 'zerosigma', model_id) or None)
+        if ind_data is None and cfgm:
+            name = None
+            try:
+                name = (cfgm.get('indicator_set_name') or cfgm.get('indicator_set') or cfgm.get('features', {}).get('indicator_set'))
+            except Exception:
+                name = None
+            if name:
+                ind_data = get_indicator_set_pack_db(payload.pack_id or 'zerosigma', str(name))
+        if ind_data is not None:
+            tmp_ind = paths['reports'] / f"indicator_set_db_{model_id}.yaml"
+            paths['reports'].mkdir(parents=True, exist_ok=True)
+            to_write = ind_data if ('indicators' in ind_data) else {'name': model_id, 'version': 1, 'indicators': ind_data}
+            tmp_ind.write_text(_yaml.safe_dump(to_write, sort_keys=False), encoding='utf-8')
+            ind_path = tmp_ind
+        else:
+            ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
                     lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
                 except Exception:
                     pass
@@ -180,7 +200,7 @@ def train_ep(payload: TrainRequest):
             lineage_vals = None
             try:
                 from sigma_core.services.lineage import compute_lineage as _compute_lineage  # type: ignore
-                ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+                    ind_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
                 lineage_vals = _compute_lineage(pack_dir=PACKS_DIR / (payload.pack_id or 'zerosigma'), model_id=model_id, indicator_set_path=ind_path)
             except Exception:
                 pass

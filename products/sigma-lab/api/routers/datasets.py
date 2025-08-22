@@ -11,6 +11,9 @@ from sigma_core.services.io import workspace_paths, load_config, resolve_indicat
 from fastapi.responses import JSONResponse
 from sigma_core.services.policy import ensure_policy_exists
 from sigma_core.storage.relational import get_db
+from api.services.store_db import get_model_config_db
+from api.services.store_db import get_indicator_set_model_db, get_indicator_set_pack_db
+import yaml as _yaml
 try:
     from sigma_core.services.model_cards import write_model_card
 except Exception:
@@ -73,14 +76,33 @@ def build_matrix_ep(payload: BuildMatrixRequest):
     if not start or not end:
         return {"ok": False, "error": "start and end are required"}
     paths = workspace_paths(model_id, payload.pack_id or 'zerosigma')
-    cfgm = load_config(model_id, payload.pack_id or 'zerosigma')
+    cfgm = (get_model_config_db(payload.pack_id or 'zerosigma', model_id) or load_config(model_id, payload.pack_id or 'zerosigma'))
     from datetime import datetime
     started_at = datetime.utcnow()
     try:
         out_csv = str(sanitize_out_path(payload.out_csv, paths['matrices'] / 'training_matrix_built.csv'))
     except ValueError as ve:
         return JSONResponse({"ok": False, "error": str(ve)}, status_code=400)
-    indicator_set_path = resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id)
+    # Prefer indicator set from DB; fallback to filesystem path
+    ind_data = (get_indicator_set_model_db(payload.pack_id or 'zerosigma', model_id) or None)
+    if ind_data is None and cfgm:
+        # If config references a named set, attempt to fetch pack-level by name
+        name = None
+        try:
+            name = (cfgm.get('indicator_set_name') or cfgm.get('indicator_set') or cfgm.get('features', {}).get('indicator_set'))
+        except Exception:
+            name = None
+        if name:
+            ind_data = get_indicator_set_pack_db(payload.pack_id or 'zerosigma', str(name))
+    if ind_data is not None:
+        # Write temp YAML for the core to consume
+        tmp_ind = paths['reports'] / f"indicator_set_db_{model_id}.yaml"
+        paths['reports'].mkdir(parents=True, exist_ok=True)
+        to_write = ind_data if ('indicators' in ind_data) else {'name': model_id, 'version': 1, 'indicators': ind_data}
+        tmp_ind.write_text(_yaml.safe_dump(to_write, sort_keys=False), encoding='utf-8')
+        indicator_set_path = str(tmp_ind)
+    else:
+        indicator_set_path = str(resolve_indicator_set_path(payload.pack_id or 'zerosigma', model_id))
     try:
         paths['matrices'].mkdir(parents=True, exist_ok=True)
         build_matrix_range(
