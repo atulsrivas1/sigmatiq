@@ -13,6 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 from sigma_core.services.io import workspace_paths, sanitize_out_path, PACKS_DIR
 from api.services.store_db import get_model_config_db, get_indicator_set_model_db, get_indicator_set_pack_db, get_policy_db
 import yaml as _yaml
+from api.services.indicator_cache import materialize_indicator_set
 from sigma_core.storage.relational import get_db
 try:
     from sigma_core.services.lineage import compute_lineage as _compute_lineage
@@ -172,10 +173,7 @@ def train_ep(payload: TrainRequest):
             if name:
                 ind_data = get_indicator_set_pack_db(payload.pack_id or 'zerosigma', str(name))
         if ind_data is not None:
-            tmp_ind = paths['reports'] / f"indicator_set_db_{model_id}.yaml"
-            paths['reports'].mkdir(parents=True, exist_ok=True)
-            to_write = ind_data if ('indicators' in ind_data) else {'name': model_id, 'version': 1, 'indicators': ind_data}
-            tmp_ind.write_text(_yaml.safe_dump(to_write, sort_keys=False), encoding='utf-8')
+            tmp_ind = materialize_indicator_set(paths['reports'], model_id, ind_data)
             ind_path = tmp_ind
         else:
             return {'ok': False, 'error': 'missing indicator_set in DB; use PUT /indicator_set'}

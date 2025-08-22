@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from api.services.store_db import get_model_config_db, get_indicator_set_model_db, get_indicator_set_pack_db, get_policy_db
 from sigma_core.storage.relational import get_db
 import yaml as _yaml
+from api.services.indicator_cache import materialize_indicator_set
 try:
     from sigma_core.services.model_cards import write_model_card
 except Exception:
@@ -95,11 +96,7 @@ def build_matrix_ep(payload: BuildMatrixRequest):
         if name:
             ind_data = get_indicator_set_pack_db(payload.pack_id or 'zerosigma', str(name))
     if ind_data is not None:
-        # Write temp YAML for the core to consume
-        tmp_ind = paths['reports'] / f"indicator_set_db_{model_id}.yaml"
-        paths['reports'].mkdir(parents=True, exist_ok=True)
-        to_write = ind_data if ('indicators' in ind_data) else {'name': model_id, 'version': 1, 'indicators': ind_data}
-        tmp_ind.write_text(_yaml.safe_dump(to_write, sort_keys=False), encoding='utf-8')
+        tmp_ind = materialize_indicator_set(paths['reports'], model_id, ind_data)
         indicator_set_path = str(tmp_ind)
     else:
         return {"ok": False, "error": "missing indicator_set in DB; use PUT /indicator_set"}
