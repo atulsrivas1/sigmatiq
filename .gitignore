@@ -28,3 +28,4 @@ products/sigma-lab/ui/.ui_dev.pid
 products/sigma-lab/ui/*.log
 products/sigma-lab/mock-api/*.log
 /products/sigma-lab/data_cache
+/branding/.vs
