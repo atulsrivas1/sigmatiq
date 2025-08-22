@@ -36,4 +36,5 @@ Products
 
 Help
 - [[FAQ|help-faq]]
+- [[Glossary|help-glossary]]
 - [[Troubleshooting|help-troubleshooting]]

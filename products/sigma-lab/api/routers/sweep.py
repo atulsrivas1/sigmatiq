@@ -92,9 +92,23 @@ def backtest_sweep_ep(payload: BacktestSweepRequest):
     runs: List[Dict[str, Any]] = []
 
     def run_one(params: Dict[str, Any]) -> Dict[str, Any]:
+        # Normalize numeric targets to textual 'UP'/'DOWN' expected by engine
+        tgt = params.get('target_col')
+        dlocal = df
+        try:
+            if tgt and (tgt in dlocal.columns):
+                s = pd.to_numeric(dlocal[tgt], errors='ignore')
+                if pd.api.types.is_numeric_dtype(s):
+                    uniq = set([v for v in pd.Series(s).dropna().unique().tolist()])
+                    if uniq.issubset({0,1}):
+                        dlocal = dlocal.copy(); dlocal['_y_txt'] = dlocal[tgt].map(lambda v: 'UP' if float(v) == 1.0 else 'DOWN'); tgt = '_y_txt'
+                    elif uniq.issubset({-1,0,1}):
+                        dlocal = dlocal.copy(); dlocal['_y_txt'] = dlocal[tgt].map(lambda v: 'UP' if float(v) > 0 else 'DOWN'); tgt = '_y_txt'
+        except Exception:
+            pass
         res = run_backtest(
-            df,
-            params['target_col'],
+            dlocal,
+            tgt,
             params.get('thresholds'),
             splits=int(params.get('splits', payload.splits)),
             embargo=float(params.get('embargo', payload.embargo)),
