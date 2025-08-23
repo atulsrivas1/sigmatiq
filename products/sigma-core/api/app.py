@@ -2428,6 +2428,7 @@ class BacktestRequest(BaseModel):
     features: BacktestFeaturesCfg
     label: BacktestLabelCfg
     # Engine params
+    mode: Optional[str] = None  # simple|advanced
     thresholds: Optional[List[float]] = [0.55, 0.6, 0.65, 0.7]
     top_pct: Optional[float] = None
     splits: int = 5
@@ -2577,6 +2578,39 @@ def run_backtest(
     fb_set = _build_fb_set_from_db(payload.features.set_id, int(payload.features.version))
     fb = FeatureBuilder(indicator_set=fb_set)
 
+    # Simple-mode defaults (hours + optional thresholds from preset)
+    thresholds_use = payload.thresholds
+    top_pct_use = payload.top_pct
+    hours_use = payload.allowed_hours
+    try:
+        mode_l = (payload.mode or '').lower()
+    except Exception:
+        mode_l = ''
+    if mode_l == 'simple':
+        # If both thresholds and top_pct are absent, try preset grid; always prefer RTH hours if not provided
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT grid FROM sc.backtest_sweep_presets WHERE preset_id = 'rth_thresholds_basic'")
+                    rr = cur.fetchone()
+                    if rr and rr[0]:
+                        grid = rr[0] or {}
+                        if thresholds_use is None and top_pct_use is None:
+                            thr_list = (grid.get('thresholds_list') or [[]])
+                            if thr_list and thr_list[0]:
+                                thresholds_use = thr_list[0]
+                        if hours_use is None:
+                            hrs_list = (grid.get('allowed_hours_list') or [[]])
+                            if hrs_list and hrs_list[0]:
+                                hours_use = hrs_list[0]
+        except Exception:
+            pass
+        # Fallbacks if preset not found
+        if thresholds_use is None and top_pct_use is None:
+            thresholds_use = [0.55, 0.6, 0.65]
+        if hours_use is None:
+            hours_use = [9,10,11,12,13,14,15]
+
     per_symbol: List[BacktestSymbolResult] = []
     skipped = 0
     frames_all: List[pd.DataFrame] = []
@@ -2714,6 +2748,7 @@ def run_backtest(
         per_symbol=per_symbol,
         pooled_result=pooled_result,
         warnings=[],
+        summary=summary,
     )
 
 
