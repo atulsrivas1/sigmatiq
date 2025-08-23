@@ -230,13 +230,19 @@ Top Recipes
 Presets
 - Common presets seeded: sp500, nasdaq100, dow30, liquid_etfs. Each has novice_ready and beginner_summary.
 - Lint: `lint-presets` validates seeds for novice coverage.
-TODO: Load full rosters for NASDAQ-100 and S&P 500 via CSV/URI into sc.universe_preset_symbols.
-Update: Added `products/sigma-core/scripts/load_preset_symbols.py` and `make preset-load PRESET=sp500 FILE=path.csv`.
+Status: Loader in place — use `make preset-load PRESET=<id> FILE=path.csv` to ingest full NASDAQ‑100 and S&P 500 rosters into `sc.universe_preset_symbols` per environment.
+Update: Added `products/sigma-core/scripts/load_preset_symbols.py` and `make preset-load` target; counts update when loaded.
 
 Latest Updates (ongoing)
 - API: Added `fields=full` support for list endpoints of indicators, indicator sets, strategies, workflows; includes novice-friendly details blocks. Fixed `novice_only` filters and indentation bugs.
 - DB: Migration `0014_sc_enforce_guardrails.sql` enforces presence of `guardrails` on novice_ready published indicator sets and strategies.
 - Presets: Introduced loader script and Makefile target to ingest full symbol rosters from CSV and update counts.
+- Backtesting: `/backtest/run` now returns a `summary` and enforces universal caps (≤ 90 days, ≤ 50 symbols); added simple‑mode defaults via a sweep preset.
+- Consensus: Implemented pack backtests with policy variants (`weighted`, `majority`, `all`).
+- Pipeline: Added model pipeline endpoints with `sc.model_pipeline_runs` (build → sweep → train stub).
+- Error handling: Global novice‑friendly FastAPI exception handler with API key guidance.
+- Seeds/Migrations: Added backtest, sweep preset, and pipeline run migrations; Postman collection updated.
+- Tooling: Added `lint-training-cfg` script/target.
 
 Alerts AI (DB & Registry)
 - Added migration 0015: `sc.model_specs` (model registry) with `sc.v_model_specs_published` view, plus alerts tables: `sc.user_alert_settings`, `sc.alert_subscriptions`, `sc.alert_runs`, `sc.alerts`, `sc.alert_delivery`, `sc.alert_outcomes`.
@@ -265,30 +271,30 @@ Product Independence
 Backtest TODOs (high‑priority)
 - Add compound index for leaderboard filters: `CREATE INDEX sc_model_backtests_model_tag_idx ON sc.model_backtest_runs (model_id, tag)`.
 - Gate sweep preset listing by visibility and user: list `public` + `team` + `owner_user_id == X-User-Id`; hide `private` from others.
-- Update Postman examples to include `pack_id` for `/backtest/run` and `/models/{id}/backtest/sweep` to encourage pack‑level benchmarking.
+- Verify Postman examples include `pack_id` for `/backtest/run` and `/models/{id}/backtest/sweep` to encourage pack‑level benchmarking; add if missing.
 - Add Postman variants to demonstrate consensus policies `majority` and `all` (with `min_quorum`, `min_score`) for `/packs/{id}/backtest/run` and `/packs/{id}/backtest/sweep`.
 
 Backtest/Consensus TODOs (implementation)
-- Universal caps: enforce ≤ 90‑day window and ≤ 50 symbols on `/backtest/run` and `/models/dataset/build` with plain‑language 400s.
-- Global error handler: add FastAPI exception middleware to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
-- Summaries: include `summary` field directly in `/backtest/run` response (parity with pack endpoints).
+- Universal caps: DONE for `/backtest/run`; PENDING for `/models/dataset/build`. Ensure plain‑language 400s and hints on all endpoints.
+- Global error handler: DONE — FastAPI middleware added to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
+- Summaries: DONE — `/backtest/run` includes `summary` (parity with pack endpoints).
 - Pack sweep simple mode: support `mode: simple` on `/packs/{id}/backtest/sweep` and default to `rth_thresholds_basic` when grid absent.
-- Postman: regenerate collection cleanly with examples for simple mode (`/backtest/run`, model sweep) and consensus policies (pack run: majority, pack sweep: all).
+- Postman: UPDATED — confirm examples for simple mode (`/backtest/run`, model sweep) and add consensus policies (pack run: majority, pack sweep: all) where missing.
 - Visibility guardrails: implement presetable listing filter by `visibility` and `owner_user_id`; require guardrails on public presets.
 - Metrics explained: add `metrics_explained` block (e.g., Sharpe = steadiness of gains) in responses when `fields=full` or `mode=simple` for novice clarity.
 - Policy echo: include `policy`, `min_quorum`, `min_score` echoed in pack backtest/sweep responses to make consensus explicit.
 - Compatibility validation: pre‑run checks that pack component models share compatible `label_cfg`/timeframes; fail fast with plain guidance.
 - Budgets/limits: add soft per‑user compute limits for auto endpoints (screen/auto, auto_build) with clear throttling errors.
 - Fail‑safe computes: audit indicators/feature paths to ensure zeros/empties instead of exceptions; expand unit coverage if needed.
-- CI: add jobs for `lint-training-cfg` and future `lint-sweep-presets`; block PRs on violations.
+- CI: DONE — `lint-training-cfg` added; PENDING — add `lint-sweep-presets` and wire into CI; block PRs on violations.
 
 Next Session Plan (North‑Star Aligned)
-- Postman (novice‑ready): regenerate a validated collection including simple‑mode, consensus, and pipeline examples. Keep requests copy/paste runnable and safe by default.
+- Postman (novice‑ready): verify and finalize examples for simple‑mode, consensus, and pipeline; keep requests copy/paste runnable and safe by default.
 - Responses (clarity): add `metrics_explained` where `mode=simple` or `fields=full` to translate metrics (e.g., Sharpe) into plain language.
 - Pack responses (explicit): echo `policy`, `min_quorum`, `min_score` in `/packs/*/backtest/*` responses.
 - Presets (guardrails): implement `visibility` + `owner_user_id` gating on sweep preset list; require guardrails on public presets.
 - Pipeline (lineage): wire dataset build (Parquet) in pipeline, persist `dataset_run_id`, and include it in pipeline responses.
-- Universal caps (consistency): verify caps enforced across `/backtest/run` and `/models/dataset/build` (≤ 90 days, ≤ 50 symbols) with plain 400s and hints.
+- Universal caps (consistency): DONE on `/backtest/run`; implement for `/models/dataset/build` and verify across endpoints with plain 400s and hints.
 - Error handling (novice): keep global handler; add specific mapping for common DB/network failures with next steps.
 - CI & lints: add `lint-sweep-presets` and include it in `lint-all`; document minimal CI wiring.
 - Docs: add short links to new pipeline endpoints in whiteboarding README; keep examples minimal and safe.
@@ -304,10 +310,10 @@ Approvals for Next Session
 - Ensure sandbox is `workspace-write` and network access ON if needed; DB env set in `products/sigma-core/.env`.
 
 Novice Audit TODOs (Sigma Core)
-- Centralize error messages: add a global FastAPI exception handler to translate DB/network errors into plain, novice‑friendly messages with next steps.
-- Cap inputs universally: enforce max 90‑day windows and universe caps on `/backtest/run` (not only on sweep) with clear 400s and guidance.
-- Simple presets for backtests: add a `mode: simple|advanced` on `/backtest/run` that defaults to a stored sweep preset (e.g., `rth_thresholds_basic`), minimizing parameter soup.
-- Plain‑language summaries: include `summary` blocks directly in JSON responses for `/backtest/run` and `/models/{id}/backtest/sweep` (not just persisted runs) describing “what it means”.
+- Centralize error messages: DONE — global FastAPI exception handler added; NEXT: extend mappings and examples for common DB/network failures.
+- Cap inputs universally: DONE for `/backtest/run`; ensure consistent caps and plain‑language guidance across related endpoints.
+- Simple presets for backtests: DONE — `/backtest/run` supports `mode: simple` with defaults via sweep preset.
+- Plain‑language summaries: DONE for `/backtest/run`; add to `/models/{id}/backtest/sweep` if missing.
 - Glossary fields: add beginner translations for metrics like Sharpe (e.g., `metrics_explained`) whenever returned to novices.
 - Visibility guardrails: require `visibility` + `owner_user_id` on sweep preset creation; enforce public presets to include guardrails (`max_combos`, `min_trades`, caps).
 - Rate limits/budgets: add optional per‑user soft limits on auto endpoints (screen/auto, set/auto_build) to prevent runaway workloads (novice safety).
