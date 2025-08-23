@@ -1,0 +1,47 @@
+{
+  "strategy_id": "zerosigma_0dte_scalp_gate",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "0DTE Scalp (Gate)",
+  "objective": "Only allow 0DTE scalp entries when gate is green.",
+  "entry_logic": "gate green => allow configured scalp entries",
+  "exit_logic": "pause on yellow/red",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "zerosigma_0dte_gate"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade 0DTE only under favorable intraday conditions.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "max_positions": 1,
+    "max_daily_trades": 4,
+    "loss_cap_bps": 50
+  },
+  "assistant_hints": [
+    "Use strict loss caps.",
+    "Avoid extremes at open.",
+    "Throttle entries.",
+    "Use predefined brackets."
+  ]
+}

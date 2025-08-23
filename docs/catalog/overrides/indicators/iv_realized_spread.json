@@ -1,0 +1,41 @@
+{
+  "subtitle": "IV − realized volatility spread — IV premium vs recent realized vol.",
+  "tags": [
+    "options_volatility",
+    "iv_rv_spread",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "> 0 IV above RV (rich premium); < 0 IV below RV (cheap).",
+    "typical_ranges": "Ticker/window dependent; use distribution percentiles.",
+    "caveats": "Sampling and annualization matter; quotes vs snapshots differ.",
+    "what_it_measures": "Iv Realized Spread derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "intraday/daily price",
+      "option IV"
+    ],
+    "timeframe": "hourly|daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Premium selling/buying decision support"
+    ],
+    "avoid_when": [
+      "Sparse IV or erratic prints"
+    ],
+    "example_conditions": [
+      "iv_realized_spread(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Positive spread (IV>RV) suggests richer premium; negative suggests cheaper.",
+    "Normalize by percentiles; raw values vary widely.",
+    "Ensure consistent sampling/annualization across series.",
+    "Use with IV rank and trend for decisions."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "IV − realized volatility spread — IV premium vs recent realized vol."
+}

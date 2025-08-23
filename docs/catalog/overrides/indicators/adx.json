@@ -1,0 +1,46 @@
+{
+  "subtitle": "Average Directional Index — strength of a trend (not its direction).",
+  "tags": [
+    "trend",
+    "strength",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 25 often indicates a meaningful trend; < 20 weak/no trend.",
+    "typical_ranges": "0–50 common; >50 rare strong trends.",
+    "caveats": "ADX rises in both up and down trends; pair with direction filter.",
+    "what_it_measures": "Adx derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Filtering for strong-trend environments"
+    ],
+    "avoid_when": [
+      "Micro timeframes with noise"
+    ],
+    "example_conditions": [
+      "adx(period=14) > 25"
+    ],
+    "step_by_step": [
+      "Pick period",
+      "Filter setups only when ADX above threshold"
+    ]
+  },
+  "assistant_hints": [
+    "ADX measures strength, not direction — combine with trend filter (e.g., EMA).",
+    "Common threshold ~25 for ‘trend on’; adjust by timeframe.",
+    "Avoid micro timeframes where noise inflates readings.",
+    "Use to gate strategies rather than time entries."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Average Directional Index — strength of a trend (not its direction)."
+}

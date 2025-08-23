@@ -1,0 +1,25 @@
+{
+  "set_id": "zerosigma_0dte_gate",
+  "version": "1.0.0",
+  "title": "0DTE Intraday Gate",
+  "purpose": "Enable options entries only under favorable intraday conditions.",
+  "components": [
+    {"indicator_id": "momentum_score_total", "params": {"w_hourly": 0.5, "w_daily": 0.5}, "role": "momentum", "timeframe": "hourly"},
+    {"indicator_id": "first15m_range_z", "params": {"ticker": "SPY", "window_mins": 15, "norm": "atr"}, "role": "session_vol", "timeframe": "5m"},
+    {"indicator_id": "open_gap_z", "params": {"ticker": "SPY", "atr_period": 14, "norm": "atr"}, "role": "gap", "timeframe": "5m"},
+    {"indicator_id": "atr", "params": {"period": 14}, "role": "brackets", "timeframe": "hourly"}
+  ],
+  "rationale": "Avoid choppy or extreme opening regimes; use momentum and session metrics to greenlight entries.",
+  "reading_guide": {"signal_logic": "momentum_score_total>0 AND first15m_range_z in [0.3,1.5] AND abs(open_gap_z)<2.0", "timeframe_alignment": "hourly + 5m"},
+  "data_requirements": {"inputs": ["intraday OHLC", "daily ATR"], "timeframe": "5m+hourly"},
+  "assistant_hints": [
+    "Only trade when the gate is green; skip yellow/red.",
+    "Avoid first 5–15m if range Z is extreme.",
+    "Respect open gap filters; fading large gaps is risky.",
+    "Use ATR brackets for predefined stops/targets."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Simple entry gate for 0DTE: trade only when conditions are favorable.",
+  "simple_defaults": { "timeframe": "5m" },
+  "guardrails": { "universe_cap": 50, "throttle_per_min": 1 }
+}

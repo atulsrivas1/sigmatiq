@@ -1,0 +1,25 @@
+{
+  "recipe_id": "options_premium_review_daily",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Options Premium Review (Daily)",
+  "subtitle": "Check if premium is rich or cheap vs history.",
+  "beginner_summary": "Daily IV rank + term slope to decide if premium is rich or cheap.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "options_premium_selector_v1",
+  "target_version": 1,
+  "defaults": {
+    "operation": "screen",
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "universe_preset": "sp500",
+    "universe_cap": 500,
+    "throttle_per_min": 1
+  },
+  "risk_profile": "conservative",
+  "universe_preset": "sp500",
+  "sort_rank": 60
+}

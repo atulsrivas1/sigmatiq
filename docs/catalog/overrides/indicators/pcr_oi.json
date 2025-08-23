@@ -1,0 +1,40 @@
+{
+  "subtitle": "Put/Call Ratio by OI — positioning bias.",
+  "tags": [
+    "options_flow",
+    "ratio",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 1.0 more puts than calls; < 1.0 more calls.",
+    "typical_ranges": "0.5–1.5 typical; varies by ticker.",
+    "caveats": "OI includes legacy positions; combine with volume/price.",
+    "what_it_measures": "Pcr Oi derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "OI by type"
+    ],
+    "timeframe": "daily",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Bias context with price and IV"
+    ],
+    "avoid_when": [
+      "Short-term scalping"
+    ],
+    "example_conditions": [
+      "pcr_oi(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "OI reflects stock of positions; complement with volume for flow.",
+    "> 1.0 does not mean bearish by itself — add price/IV context.",
+    "Beware stale/erroneous OI updates; validate data freshness.",
+    "Use as slow-moving bias, not a timing signal."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Put/Call Ratio by OI — positioning bias."
+}

@@ -1,0 +1,40 @@
+{
+  "set_id": "ichimoku_trend_gate_v1",
+  "version": "1.0.0",
+  "title": "Ichimoku Trend Gate",
+  "purpose": "Use cloud bias and Tenkan/Kijun cross as a trend gate.",
+  "components": [
+    {
+      "indicator_id": "ichimoku",
+      "params": {},
+      "role": "cloud",
+      "timeframe": "hourly"
+    }
+  ],
+  "rationale": "Use cloud bias and Tenkan/Kijun cross as a trend gate.",
+  "reading_guide": {
+    "signal_logic": "price above cloud AND tenkan>kijun => bullish context",
+    "timeframe_alignment": "hourly"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "hourly"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Trade in direction of Ichimoku cloud bias with Tenkan/Kijun cross.",
+  "simple_defaults": {
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Use cloud bias to avoid fighting trends.",
+    "Wait for pullbacks when far from cloud.",
+    "Check higher timeframe alignment.",
+    "Avoid low-timeframe noise."
+  ]
+}

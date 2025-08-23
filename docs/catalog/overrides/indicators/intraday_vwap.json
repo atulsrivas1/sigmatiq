@@ -1,0 +1,42 @@
+{
+  "subtitle": "Intraday VWAP — volume-weighted average price during the session.",
+  "tags": [
+    "volume",
+    "vwap",
+    "intraday",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "Reference line for fair price; price above = buyer control; below = seller control.",
+    "typical_ranges": "N/A; reference varies during session.",
+    "caveats": "Resets each session; requires reliable intraday volume.",
+    "what_it_measures": "Volume-weighted average price for the session."
+  },
+  "data_requirements": {
+    "inputs": [
+      "price",
+      "volume"
+    ],
+    "timeframe": "1m | 5m",
+    "lookback": null
+  },
+  "usage": {
+    "best_when": [
+      "Intraday mean reversion and pullback entries"
+    ],
+    "avoid_when": [
+      "First minutes with erratic prints"
+    ],
+    "example_conditions": [
+      "abs(close - vwap)/vwap > 0.005"
+    ]
+  },
+  "assistant_hints": [
+    "VWAP resets each session; don’t compare across days.",
+    "Use distance bands (% from VWAP) to avoid chasing.",
+    "Prefer liquid hours; thin sessions distort VWAP.",
+    "Combine with volume or OBV for confirmation."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Intraday VWAP — volume-weighted average price during the session."
+}

@@ -1,0 +1,45 @@
+{
+  "subtitle": "Stochastic of RSI — sensitivity boost for oscillations.",
+  "tags": [
+    "oscillator",
+    "mean_reversion",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Values near 0 = RSI at lows; near 1 = RSI at highs; crosses indicate momentum turns.",
+    "typical_ranges": "Use RSI period 14; Stoch smoothing 3–3 is common.",
+    "caveats": "Very sensitive; combine with higher timeframe bias to reduce noise.",
+    "what_it_measures": "Stochastic RSI — speed of RSI changes, 0–1."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "15m | hourly | daily",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Short‑term mean reversion"
+    ],
+    "avoid_when": [
+      "High volatility spikes"
+    ],
+    "example_conditions": [
+      "stoch_rsi(rsi_period=14) crosses above 0.2"
+    ],
+    "step_by_step": [
+      "Compute RSI",
+      "Apply Stoch smoothing",
+      "Alert on cross"
+    ]
+  },
+  "assistant_hints": [
+    "Very sensitive — use with a trend or regime filter.",
+    "Favor cross signals (0.2/0.8) rather than static extremes.",
+    "Consider minimum bar spacing to avoid rapid re-signals.",
+    "Pair with VWAP/EMA context for intraday usage."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Stochastic of RSI — sensitivity boost for oscillations."
+}

@@ -1,0 +1,3 @@
+ALTER TABLE IF EXISTS sc.universe_presets
+  ADD COLUMN IF NOT EXISTS novice_ready BOOLEAN DEFAULT TRUE NOT NULL,
+  ADD COLUMN IF NOT EXISTS beginner_summary TEXT;

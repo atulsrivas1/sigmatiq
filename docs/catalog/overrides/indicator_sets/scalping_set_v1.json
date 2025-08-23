@@ -1,0 +1,25 @@
+{
+  "set_id": "scalping_set_v1",
+  "version": "1.0.0",
+  "title": "Scalping Set (Ultra‑Short TF)",
+  "purpose": "Micro pullback entries with VWAP/EMA alignment and RSI confirmation.",
+  "components": [
+    {"indicator_id": "intraday_vwap", "params": {"price_col": "close", "volume_col": "volume"}, "role": "vwap", "timeframe": "1m"},
+    {"indicator_id": "rsi", "params": {"period": 7}, "role": "oscillator", "timeframe": "1m"},
+    {"indicator_id": "ema", "params": {"column": "close", "window": 9}, "role": "trend", "timeframe": "1m"},
+    {"indicator_id": "vol_zscore", "params": {"window": 20}, "role": "volume", "timeframe": "1m"}
+  ],
+  "rationale": "Favor quick pullbacks to VWAP/EMA with RSI re‑cross and adequate volume.",
+  "reading_guide": {"signal_logic": "price near vwap or ema9 AND rsi7 recross AND vol_z not depressed", "timeframe_alignment": "1m"},
+  "data_requirements": {"inputs": ["1m OHLCV"], "timeframe": "1m"},
+  "novice_ready": true,
+  "beginner_summary": "Ultra-short entries near VWAP/EMA with quick RSI recross and volume support.",
+  "simple_defaults": {"timeframe": "1m"},
+  "guardrails": {"universe_cap": 30, "throttle_per_min": 2},
+  "assistant_hints": [
+    "Trade only during liquid hours; avoid midday lulls.",
+    "Favor pullbacks to VWAP/EMA with fast rejection.",
+    "RSI re‑cross works better than fixed thresholds here.",
+    "Keep stops tight; accept many small losses over few big ones."
+  ]
+}

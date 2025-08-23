@@ -486,6 +486,27 @@ def get_polygon_daily_bars(ticker: str, start_date: str, end_date: str) -> pd.Da
         raise ValueError("POLYGON_API_KEY (or ZE_POLYGON_API_KEY) is not set.")
     url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/day/{start_date}/{end_date}"
     params = {"adjusted": "false", "sort": "asc", "limit": 50000, "apiKey": POLYGON_API_KEY}
+
+    # Cache historical (never today) to reduce load and allow offline reuse
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    try:
+        sd = datetime.strptime(start_date, "%Y-%m-%d").date()
+        ed = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except Exception:
+        sd = None; ed = None
+    is_today = (sd == _today_et()) or (ed == _today_et()) if (sd and ed) else False
+    cache_path = os.path.join(CACHE_DIR, f"{ticker}_day_{start_date}_{end_date}.json")
+    if (not is_today) and os.path.exists(cache_path):
+        try:
+            with open(cache_path, 'r') as f:
+                data_cached = json.load(f)
+            return pd.DataFrame(data_cached)
+        except Exception:
+            try:
+                os.remove(cache_path)
+            except Exception:
+                pass
+
     last_err = None
     for attempt in range(1, 4):
         try:
@@ -506,7 +527,14 @@ def get_polygon_daily_bars(ticker: str, start_date: str, end_date: str) -> pd.Da
                     'volume': res.get('v',0),
                     'vwap': res.get('vw', None),
                 })
-            return pd.DataFrame(rows)
+            df = pd.DataFrame(rows)
+            if (not is_today) and not df.empty:
+                try:
+                    with open(cache_path, 'w') as f:
+                        json.dump(df.to_dict(orient='records'), f, default=str)
+                except Exception:
+                    pass
+            return df
         except requests.exceptions.RequestException as e:
             last_err = e
             time.sleep(2 ** (attempt - 1))
@@ -548,13 +576,34 @@ def get_polygon_index_daily_bars(index_ticker: str, start_date: str, end_date: s
 
 def get_polygon_agg_bars(ticker: str, multiplier: int, timespan: str, start_date: str, end_date: str) -> pd.DataFrame:
     """Generic aggregates fetcher (e.g., 5-minute bars). Returns DataFrame with 'date' ts and OHLCV/VWAP.
-    Never caches today's data; historical can be cached similarly to hourly fetcher if needed later.
+    Historical ranges are cached on disk; today's data is never cached.
     """
     POLYGON_API_KEY = os.getenv("POLYGON_API_KEY") or os.getenv("ZE_POLYGON_API_KEY")
     if not POLYGON_API_KEY:
         raise ValueError("POLYGON_API_KEY (or ZE_POLYGON_API_KEY) is not set.")
     url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/{int(multiplier)}/{timespan}/{start_date}/{end_date}"
     params = {"adjusted": "false", "sort": "asc", "limit": 50000, "apiKey": POLYGON_API_KEY}
+
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    try:
+        sd = datetime.strptime(start_date, "%Y-%m-%d").date()
+        ed = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except Exception:
+        sd = None; ed = None
+    is_today = (sd == _today_et()) or (ed == _today_et()) if (sd and ed) else False
+    key = f"{ticker}_{int(multiplier)}{timespan}_{start_date}_{end_date}.json"
+    cache_path = os.path.join(CACHE_DIR, key)
+    if (not is_today) and os.path.exists(cache_path):
+        try:
+            with open(cache_path, 'r') as f:
+                data_cached = json.load(f)
+            return pd.DataFrame(data_cached)
+        except Exception:
+            try:
+                os.remove(cache_path)
+            except Exception:
+                pass
+
     r = requests.get(url, params=params, timeout=20)
     r.raise_for_status()
     data = r.json() or {}
@@ -573,7 +622,14 @@ def get_polygon_agg_bars(ticker: str, multiplier: int, timespan: str, start_date
             'volume': res.get('v',0),
             'vwap': res.get('vw', None),
         })
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    if (not is_today) and not df.empty:
+        try:
+            with open(cache_path, 'w') as f:
+                json.dump(df.to_dict(orient='records'), f, default=str)
+        except Exception:
+            pass
+    return df
 
 def get_polygon_oi_snapshot_today(underlying_ticker: str, expiration_date: date, strikes: list[float]) -> pd.DataFrame:
     """

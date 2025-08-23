@@ -1,0 +1,40 @@
+{
+  "subtitle": "IV Rank (52w) — where current ATM IV sits vs last year (0–1).",
+  "tags": [
+    "options_volatility",
+    "iv_rank",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "> 0.8 high IV (premium rich); < 0.2 low IV (premium cheap).",
+    "typical_ranges": "0–1 by definition.",
+    "caveats": "Depends on ATM definition and data quality.",
+    "what_it_measures": "Percentile of current ATM IV vs past year (0–1)."
+  },
+  "data_requirements": {
+    "inputs": [
+      "ATM IV time series"
+    ],
+    "timeframe": "daily",
+    "lookback": 252
+  },
+  "usage": {
+    "best_when": [
+      "Choosing premium selling vs buying strategies"
+    ],
+    "avoid_when": [
+      "Stale IV"
+    ],
+    "example_conditions": [
+      "iv_rank_52w(underlying=\"SPY\") > 0.8"
+    ]
+  },
+  "assistant_hints": [
+    "> 0.8 often favors selling premium; < 0.2 favors buying (with caution).",
+    "Check earnings/events — regime can shift abruptly.",
+    "Ensure ATM definition and data source are consistent across time.",
+    "Combine with term slope and trend for a fuller view."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "IV Rank tells you if options are expensive or cheap vs the past year (high >80%, low <20%)."
+}

@@ -1,0 +1,47 @@
+{
+  "subtitle": "Chaikin Money Flow — accumulation/distribution using price and volume.",
+  "tags": [
+    "volume",
+    "flow",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 0 suggests buying pressure; < 0 selling pressure.",
+    "typical_ranges": "Period 20 common.",
+    "caveats": "Relies on accurate volume; can be noisy intraday.",
+    "what_it_measures": "Chaikin Money Flow — volume-weighted accumulation/distribution."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Confirming trend strength"
+    ],
+    "avoid_when": [
+      "Illiquid tickers"
+    ],
+    "example_conditions": [
+      "cmf(period=20) > 0"
+    ],
+    "step_by_step": [
+      "Pick period",
+      "Use sign/slope as confirmation"
+    ]
+  },
+  "assistant_hints": [
+    "Volume quality matters — filter illiquid names.",
+    "Use CMF sign/slope as confirmation, not a trigger.",
+    "Pair with price trend or OBV for robustness.",
+    "Smooth on low timeframes to reduce whipsaws."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Chaikin Money Flow — accumulation/distribution using price and volume."
+}

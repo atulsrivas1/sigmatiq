@@ -1,0 +1,45 @@
+{
+  "subtitle": "Aroon Up/Down — time since recent highs/lows to gauge trend changes.",
+  "tags": [
+    "trend",
+    "indicator",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Aroon Up near 100% and Aroon Down low suggests uptrend; inverse suggests downtrend.",
+    "typical_ranges": "Lookback 14–25 typical.",
+    "caveats": "Can lag and whipsaw; use with trend filters.",
+    "what_it_measures": "Aroon derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "timeframe": "any",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Detecting emerging trends after consolidation"
+    ],
+    "avoid_when": [
+      "Very choppy markets"
+    ],
+    "example_conditions": [
+      "aroon(period=14).up > 70 and .down < 30"
+    ],
+    "step_by_step": [
+      "Pick window",
+      "Alert when lines diverge strongly"
+    ]
+  },
+  "assistant_hints": [
+    "Look for strong up/down divergence after consolidation.",
+    "Confirm with price/EMA to avoid whipsaws.",
+    "Use as context for trend onset, not precise entries.",
+    "Longer windows reduce noise but delay signals."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Aroon Up/Down — time since recent highs/lows to gauge trend changes."
+}

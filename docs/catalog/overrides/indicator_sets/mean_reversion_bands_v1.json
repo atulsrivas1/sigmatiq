@@ -1,0 +1,61 @@
+{
+  "set_id": "mean_reversion_bands_v1",
+  "version": "1.0.0",
+  "title": "Mean Reversion Bands + Oscillator",
+  "purpose": "Find fades from Bollinger bands with oscillator confirmation.",
+  "components": [
+    {
+      "indicator_id": "bollinger_bands",
+      "params": {
+        "column": "close",
+        "window": 20,
+        "num_std": 2.0
+      },
+      "role": "bands",
+      "timeframe": "hourly"
+    },
+    {
+      "indicator_id": "rsi",
+      "params": {
+        "period": 14
+      },
+      "role": "oscillator",
+      "timeframe": "hourly"
+    },
+    {
+      "indicator_id": "stoch_rsi",
+      "params": {
+        "rsi_period": 14,
+        "stoch_period": 14
+      },
+      "role": "confirmation",
+      "timeframe": "hourly"
+    }
+  ],
+  "rationale": "Fade extremes at Bollinger bands when RSI is oversold/overbought and Stoch RSI turns.",
+  "reading_guide": {
+    "signal_logic": "(close <= bb_lower_20 AND rsi<30 AND stoch_rsi up) OR (close >= bb_upper_20 AND rsi>70 AND stoch_rsi down)",
+    "timeframe_alignment": "hourly"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLC"
+    ],
+    "timeframe": "hourly"
+  },
+  "assistant_hints": [
+    "Fade extremes at bands; avoid strong trends.",
+    "Wait for Stoch RSI turn, not just RSI extreme.",
+    "Take profits near mid-band to reduce whipsaw.",
+    "Use hourly to reduce noise for beginners."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Find fades from Bollinger bands with oscillator confirmation.",
+  "simple_defaults": {
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  }
+}

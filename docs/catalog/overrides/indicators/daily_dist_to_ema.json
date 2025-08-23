@@ -1,0 +1,41 @@
+{
+  "subtitle": "Distance of price from daily EMA — stretch from trend.",
+  "tags": [
+    "trend",
+    "daily",
+    "risk"
+  ],
+  "measures": {
+    "how_to_read": "Positive = above EMA; negative = below; magnitude shows stretch.",
+    "typical_ranges": "Normalize by ATR or z-score for comparability.",
+    "caveats": "Absolute distances vary by ticker volatility.",
+    "what_it_measures": "Daily Dist To Ema derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "daily close"
+    ],
+    "timeframe": "daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Avoiding extended entries",
+      "Mean-reversion filters"
+    ],
+    "avoid_when": [
+      "Noisy low-volume names"
+    ],
+    "example_conditions": [
+      "daily_dist_to_ema(underlying='SPY', window=20, normalize=true) > 1.5σ"
+    ]
+  },
+  "assistant_hints": [
+    "Normalize by ATR or z-score for cross-ticker comparability.",
+    "Use as a stretch filter; avoid as a direct entry trigger.",
+    "Combine with daily trend (EMA) and catalyst context.",
+    "Beware regime shifts where ‘normal’ stretch changes."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Distance of price from daily EMA — stretch from trend."
+}

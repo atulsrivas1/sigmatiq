@@ -1,0 +1,25 @@
+{
+  "recipe_id": "gap_and_go_backtest_5m",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Gap and Go (5m)",
+  "subtitle": "Small gap + strong 15m + momentum.",
+  "beginner_summary": "Backtest a small-gap continuation setup with session context.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "strategy",
+  "target_id": "gap_and_go",
+  "target_version": 1,
+  "defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 75
+}

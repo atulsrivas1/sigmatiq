@@ -1,0 +1,44 @@
+{
+  "subtitle": "Change in price over a window — directional thrust.",
+  "tags": [
+    "momentum",
+    "trend",
+    "beginner",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Positive values = upward momentum; negative = downward.",
+    "typical_ranges": "Depends on window and ticker volatility; standardize if comparing.",
+    "caveats": "Sensitive to outliers; normalize or cap if needed.",
+    "what_it_measures": "Rate of price change; positive = up momentum, negative = down."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Trend continuation setups"
+    ],
+    "avoid_when": [
+      "Noisy low‑volume names"
+    ],
+    "example_conditions": [
+      "momentum(column=close, window=20) > 0"
+    ],
+    "step_by_step": [
+      "Pick window",
+      "Screen for positive/negative momentum by bias"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Change in price over a window — directional thrust.",
+  "assistant_hints": [
+    "Normalize or compare relatively across symbols.",
+    "Combine with trend filters.",
+    "Fade weak momentum in ranges."
+  ]
+}

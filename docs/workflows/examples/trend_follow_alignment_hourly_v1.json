@@ -1,0 +1,34 @@
+{
+  "workflow_id": "trend_follow_alignment_hourly_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Trend-Follow Alignment (10 minutes)",
+  "subtitle": "Go with the daily trend only when the hourly agrees.",
+  "goal": "Check bias and run a simple backtest.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": ["API at http://localhost:8001", "Hourly and daily data"],
+  "dependencies": {"indicators": ["daily_ema","ema","ema_slope"], "indicator_sets": ["multi_tf_trend_v1"], "strategies": ["trend_follow_alignment"]},
+  "steps": [
+    {
+      "description": "Evaluate HTF alignment using set (daily + hourly).",
+      "rationale": "Bias from daily EMA; confirm hourly EMA and slope.",
+      "api": {"method": "POST", "path": "/indicator_sets/multi_tf_trend_v1/evaluate", "body": {"universe": ["SPY"], "timeframe": "hourly"}},
+      "expects": "ok:true and alignment flags"
+    },
+    {
+      "description": "Run a quick backtest of the alignment strategy.",
+      "rationale": "Validate idea with simple metrics.",
+      "api": {"method": "POST", "path": "/strategies/trend_follow_alignment/backtest", "body": {"universe": ["SPY"], "timeframe": "hourly", "start": "2024-01-01", "end": "2024-03-31"}},
+      "expects": "ok:true and summary metrics"
+    }
+  ],
+  "outputs": ["Bias flags", "Backtest summary"],
+  "best_when": ["Clear daily trends"],
+  "avoid_when": ["Choppy daily context"],
+  "caveats": ["Entries late after long trends"],
+  "links": {"indicator_set": "/catalog/indicator_set/multi_tf_trend_v1", "strategy": "/catalog/strategy/trend_follow_alignment"},
+  "novice_ready": true,
+  "beginner_summary": "Trade in the direction of the daily trend only when the hourly agrees."
+}

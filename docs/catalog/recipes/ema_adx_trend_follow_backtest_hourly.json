@@ -1,0 +1,25 @@
+{
+  "recipe_id": "ema_adx_trend_follow_backtest_hourly",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "EMA Trend Follow (ADX Gate)",
+  "subtitle": "Follow trend only when ADX>25.",
+  "beginner_summary": "Backtest EMA trend-follow with ADX>25 gate to avoid chop.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "strategy",
+  "target_id": "ema_trend_follow_adx_gate",
+  "target_version": 1,
+  "defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "conservative",
+  "universe_preset": "watchlist",
+  "sort_rank": 65
+}

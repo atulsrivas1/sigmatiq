@@ -1,0 +1,40 @@
+{
+  "subtitle": "Hour-of-day feature — time-based behavior context.",
+  "tags": [
+    "time",
+    "intraday",
+    "context"
+  ],
+  "measures": {
+    "how_to_read": "Categorical/ordinal hour values to capture session effects.",
+    "typical_ranges": "13–20 UTC for US RTH hours (approx).",
+    "caveats": "Convert to session timezone; DST shifts apply.",
+    "what_it_measures": "Hour Of Day derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "timestamp"
+    ],
+    "timeframe": "intraday",
+    "lookback": null
+  },
+  "usage": {
+    "best_when": [
+      "Filtering allowed trading hours"
+    ],
+    "avoid_when": [
+      "Non-US sessions without mapping"
+    ],
+    "example_conditions": [
+      "hour_of_day(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Liquidity and behavior vary by hour — filter accordingly.",
+    "Open/close windows differ; midday often lower activity.",
+    "Use as a filter, not a timing signal.",
+    "Handle timezones/DST to avoid misalignment."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Hour-of-day feature — time-based behavior context."
+}

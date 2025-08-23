@@ -1,0 +1,25 @@
+{
+  "set_id": "swing_risk_controls_v1",
+  "version": "1.0.0",
+  "title": "Swing Set With Risk Controls",
+  "purpose": "Swing entries with trend confirmation and ATR‑based risk controls.",
+  "components": [
+    {"indicator_id": "macd", "params": {"column": "close", "fast": 12, "slow": 26, "signal": 9}, "role": "trend_momentum", "timeframe": "hourly"},
+    {"indicator_id": "ema", "params": {"column": "close", "window": 50}, "role": "trend_filter", "timeframe": "hourly"},
+    {"indicator_id": "bollinger_bands", "params": {"column": "close", "window": 20, "num_std": 2.0}, "role": "context", "timeframe": "hourly"},
+    {"indicator_id": "atr", "params": {"period": 14}, "role": "risk", "timeframe": "hourly"}
+  ],
+  "rationale": "Use MACD and EMA for direction, bands for context, and ATR for stops/targets.",
+  "reading_guide": {"signal_logic": "macd up AND close>ema50; use ATR multiples for brackets", "timeframe_alignment": "hourly"},
+  "data_requirements": {"inputs": ["hourly OHLC"], "timeframe": "hourly"},
+  "novice_ready": true,
+  "beginner_summary": "Swing entries with trend confirmation and ATR-based stops/targets.",
+  "simple_defaults": {"timeframe": "hourly"},
+  "guardrails": {"universe_cap": 200, "throttle_per_min": 1},
+  "assistant_hints": [
+    "Trade in direction of EMA/MACD; skip counter‑trend swings.",
+    "Size stops/targets using ATR multiples (e.g., 1x/2x).",
+    "Avoid entries at band extremes without confirmation.",
+    "Check higher timeframe context before sizing up."
+  ]
+}

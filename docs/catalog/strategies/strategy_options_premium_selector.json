@@ -1,0 +1,24 @@
+{
+  "strategy_id": "options_premium_selector",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Options Premium Selector",
+  "objective": "Choose premium selling vs buying contexts using IV rank and term slope.",
+  "entry_logic": "if iv_rank>0.7 and term_slope>0 => sell; if iv_rank<0.3 and term_slope<0 and momentum up => buy",
+  "exit_logic": "policy-defined for chosen structure (notional)",
+  "risk": {"position_sizing": "notional_caps", "stops_targets": "structure-specific", "exposure_caps": "per underlying"},
+  "execution_policy": {"hours": "RTH", "liquidity_rules": "min OI/volume"},
+  "pre_reqs": {"indicator_sets_used": ["options_premium_selector_v1"]},
+  "performance_snapshot": {"winrate_range": "contextual", "dd_range": "contextual"},
+  "caveats": "Earnings and event risk can flip IV regimes; require liquidity filters.",
+  "novice_ready": true,
+  "beginner_summary": "High IV usually favors selling premium; low IV can favor buying if trend helps.",
+  "simple_defaults": {"operation": "backtest", "timeframe": "daily"},
+  "guardrails": {"max_positions": 3, "max_daily_trades": 5, "loss_cap_bps": 75},
+  "assistant_hints": [
+    "Use strict liquidity filters (min OI/volume).",
+    "Avoid earnings windows unless designed for that risk.",
+    "Confirm low-IV buys with momentum; avoid dead markets.",
+    "Set per-underlying exposure caps."
+  ]
+}

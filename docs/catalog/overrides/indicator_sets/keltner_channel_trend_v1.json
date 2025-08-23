@@ -1,0 +1,52 @@
+{
+  "set_id": "keltner_channel_trend_v1",
+  "version": "1.0.0",
+  "title": "Keltner Channel Trend",
+  "purpose": "Use Keltner channel breaks and midline for trend-follow entries.",
+  "components": [
+    {
+      "indicator_id": "keltner",
+      "params": {
+        "window": 20,
+        "mult": 2
+      },
+      "role": "channel",
+      "timeframe": "hourly"
+    },
+    {
+      "indicator_id": "ema",
+      "params": {
+        "column": "close",
+        "window": 20
+      },
+      "role": "trend",
+      "timeframe": "hourly"
+    }
+  ],
+  "rationale": "Use Keltner channel breaks and midline for trend-follow entries.",
+  "reading_guide": {
+    "signal_logic": "close crosses channel upper AND close>ema20 => continuation (inverse for short)",
+    "timeframe_alignment": "hourly"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "hourly"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Trade channel breaks aligned with EMA trend; use midline as pullback level.",
+  "simple_defaults": {
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Confirm direction with EMA.",
+    "Use midline for pullbacks and stops.",
+    "Avoid range-bound chop.",
+    "Check volatility regime."
+  ]
+}

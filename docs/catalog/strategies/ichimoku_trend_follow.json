@@ -1,0 +1,47 @@
+{
+  "strategy_id": "ichimoku_trend_follow",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Ichimoku Trend Follow",
+  "objective": "Follow cloud bias with Tenkan/Kijun cross.",
+  "entry_logic": "price above cloud and tenkan>kijun",
+  "exit_logic": "exit on Kijun cross down or cloud breach",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "ichimoku_trend_gate_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade in the direction of the cloud with cross confirmation.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 5,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Use pullbacks when far from cloud.",
+    "Confirm HTF alignment.",
+    "Avoid micro timeframes.",
+    "Use ATR stops."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "strategy_id": "swing_trend_follow",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Swing Trend Follow",
+  "objective": "Swing entries with EMA/MACD confirmation and ATR brackets.",
+  "entry_logic": "close>ema50 and macd up",
+  "exit_logic": "targets via ATR multiples; trail stops",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "swing_risk_controls_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Follow trend with risk controls using ATR stops/targets.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "max_positions": 5,
+    "max_daily_trades": 6,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Trade with trend.",
+    "Use ATR brackets.",
+    "Avoid band extremes.",
+    "Check HTF before sizing."
+  ]
+}

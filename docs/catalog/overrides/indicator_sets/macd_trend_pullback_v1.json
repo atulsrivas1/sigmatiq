@@ -1,0 +1,61 @@
+{
+  "set_id": "macd_trend_pullback_v1",
+  "version": "1.0.0",
+  "title": "MACD Trend Pullback",
+  "purpose": "Trend confirm via MACD; enter on EMA pullback with volume support.",
+  "components": [
+    {
+      "indicator_id": "macd",
+      "params": {
+        "fast": 12,
+        "slow": 26,
+        "signal": 9
+      },
+      "role": "trend",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "ema",
+      "params": {
+        "column": "close",
+        "window": 20
+      },
+      "role": "pullback_level",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "vol_zscore",
+      "params": {
+        "window": 20
+      },
+      "role": "volume_confirm",
+      "timeframe": "5m"
+    }
+  ],
+  "rationale": "Trend confirm via MACD; enter on EMA pullback with volume support.",
+  "reading_guide": {
+    "signal_logic": "macd up AND pullback to ema20 AND vol_z>0",
+    "timeframe_alignment": "5m"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "5m"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Uptrend by MACD; buy pullbacks to EMA20 with healthy volume.",
+  "simple_defaults": {
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Require MACD up and a clean pullback to EMA.",
+    "Use volume z-score to avoid weak pullbacks.",
+    "Avoid thinly traded symbols.",
+    "Take partials at prior high."
+  ]
+}

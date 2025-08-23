@@ -1,0 +1,40 @@
+{
+  "subtitle": "Daily RSI — momentum view on the daily timeframe.",
+  "tags": [
+    "momentum",
+    "daily",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "> 70 overbought; < 30 oversold on daily charts.",
+    "typical_ranges": "Period 14 default.",
+    "caveats": "Extremes can persist in strong trends.",
+    "what_it_measures": "Daily Rsi derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "daily close"
+    ],
+    "timeframe": "daily",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Swing filters and scans"
+    ],
+    "avoid_when": [
+      "Earnings or news spikes"
+    ],
+    "example_conditions": [
+      "daily_rsi(underlying='SPY', period=14) < 30"
+    ]
+  },
+  "assistant_hints": [
+    "Favor crosses back through 30/70 over static extremes.",
+    "Combine with trend filters (e.g., daily EMA) for context.",
+    "Extremes can persist — scale entries, don’t assume immediate mean reversion.",
+    "Beware event risk that distorts daily momentum."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Daily RSI — momentum view on the daily timeframe."
+}

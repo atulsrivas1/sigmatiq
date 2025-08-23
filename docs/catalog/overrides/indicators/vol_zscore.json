@@ -1,0 +1,45 @@
+{
+  "subtitle": "Volume Z‑Score — unusual activity vs recent history.",
+  "tags": [
+    "volume",
+    "flow",
+    "beginner",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "> 2.0 implies unusually high volume; < -2.0 unusually low.",
+    "typical_ranges": "Window 20 common; Z 2–3 marks spikes.",
+    "caveats": "Earnings/news can dominate; combine with context.",
+    "what_it_measures": "Volume z-score — how unusual current volume is vs recent average."
+  },
+  "data_requirements": {
+    "inputs": [
+      "volume"
+    ],
+    "timeframe": "1m | 5m | hourly | daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Confirming breakouts/moves"
+    ],
+    "avoid_when": [
+      "Illiquid tickers"
+    ],
+    "example_conditions": [
+      "vol_zscore(window=20) > 2.0"
+    ],
+    "step_by_step": [
+      "Pick window",
+      "Alert on spikes"
+    ]
+  },
+  "assistant_hints": [
+    "Focus on spikes with supporting price action, not isolated prints.",
+    "Debounce repeated alerts in choppy sessions.",
+    "Compare against session context (open/close) to avoid false positives.",
+    "Filter illiquid symbols where prints are unreliable."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Volume Z‑Score — unusual activity vs recent history."
+}

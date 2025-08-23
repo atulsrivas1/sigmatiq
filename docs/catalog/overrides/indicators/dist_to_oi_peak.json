@@ -1,0 +1,41 @@
+{
+  "subtitle": "Distance of spot from peak open interest strike (structure context).",
+  "tags": [
+    "options_structure",
+    "context",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Near zero implies spot near the largest OI concentration.",
+    "typical_ranges": "Ticker dependent.",
+    "caveats": "OI updates daily; not a real‑time signal.",
+    "what_it_measures": "Dist To Oi Peak derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "spot",
+      "option chain OI"
+    ],
+    "timeframe": "daily",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Structural context for intraday setups"
+    ],
+    "avoid_when": [
+      "Outdated OI data"
+    ],
+    "example_conditions": [
+      "dist_to_oi_peak(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Treat as slow-moving context; OI updates daily.",
+    "Large OI peaks can attract/repel price; confirm with price/volume.",
+    "Check chain quality and roll schedules for shifts.",
+    "Combine with gamma/flow metrics for decisions."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Distance of spot from peak open interest strike (structure context)."
+}

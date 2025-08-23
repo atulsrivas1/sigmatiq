@@ -1,0 +1,41 @@
+{
+  "subtitle": "Distance of spot from peak options gamma strike (structure context).",
+  "tags": [
+    "options_structure",
+    "context",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Positive when above peak; negative when below; near zero implies proximity to gamma focus.",
+    "typical_ranges": "Ticker/spot dependent.",
+    "caveats": "Snapshot‑based; intraday changes and data quality matter.",
+    "what_it_measures": "Dist To Gamma Peak derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "spot",
+      "option chain"
+    ],
+    "timeframe": "daily|intraday",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Understanding where dealers’ hedging pressure concentrates"
+    ],
+    "avoid_when": [
+      "Sparse chain data"
+    ],
+    "example_conditions": [
+      "dist_to_gamma_peak(underlying='SPY') near 0"
+    ]
+  },
+  "assistant_hints": [
+    "Treat as context; not a direct trade signal.",
+    "Strike granularity and OI clustering can shift peaks quickly.",
+    "Combine with price action/VWAP and volume.",
+    "Ensure chain freshness to avoid stale readings."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Distance of spot from peak options gamma strike (structure context)."
+}

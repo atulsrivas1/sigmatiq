@@ -1,0 +1,24 @@
+{
+  "strategy_id": "trend_follow_alignment",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Trend Follow with HTF Alignment",
+  "objective": "Trade in the direction of the daily trend when hourly aligns.",
+  "entry_logic": "daily_ema up AND hourly close > ema20 AND ema_slope > 0",
+  "exit_logic": "trail stop via ATR; exit on EMA cross down or target",
+  "risk": {"position_sizing": "vol_scaled", "stops_targets": "ATR(14) x1.0/2.0"},
+  "execution_policy": {"order_types": ["limit"], "hours": "RTH", "slippage_model": "bps:1.0"},
+  "pre_reqs": {"indicator_sets_used": ["multi_tf_trend_v1"]},
+  "performance_snapshot": {"sharpe_range": "1.0–1.5 typical", "dd_range": "8–15%"},
+  "caveats": "Late reversals after long trends; watch for HTF shifts.",
+  "novice_ready": true,
+  "beginner_summary": "Go with the daily trend only when the hourly agrees.",
+  "simple_defaults": {"operation": "backtest", "timeframe": "hourly"},
+  "guardrails": {"max_positions": 3, "max_daily_trades": 6, "loss_cap_bps": 75},
+  "assistant_hints": [
+    "Check daily bias before entering.",
+    "Require hourly EMA alignment and positive slope.",
+    "Use ATR-based trailing stops.",
+    "Re-evaluate after major daily swings."
+  ]
+}

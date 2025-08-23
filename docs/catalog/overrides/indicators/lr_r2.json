@@ -1,0 +1,40 @@
+{
+  "subtitle": "Linear regression R² — trend quality score.",
+  "tags": [
+    "trend",
+    "quality",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Closer to 1.0 = better linear fit; near 0 = noisy/no trend.",
+    "typical_ranges": "0–1 by definition.",
+    "caveats": "Linearity assumption; can be gamed by outliers.",
+    "what_it_measures": "Lr R2 derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Filter for clean trends"
+    ],
+    "avoid_when": [
+      "Short noisy windows"
+    ],
+    "example_conditions": [
+      "lr_r2(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Higher R² implies cleaner linear trend; set a threshold gate.",
+    "Combine with slope sign for direction.",
+    "Longer windows reduce noise but add lag.",
+    "Beware outliers skewing fit; consider robust methods."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Linear regression R² — trend quality score."
+}

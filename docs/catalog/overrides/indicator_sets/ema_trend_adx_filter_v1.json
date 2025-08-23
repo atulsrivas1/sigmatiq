@@ -1,0 +1,23 @@
+{
+  "set_id": "ema_trend_adx_filter_v1",
+  "version": "1.0.0",
+  "title": "EMA Trend with ADX Gate",
+  "purpose": "Follow trend when EMA direction agrees and ADX confirms strength.",
+  "components": [
+    {"indicator_id": "ema", "params": {"column": "close", "window": 20}, "role": "trend", "timeframe": "hourly"},
+    {"indicator_id": "adx", "params": {"period": 14}, "role": "trend_strength", "timeframe": "hourly"}
+  ],
+  "rationale": "Use EMA for direction and gate trades with ADX>25 to reduce whipsaws.",
+  "reading_guide": {"signal_logic": "close>ema20 AND adx>25 => bullish context (inverse for bearish)", "timeframe_alignment": "hourly"},
+  "data_requirements": {"inputs": ["hourly OHLC"], "timeframe": "hourly"},
+  "novice_ready": true,
+  "beginner_summary": "Trade with the EMA trend only when ADX shows a meaningful trend (e.g., >25).",
+  "simple_defaults": {"timeframe": "hourly"},
+  "guardrails": {"universe_cap": 200, "throttle_per_min": 2},
+  "assistant_hints": [
+    "Use EMA for direction; require ADX>25 before entries.",
+    "Avoid counter-trend setups with low ADX.",
+    "Review higher timeframe context weekly.",
+    "Consider ATR for stop sizing."
+  ]
+}

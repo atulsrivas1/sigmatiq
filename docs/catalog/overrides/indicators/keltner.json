@@ -1,0 +1,46 @@
+{
+  "subtitle": "Keltner Channels — ATR‑based envelope around EMA.",
+  "tags": [
+    "bands",
+    "volatility",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Touches outside channels imply strong moves; width reflects volatility.",
+    "typical_ranges": "EMA window ~20; multiplier ~1.5–2.0.",
+    "caveats": "Parameters affect sensitivity; compare to Bollinger for differences.",
+    "what_it_measures": "EMA-based channel using ATR as band width."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Trend pullbacks and breakouts"
+    ],
+    "avoid_when": [
+      "Very tight ranges"
+    ],
+    "example_conditions": [
+      "close > keltner_upper(window=20,multiplier=2.0)"
+    ],
+    "step_by_step": [
+      "Pick EMA window/multiplier",
+      "Alert on touches or breaks"
+    ]
+  },
+  "assistant_hints": [
+    "ATR-based bands are smoother than Bollinger in trends.",
+    "Fade in ranges; use breaks/pullbacks in trends.",
+    "Tune multiplier/window to timeframe and volatility.",
+    "Combine with EMA/MACD to avoid fading strong moves."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Keltner Channels — ATR‑based envelope around EMA."
+}

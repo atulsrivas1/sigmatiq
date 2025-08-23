@@ -1,0 +1,46 @@
+{
+  "subtitle": "Channel of highest highs/lowest lows over a window (breakout tool).",
+  "tags": [
+    "trend",
+    "breakout",
+    "intermediate",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Price breaking above upper band suggests bullish breakout; below lower band suggests bearish breakout.",
+    "typical_ranges": "20 periods common; longer windows reduce signals.",
+    "caveats": "Many breakouts fail in choppy markets; consider volume confirm.",
+    "what_it_measures": "Channel of highest high and lowest low over a window."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "timeframe": "5m | hourly | daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Consolidations before trend moves"
+    ],
+    "avoid_when": [
+      "Choppy ranges"
+    ],
+    "example_conditions": [
+      "close > donchian_upper_20"
+    ],
+    "step_by_step": [
+      "Pick window",
+      "Alert on break above/below band"
+    ]
+  },
+  "assistant_hints": [
+    "Confirm breaks with volume or retests to reduce false signals.",
+    "Favor pullback entries after the breakout rather than chasing.",
+    "Avoid trading Donchian signals in tight chop.",
+    "Align with higher timeframe trend for better odds."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Channel of highest highs/lowest lows over a window (breakout tool)."
+}

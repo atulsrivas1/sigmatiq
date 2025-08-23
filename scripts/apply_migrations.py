@@ -27,6 +27,10 @@ try:
     prod_env = Path(__file__).resolve().parents[1] / 'products' / 'sigma-lab' / '.env'
     if prod_env.exists():
         load_dotenv(dotenv_path=prod_env, override=False)
+    # Try sigma-core .env for direct library DB tasks
+    core_env = Path(__file__).resolve().parents[1] / 'products' / 'sigma-core' / '.env'
+    if core_env.exists():
+        load_dotenv(dotenv_path=core_env, override=False)
 except Exception:
     pass
 

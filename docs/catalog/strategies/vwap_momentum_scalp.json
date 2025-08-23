@@ -1,0 +1,47 @@
+{
+  "strategy_id": "vwap_momentum_scalp",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "VWAP Momentum Scalp",
+  "objective": "Scalp momentum bursts around VWAP in liquid names.",
+  "entry_logic": "momentum>threshold and near vwap and vol_z>0",
+  "exit_logic": "tight stop; quick profits",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "vwap_distance_obv_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade quick bursts near VWAP with OBV/volume support.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "max_positions": 2,
+    "max_daily_trades": 10,
+    "loss_cap_bps": 50
+  },
+  "assistant_hints": [
+    "Use liquid tickers only.",
+    "Avoid first 1–3 minutes.",
+    "Throttle entries.",
+    "Keep stops tight."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "subtitle": "First N minutes range normalized by volatility.",
+  "tags": [
+    "intraday",
+    "open",
+    "risk",
+    "gating"
+  ],
+  "measures": {
+    "how_to_read": "> 1.0 large opening range day; < 0.5 quiet open.",
+    "typical_ranges": "Most sessions 0.3–1.2.",
+    "caveats": "Holiday/short sessions can skew values.",
+    "what_it_measures": "First15M Range Z derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "intraday high/low first N mins",
+      "ATR or stddev"
+    ],
+    "timeframe": "1m|5m",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Gating intraday strategies by regime"
+    ],
+    "avoid_when": [
+      "Sparse prints"
+    ],
+    "example_conditions": [
+      "first15m_range_z(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Extreme opening ranges often imply volatile/choppy sessions.",
+    "Use thresholds (e.g., 0.3–1.5) to gate strategies.",
+    "Combine with open gap and momentum for robustness.",
+    "Compute after the window completes (no lookahead)."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "First N minutes range normalized by volatility."
+}

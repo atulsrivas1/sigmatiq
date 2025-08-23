@@ -1,0 +1,47 @@
+{
+  "strategy_id": "donchian_breakout_trend",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Donchian Breakout (Trend)",
+  "objective": "Classic Donchian breakouts with volume confirmation.",
+  "entry_logic": "close>donchian_upper and vol_z>2",
+  "exit_logic": "trail with ATR or exit on channel re-entry",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "donchian_channel_breakouts_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade real breakouts with a volume spike; avoid wicks.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 10,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Use close beyond channel.",
+    "Set stops just inside channel.",
+    "Avoid low-liquidity.",
+    "Consider partial profits early."
+  ]
+}

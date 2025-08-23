@@ -1,0 +1,25 @@
+{
+  "recipe_id": "relative_strength_rotation_daily",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Relative Strength Rotation (Daily)",
+  "subtitle": "Rotate into leaders with regime context.",
+  "beginner_summary": "Backtest a simple rotation: leaders by momentum proxy with regime check.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "strategy",
+  "target_id": "relative_strength_rotation",
+  "target_version": 1,
+  "defaults": {
+    "operation": "backtest",
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "universe_preset": "sp500",
+    "universe_cap": 500,
+    "throttle_per_min": 1
+  },
+  "risk_profile": "conservative",
+  "universe_preset": "sp500",
+  "sort_rank": 110
+}

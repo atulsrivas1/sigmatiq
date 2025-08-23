@@ -1,0 +1,25 @@
+{
+  "set_id": "options_premium_selector_v1",
+  "version": "1.0.0",
+  "title": "Options Premium Strategy Selector",
+  "purpose": "Choose between premium selling vs buying based on IV regime and momentum.",
+  "components": [
+    {"indicator_id": "iv_rank_52w", "params": {"underlying": "SPY", "window_days": 252}, "role": "iv_rank", "timeframe": "daily"},
+    {"indicator_id": "iv_term_slope", "params": {"underlying": "SPY", "days_fwd": 30, "iv_source": "snapshot"}, "role": "term_structure", "timeframe": "daily"},
+    {"indicator_id": "atm_iv_zscore", "params": {"underlying": "SPY", "window_days": 20}, "role": "iv_short_term", "timeframe": "daily"},
+    {"indicator_id": "momentum", "params": {"column": "close", "window": 50}, "role": "underlying_trend", "timeframe": "daily"}
+  ],
+  "rationale": "High IV rank and contango slope favor premium selling; low IV rank and backwardation may favor buying.",
+  "reading_guide": {"signal_logic": "if iv_rank>0.7 and slope>0 => sell premium; if iv_rank<0.3 and slope<0 and momentum up => buy", "timeframe_alignment": "daily"},
+  "data_requirements": {"inputs": ["IV time series", "daily OHLC"], "timeframe": "daily"},
+  "novice_ready": true,
+  "beginner_summary": "High IV usually favors selling premium; low IV can favor buying if trend helps.",
+  "simple_defaults": {"timeframe": "daily"},
+  "guardrails": {"universe_cap": 100, "throttle_per_min": 1},
+  "assistant_hints": [
+    "High IV rank (>70%) generally favors selling premium.",
+    "Low IV rank (<30%) can favor buying premium if momentum aligns.",
+    "Term slope (contango) supports short vol; backwardation cautions.",
+    "Avoid earnings/major events; IV regime shifts can invert signals."
+  ]
+}

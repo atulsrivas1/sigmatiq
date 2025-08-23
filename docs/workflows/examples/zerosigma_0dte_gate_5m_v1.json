@@ -1,0 +1,28 @@
+{
+  "workflow_id": "zerosigma_0dte_gate_5m_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "0DTE Gate (5 minutes)",
+  "subtitle": "Only trade when intraday conditions are favorable.",
+  "goal": "Stream gate status with reasons.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 5,
+  "prerequisites": ["API at http://localhost:8001", "Intraday data"],
+  "dependencies": {"indicators": ["momentum","first15m_range_z","open_gap_z","atr"], "indicator_sets": ["zerosigma_0dte_gate"], "strategies": ["zerosigma_0dte_scalp_gate"]},
+  "steps": [
+    {
+      "description": "Subscribe to gate with 5m timeframe and throttle.",
+      "rationale": "Stream updates; act only when gate=green.",
+      "api": {"method": "WS", "path": "/ws/indicator_sets", "body": {"action": "subscribe", "set_id": "zerosigma_0dte_gate", "universe": ["SPY"], "timeframe": "5m", "throttle_ms": 5000}},
+      "expects": "match events with gate and reasons"
+    }
+  ],
+  "outputs": ["Gate status with reasons"],
+  "best_when": ["Liquid underlyings during RTH"],
+  "avoid_when": ["Halts, extreme gaps"],
+  "caveats": ["This is context; follow strategy policy"],
+  "links": {"indicator_set": "/catalog/indicator_set/zerosigma_0dte_gate", "strategy": "/catalog/strategy/zerosigma_0dte_scalp_gate"},
+  "novice_ready": true,
+  "beginner_summary": "Use a simple gate to trade 0DTE only when conditions are favorable."
+}

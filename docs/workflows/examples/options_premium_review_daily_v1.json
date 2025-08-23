@@ -1,0 +1,28 @@
+{
+  "workflow_id": "options_premium_review_daily_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Options Premium Review (5 minutes)",
+  "subtitle": "See if premium is rich or cheap vs history.",
+  "goal": "Daily IV regime check with a simple recommendation.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 5,
+  "prerequisites": ["API at http://localhost:8001", "Daily IV data access"],
+  "dependencies": {"indicators": ["iv_rank_52w","vix_term_slope"], "indicator_sets": ["options_premium_selector_v1"], "strategies": ["options_premium_selector"]},
+  "steps": [
+    {
+      "description": "Evaluate options premium context (IV rank + term slope).",
+      "rationale": "High IV favors selling; low IV can favor buying if trend helps.",
+      "api": {"method": "POST", "path": "/indicator_sets/options_premium_selector_v1/evaluate", "body": {"universe": ["SPY"], "timeframe": "daily"}},
+      "expects": "ok:true and context flags"
+    }
+  ],
+  "outputs": ["Premium context flags"],
+  "best_when": ["Calm, liquid markets"],
+  "avoid_when": ["Earnings/events"],
+  "caveats": ["Regimes can flip quickly around events"],
+  "links": {"indicator_set": "/catalog/indicator_set/options_premium_selector_v1", "strategy": "/catalog/strategy/options_premium_selector"},
+  "novice_ready": true,
+  "beginner_summary": "Check IV rank and term structure to decide if premium is rich or cheap."
+}

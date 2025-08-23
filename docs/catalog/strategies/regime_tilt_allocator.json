@@ -1,0 +1,47 @@
+{
+  "strategy_id": "regime_tilt_allocator",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Regime Tilt Allocator",
+  "objective": "Tilt exposure up/down based on daily regime.",
+  "entry_logic": "calm/trend regime => allow entries; volatile => reduce exposure",
+  "exit_logic": "rebalance on regime change",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "regime_detection_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Adjust exposure by regime to keep risk bounded.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "max_positions": 5,
+    "max_daily_trades": 5,
+    "loss_cap_bps": 50
+  },
+  "assistant_hints": [
+    "Reduce size in high-vol regimes.",
+    "Pause new entries on volatility spikes.",
+    "Review exposure caps weekly.",
+    "Use liquid ETFs for tilts."
+  ]
+}

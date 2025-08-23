@@ -1,0 +1,55 @@
+{
+  "subtitle": "Momentum oscillator (0–100) to spot overbought/oversold.",
+  "tags": [
+    "momentum",
+    "oscillator",
+    "beginner",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Above 70 often overbought; below 30 oversold. Crosses of 50 can mark trend bias.",
+    "typical_ranges": "20–80 common; 30/70 for extremes; use 40/60 in strong trends.",
+    "caveats": "RSI can stay extreme during strong trends; extremes alone are not entry signals.",
+    "what_it_measures": "Relative Strength Index — momentum oscillator 0–100."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "5m | hourly | daily",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Range‑bound markets",
+      "Slower timeframes reduce noise"
+    ],
+    "avoid_when": [
+      "News spikes",
+      "Very low liquidity"
+    ],
+    "example_conditions": [
+      "rsi(period=14) < 30",
+      "rsi(period=14) crosses above 30"
+    ],
+    "step_by_step": [
+      "Pick timeframe",
+      "Choose threshold (30/70)",
+      "Run screen",
+      "Set alert on cross"
+    ]
+  },
+  "performance_hints": {
+    "cost_band": "low",
+    "latency_band": "rt_fast",
+    "stability": "high"
+  },
+  "assistant_hints": [
+    "Use 30/70 as a start; shift to 40/60 in strong trends.",
+    "Prefer crosses back through thresholds over static extremes.",
+    "Combine with trend filter (e.g., EMA) to reduce fade risk.",
+    "Avoid trading solely on RSI during news-driven sessions."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "RSI shows when a symbol may be oversold (<30) or overbought (>70). Use it to quickly find possible rebounds or exhaustion."
+}

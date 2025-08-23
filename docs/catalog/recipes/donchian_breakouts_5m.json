@@ -1,0 +1,25 @@
+{
+  "recipe_id": "donchian_breakouts_5m",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Donchian Breakouts (5m)",
+  "subtitle": "Trade real breaks confirmed by volume.",
+  "beginner_summary": "Scan 5m for Donchian breaks with volume spikes.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "donchian_channel_breakouts_v1",
+  "target_version": 1,
+  "defaults": {
+    "operation": "screen",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 90
+}

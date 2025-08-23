@@ -1,0 +1,24 @@
+{
+  "set_id": "fundamental_tech_hybrid_v1",
+  "version": "1.0.0",
+  "title": "Fundamental‑Technical Hybrid (Awareness)",
+  "purpose": "Surface candidates where technical trend aligns with external fundamentals (placeholder).",
+  "components": [
+    {"indicator_id": "daily_ret", "params": {"underlying": "SPY", "window": 20}, "role": "technical_trend", "timeframe": "daily"},
+    {"indicator_id": "volatility", "params": {"column": "close", "window": 20}, "role": "risk_context", "timeframe": "daily"},
+    {"indicator_id": "momentum", "params": {"column": "close", "window": 50}, "role": "confirmation", "timeframe": "daily"}
+  ],
+  "rationale": "Start with technical alignment; later integrate a fundamental score as a separate signal.",
+  "reading_guide": {"signal_logic": "technical trend up AND reasonable volatility; (future) fundamentals aligned", "timeframe_alignment": "daily"},
+  "data_requirements": {"inputs": ["daily OHLC"], "timeframe": "daily"},
+  "novice_ready": true,
+  "beginner_summary": "Awareness list where technical uptrend aligns with a simple fundamentals cue.",
+  "simple_defaults": {"timeframe": "daily"},
+  "guardrails": {"universe_cap": 500, "throttle_per_min": 1},
+  "assistant_hints": [
+    "Treat fundamentals as a separate gate; avoid overfitting.",
+    "Use daily timeframe for stability; ignore intraday noise.",
+    "Align technical trend first; then apply fundamental tilt.",
+    "Refresh fundamentals on schedule; avoid stale signals."
+  ]
+}

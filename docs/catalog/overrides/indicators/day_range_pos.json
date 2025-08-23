@@ -1,0 +1,47 @@
+{
+  "subtitle": "Position of current price within today’s high-low range.",
+  "tags": [
+    "intraday",
+    "session_range",
+    "context",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "0 = session low, 1 = session high; 0.5 = mid.",
+    "typical_ranges": "Resets daily; interpret relative to 0.5.",
+    "caveats": "Can bounce around mid in chop.",
+    "what_it_measures": "Day Range Pos derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "intraday high",
+      "intraday low",
+      "close"
+    ],
+    "timeframe": "1m | 5m",
+    "lookback": null
+  },
+  "usage": {
+    "best_when": [
+      "Context for timing entries"
+    ],
+    "avoid_when": [
+      "Tight ranges"
+    ],
+    "example_conditions": [
+      "day_range_pos() < 0.2 for bargain hunting"
+    ],
+    "step_by_step": [
+      "Compute today’s high/low",
+      "Map close to [0,1]"
+    ]
+  },
+  "assistant_hints": [
+    "Avoid early minutes; range not established yet.",
+    "Use with volume/volatility context to avoid chop traps.",
+    "High values near 1.0 often imply momentum continuation risk for fades.",
+    "Combine with VWAP/EMA for better timing."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Position of current price within today’s high-low range."
+}

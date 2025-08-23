@@ -1,0 +1,43 @@
+{
+  "subtitle": "Percentage Price Oscillator — MACD in percent terms.",
+  "tags": [
+    "momentum",
+    "trend",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Above signal = bullish; below = bearish; percentages make cross‑symbol comparisons easier.",
+    "typical_ranges": "Fast/slow/signal 12/26/9 common.",
+    "caveats": "Similar to MACD; avoid redundancy if both present.",
+    "what_it_measures": "Percentage Price Oscillator — MACD variant normalized by price."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 26
+  },
+  "usage": {
+    "best_when": [
+      "Trend confirmation with cross‑asset comparisons"
+    ],
+    "avoid_when": [
+      "Redundant with MACD"
+    ],
+    "example_conditions": [
+      "ppo(fast=12,slow=26,signal=9) crosses above signal"
+    ],
+    "step_by_step": [
+      "Use defaults",
+      "Alert on cross"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Percentage Price Oscillator — MACD in percent terms.",
+  "assistant_hints": [
+    "Use with trend to avoid chop.",
+    "Normalize across prices.",
+    "Confirm with higher timeframe."
+  ]
+}

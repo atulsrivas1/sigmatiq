@@ -1,0 +1,25 @@
+{
+  "recipe_id": "swing_trend_follow_backtest_hourly",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Swing Trend Follow (Hourly)",
+  "subtitle": "EMA/MACD confirmation with ATR brackets.",
+  "beginner_summary": "Backtest swing trend-follow with ATR-based brackets.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "strategy",
+  "target_id": "swing_trend_follow",
+  "target_version": 1,
+  "defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 115
+}

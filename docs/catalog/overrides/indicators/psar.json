@@ -1,0 +1,45 @@
+{
+  "subtitle": "Parabolic SAR — trend following stop/exit indicator.",
+  "tags": [
+    "trend",
+    "exit",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Dots below price indicate uptrend; above indicate downtrend. Flips can be exit cues.",
+    "typical_ranges": "Step 0.02, max 0.2 common defaults.",
+    "caveats": "Sensitive to sudden reversals; use as trailing guide, not sole entry.",
+    "what_it_measures": "Parabolic SAR — trailing stop indicator."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 100
+  },
+  "usage": {
+    "best_when": [
+      "Managing exits in trends"
+    ],
+    "avoid_when": [
+      "Whipsaw environments"
+    ],
+    "example_conditions": [
+      "psar(step=0.02,max_step=0.2) flips"
+    ],
+    "step_by_step": [
+      "Use defaults",
+      "Trail exits with PSAR flips"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Parabolic SAR — trend following stop/exit indicator.",
+  "assistant_hints": [
+    "Works in trends, whipsaws in ranges.",
+    "Use as trailing stop, not entry.",
+    "Adjust acceleration for sensitivity."
+  ]
+}

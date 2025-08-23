@@ -1,0 +1,41 @@
+{
+  "subtitle": "Daily EMA — higher timeframe trend filter.",
+  "tags": [
+    "trend",
+    "daily",
+    "filter",
+    "beginner"
+  ],
+  "measures": {
+    "what_it_measures": "Smoothed average of daily closes to reveal trend.",
+    "how_to_read": "Price above daily EMA suggests bullish bias; below suggests bearish bias.",
+    "typical_ranges": "20/50 commonly used.",
+    "caveats": "Lagging; intraday moves can diverge from daily."
+  },
+  "data_requirements": {
+    "inputs": [
+      "daily close"
+    ],
+    "timeframe": "daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Aligning intraday trades with daily trend"
+    ],
+    "avoid_when": [
+      "Counter-trend scalps"
+    ],
+    "example_conditions": [
+      "daily_ema(underlying='SPY', window=20)"
+    ]
+  },
+  "assistant_hints": [
+    "Use daily EMA as bias; not a precise trigger.",
+    "Require intraday alignment (e.g., hourly EMA) before entries.",
+    "Re‑evaluate bias when price decisively crosses daily EMA.",
+    "Beware of whipsaws around the EMA in sideways markets."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Daily EMA — higher timeframe trend filter."
+}

@@ -1,0 +1,43 @@
+{
+  "subtitle": "Opening gap normalized by volatility — gauges shock at the open.",
+  "tags": [
+    "intraday",
+    "open",
+    "risk",
+    "gating"
+  ],
+  "measures": {
+    "how_to_read": "> 1.0 large gap vs ATR/STD; sign indicates up/down gap.",
+    "typical_ranges": "Most days within ±1.0; >2.0 is unusual.",
+    "caveats": "Depends on data quality and normalization choice.",
+    "what_it_measures": "Opening gap size normalized by ATR."
+  },
+  "data_requirements": {
+    "inputs": [
+      "date",
+      "open",
+      "prev_close",
+      "ATR or stddev"
+    ],
+    "timeframe": "daily+intraday",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Gating 0DTE or open-only strategies"
+    ],
+    "avoid_when": [
+      "Illiquid names"
+    ],
+    "example_conditions": [
+      "abs(open_gap_z(ticker=\"SPY\")) < 2.0"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Opening gap normalized by volatility — gauges shock at the open.",
+  "assistant_hints": [
+    "Avoid fading extreme gaps.",
+    "Wait for first minutes to settle.",
+    "Gate entries by gap size."
+  ]
+}

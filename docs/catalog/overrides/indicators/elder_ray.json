@@ -1,0 +1,42 @@
+{
+  "subtitle": "Elder Ray Index — bull/bear power vs EMA.",
+  "tags": [
+    "trend",
+    "strength",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Bull Power = high - EMA; Bear Power = low - EMA; positive/negative show pressure.",
+    "typical_ranges": "Depends on EMA window and volatility.",
+    "caveats": "EMA choice matters; interpret direction with care.",
+    "what_it_measures": "Elder Ray derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 13
+  },
+  "usage": {
+    "best_when": [
+      "Assessing buying/selling pressure"
+    ],
+    "avoid_when": [
+      "Low signal-to-noise environments"
+    ],
+    "example_conditions": [
+      "elder_ray(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Interpret Bull/Bear Power relative to an EMA baseline.",
+    "Rising Bull Power in uptrends adds conviction to pullbacks.",
+    "Focus on direction/peaks rather than raw values.",
+    "Use with trend filters and volume for robustness."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Elder Ray Index — bull/bear power vs EMA."
+}

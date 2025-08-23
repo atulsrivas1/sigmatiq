@@ -1,0 +1,25 @@
+{
+  "set_id": "breakout_pullback_v1",
+  "version": "1.0.0",
+  "title": "Breakout Pullback Entry",
+  "purpose": "Enter on first pullback after breakout to EMA/VWAP with volume confirmation.",
+  "components": [
+    {"indicator_id": "donchian", "params": {"window": 20}, "role": "breakout", "timeframe": "5m"},
+    {"indicator_id": "ema", "params": {"column": "close", "window": 20}, "role": "pullback_level", "timeframe": "5m"},
+    {"indicator_id": "intraday_vwap", "params": {"price_col": "close", "volume_col": "volume"}, "role": "pullback_level", "timeframe": "5m"},
+    {"indicator_id": "vol_zscore", "params": {"window": 20}, "role": "volume_confirm", "timeframe": "5m"}
+  ],
+  "rationale": "Use Donchian breakout to locate momentum and buy pullbacks to EMA/VWAP when volume remains healthy.",
+  "reading_guide": {"signal_logic": "(close>donchian_upper_20) THEN wait for close near ema20 or vwap AND vol_z>0", "timeframe_alignment": "5m"},
+  "data_requirements": {"inputs": ["5m OHLCV"], "timeframe": "5m"},
+  "novice_ready": true,
+  "beginner_summary": "Enter after a breakout on the first pullback to EMA or VWAP with healthy volume.",
+  "simple_defaults": {"timeframe": "5m"},
+  "guardrails": {"universe_cap": 200, "throttle_per_min": 2},
+  "assistant_hints": [
+    "Confirm breakout with a close beyond range, not a wick.",
+    "Enter on first clean pullback to EMA/VWAP with support.",
+    "Avoid entries if volume dries up on the pullback.",
+    "Use stops below pullback swing or VWAP band; predefine risk."
+  ]
+}

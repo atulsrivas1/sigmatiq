@@ -1,0 +1,26 @@
+{
+  "recipe_id": "macd_cross_alerts_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "MACD Cross Alerts",
+  "subtitle": "Get notified when momentum flips",
+  "beginner_summary": "Alerts you when MACD crosses its signal line — a simple, popular momentum cue.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator",
+  "target_id": "macd",
+  "target_version": 1,
+  "defaults": {
+    "operation": "alert",
+    "timeframe": "hourly",
+    "params": { "fast": 12, "slow": 26, "signal": 9, "cross": "any" }
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 1
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 20
+}

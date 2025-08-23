@@ -1,0 +1,28 @@
+{
+  "workflow_id": "breakout_pullback_scan_5m_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Scan Breakout Pullbacks (10 minutes)",
+  "subtitle": "Find first pullbacks after real breakouts with volume support.",
+  "goal": "Get a ranked list of candidates using the Breakout Pullback set.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": ["API at http://localhost:8001", "Watchlist or a universe preset"],
+  "dependencies": {"indicators": ["donchian","ema","intraday_vwap","vol_zscore"], "indicator_sets": ["breakout_pullback_v1"], "strategies": []},
+  "steps": [
+    {
+      "description": "Evaluate the breakout pullback set at 5m timeframe.",
+      "rationale": "Runs the components and returns matches with context.",
+      "api": {"method": "POST", "path": "/indicator_sets/breakout_pullback_v1/evaluate", "body": {"universe": ["SPY","AAPL"], "timeframe": "5m"}},
+      "expects": "ok:true and matches with reasons"
+    }
+  ],
+  "outputs": ["Ranked list: { symbol, ts, reason }"],
+  "best_when": ["Post‑consolidation breakouts", "Liquid names"],
+  "avoid_when": ["Low liquidity", "Broad chop"],
+  "caveats": ["False breaks without volume"],
+  "links": {"indicator_set": "/catalog/indicator_set/breakout_pullback_v1"},
+  "novice_ready": true,
+  "beginner_summary": "Scan for first pullbacks after real breakouts using a 5m preset."
+}

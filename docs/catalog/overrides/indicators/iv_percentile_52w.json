@@ -1,0 +1,40 @@
+{
+  "subtitle": "IV Percentile (52w) — fraction of past days with IV ≤ today.",
+  "tags": [
+    "options_volatility",
+    "iv_rank",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "0.9 means 90% of days had lower IV; 0.1 means IV is low vs history.",
+    "typical_ranges": "0–1 by construction.",
+    "caveats": "Sensitive to outliers; rank vs percentile differ slightly.",
+    "what_it_measures": "Percentile rank of IV vs 52-week history."
+  },
+  "data_requirements": {
+    "inputs": [
+      "ATM IV time series"
+    ],
+    "timeframe": "daily",
+    "lookback": 252
+  },
+  "usage": {
+    "best_when": [
+      "Premium strategy selection"
+    ],
+    "avoid_when": [
+      "Sparse IV series"
+    ],
+    "example_conditions": [
+      "iv_percentile_52w(underlying=\"SPY\") > 80"
+    ]
+  },
+  "assistant_hints": [
+    "High percentile suggests rich IV; low suggests cheap IV.",
+    "Percentile vs rank differ subtly; be consistent in selection.",
+    "Outliers skew percentiles — review window and cleaning.",
+    "Use with momentum/regime to avoid fighting market direction."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "IV Percentile (52w) — fraction of past days with IV ≤ today."
+}

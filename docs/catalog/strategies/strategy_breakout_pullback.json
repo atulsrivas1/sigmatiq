@@ -1,0 +1,24 @@
+{
+  "strategy_id": "breakout_pullback_entry",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Breakout Pullback Entry",
+  "objective": "Enter on first pullback after a confirmed breakout with volume.",
+  "entry_logic": "close > donchian_high and vol_z > 2 then enter on pullback to ema20 or vwap",
+  "exit_logic": "target: prior high + ATR, stop: pullback swing low",
+  "risk": {"position_sizing": "fixed_fraction", "stops_targets": "ATR(14) x1.0/1.5"},
+  "execution_policy": {"order_types": ["limit"], "hours": "RTH", "slippage_model": "bps:1.0"},
+  "pre_reqs": {"indicator_sets_used": ["breakout_pullback_v1"]},
+  "performance_snapshot": {"winrate_range": "45–55%", "dd_range": "5–12%"},
+  "caveats": "False breakouts in chop; require volume confirmation.",
+  "novice_ready": true,
+  "beginner_summary": "Buy the first clean pullback after a real breakout, with volume.",
+  "simple_defaults": {"operation": "backtest", "timeframe": "5m"},
+  "guardrails": {"max_positions": 2, "max_daily_trades": 8, "loss_cap_bps": 75},
+  "assistant_hints": [
+    "Wait for a close beyond the range before calling it a breakout.",
+    "Use volume z-score > 2 as a confirm.",
+    "Enter on the first pullback to EMA20/VWAP with support.",
+    "Prefer liquid tickers; avoid thin names."
+  ]
+}

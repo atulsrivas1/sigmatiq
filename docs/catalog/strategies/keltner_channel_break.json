@@ -1,0 +1,47 @@
+{
+  "strategy_id": "keltner_channel_break",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Keltner Channel Break",
+  "objective": "Trade Keltner channel breaks aligned with EMA trend.",
+  "entry_logic": "close>keltner_upper and close>ema20",
+  "exit_logic": "exit on midline retest or ATR trail",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "keltner_channel_trend_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Continuation trades on channel breaks with EMA alignment.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 6,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Confirm with EMA direction.",
+    "Avoid chop.",
+    "Use midline for pullbacks.",
+    "Size by ATR."
+  ]
+}

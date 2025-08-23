@@ -1,0 +1,45 @@
+{
+  "subtitle": "Williams %R — overbought/oversold oscillator.",
+  "tags": [
+    "oscillator",
+    "mean_reversion",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "Above -20 overbought; below -80 oversold.",
+    "typical_ranges": "Lookback 14 common; thresholds -20/-80.",
+    "caveats": "Similar to Stochastic; choose one to avoid redundancy.",
+    "what_it_measures": "Williams R derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Range‑bound markets"
+    ],
+    "avoid_when": [
+      "Strong trends"
+    ],
+    "example_conditions": [
+      "williams_r(period=14) < -80"
+    ],
+    "step_by_step": [
+      "Pick period",
+      "Screen for extremes"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Williams %R — overbought/oversold oscillator.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

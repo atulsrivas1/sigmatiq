@@ -1,0 +1,51 @@
+{
+  "set_id": "relative_strength_rotation_v1",
+  "version": "1.0.0",
+  "title": "Relative Strength Rotation",
+  "purpose": "Surface leaders by momentum and simple risk context for rotation.",
+  "components": [
+    {
+      "indicator_id": "momentum",
+      "params": {
+        "column": "close",
+        "window": 50
+      },
+      "role": "rs_proxy",
+      "timeframe": "daily"
+    },
+    {
+      "indicator_id": "vix_level",
+      "params": {
+        "index_ticker": "^VIX"
+      },
+      "role": "risk_context",
+      "timeframe": "daily"
+    }
+  ],
+  "rationale": "Surface leaders by momentum and simple risk context for rotation.",
+  "reading_guide": {
+    "signal_logic": "momentum strong vs peers; prefer calm VIX regimes",
+    "timeframe_alignment": "daily"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "daily"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Find leaders by momentum (as a proxy for RS) with basic risk context.",
+  "simple_defaults": {
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Compare symbols within a universe.",
+    "Avoid thinly traded names.",
+    "Review regime context before rotating.",
+    "Use daily timeframe for stability."
+  ]
+}

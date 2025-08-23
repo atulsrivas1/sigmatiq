@@ -1,0 +1,44 @@
+{
+  "subtitle": "Slope of EMA — direction and steepness of trend.",
+  "tags": [
+    "trend",
+    "intermediate",
+    "gating"
+  ],
+  "measures": {
+    "how_to_read": "Positive slope indicates uptrend acceleration; negative slope indicates downtrend.",
+    "typical_ranges": "Ticker and timeframe dependent; compare relative to history.",
+    "caveats": "Can flip rapidly on very short windows; smooth as needed.",
+    "what_it_measures": "Ema Slope derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "As a trend filter for entries"
+    ],
+    "avoid_when": [
+      "Noisy 1–2 bar windows"
+    ],
+    "example_conditions": [
+      "ema_slope(window=20, period=1) > 0"
+    ],
+    "step_by_step": [
+      "Pick EMA window",
+      "Require slope > 0 for long setups"
+    ]
+  },
+  "assistant_hints": [
+    "Positive slope supports long bias; negative supports short bias.",
+    "Magnitude matters — compare to historical distribution.",
+    "Smooth or step up timeframe to reduce noise.",
+    "Pair with EMA distance/cross for entries."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Slope of EMA — direction and steepness of trend."
+}

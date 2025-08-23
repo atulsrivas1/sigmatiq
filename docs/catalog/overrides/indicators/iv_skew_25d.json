@@ -1,0 +1,40 @@
+{
+  "subtitle": "25‑delta skew — difference between 25Δ call and put IVs.",
+  "tags": [
+    "options_volatility",
+    "iv_skew",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "> 0 calls > puts (call‑skew); < 0 put‑skew (common in equities).",
+    "typical_ranges": "Small absolute values; watch for regime shifts.",
+    "caveats": "Delta estimates and sampling windows affect values.",
+    "what_it_measures": "Iv Skew 25D derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option quotes or snapshots"
+    ],
+    "timeframe": "daily|intraday",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Context for directional/vol trades"
+    ],
+    "avoid_when": [
+      "Sparse quotes"
+    ],
+    "example_conditions": [
+      "iv_skew_25d(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Negative skew (equities) implies pricier puts — downside demand.",
+    "Use within-ticker comparisons; cross-asset skew differs structurally.",
+    "Treat as context for strategy selection (e.g., risk reversals).",
+    "Delta method and data sampling matter; be consistent."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "25‑delta skew — difference between 25Δ call and put IVs."
+}

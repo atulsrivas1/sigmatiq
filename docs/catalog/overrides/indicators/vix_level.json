@@ -1,0 +1,46 @@
+{
+  "subtitle": "VIX level — market fear proxy for regime gating.",
+  "tags": [
+    "regime",
+    "risk",
+    "beginner",
+    "gating"
+  ],
+  "measures": {
+    "how_to_read": "Higher VIX implies higher market volatility and risk; many systems reduce risk above thresholds (e.g., 25).",
+    "typical_ranges": "10–35 typical; >40 rare stress events.",
+    "caveats": "VIX applies to S&P 500; relevance varies by asset.",
+    "what_it_measures": "CBOE VIX level — implied vol of S&P 500 options."
+  },
+  "data_requirements": {
+    "inputs": [
+      "^VIX"
+    ],
+    "timeframe": "daily | hourly",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Portfolio/risk gating"
+    ],
+    "avoid_when": [
+      "Non‑equity assets without correlation"
+    ],
+    "example_conditions": [
+      "vix_level(index_ticker=^VIX) > 25"
+    ],
+    "step_by_step": [
+      "Fetch VIX",
+      "Compare to thresholds",
+      "Gate strategies accordingly"
+    ]
+  },
+  "assistant_hints": [
+    "Use as a risk gate/tilt, not an entry signal.",
+    "Thresholds are policy choices; 20–25 often a caution zone.",
+    "Daily values are stabler than intraday for gating.",
+    "Pair with IV rank or momentum for nuanced decisions."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "VIX level — market fear proxy for regime gating."
+}

@@ -1,0 +1,24 @@
+{
+  "strategy_id": "mean_reversion_bands",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Mean Reversion at Bands",
+  "objective": "Fade extremes at Bollinger bands with oscillator confirmation.",
+  "entry_logic": "(close <= bb_lower_20 AND rsi<30 AND stoch_rsi up) OR (close >= bb_upper_20 AND rsi>70 AND stoch_rsi down)",
+  "exit_logic": "target: mid-band; stop: beyond band by ATR",
+  "risk": {"position_sizing": "fixed_fraction", "stops_targets": "ATR(14) x1.0"},
+  "execution_policy": {"order_types": ["limit"], "hours": "RTH", "slippage_model": "bps:1.0"},
+  "pre_reqs": {"indicator_sets_used": ["mean_reversion_bands_v1"]},
+  "performance_snapshot": {"winrate_range": "45–55%", "dd_range": "6–12%"},
+  "caveats": "Strong trends can overrun reversions; require oscillator turn.",
+  "novice_ready": true,
+  "beginner_summary": "Fade band extremes only when RSI/StochRSI turn; take profits at mid-band.",
+  "simple_defaults": {"operation": "backtest", "timeframe": "hourly"},
+  "guardrails": {"max_positions": 2, "max_daily_trades": 6, "loss_cap_bps": 75},
+  "assistant_hints": [
+    "Avoid fighting strong trends; wait for oscillator turn.",
+    "Use mid-band as a first target to reduce whipsaw.",
+    "Do not enter on thinly traded names.",
+    "Confirm with volume context when possible."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "breakout_with_volume_scanner_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Find Breakouts with Volume (10 minutes)",
+  "subtitle": "Use a preset indicator set to catch breakouts confirmed by volume.",
+  "goal": "Get a ranked list of breakout candidates using a 5m breakout preset.",
+  "persona": "day_trader",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": [
+    "API at http://localhost:8001",
+    "Watchlist or universe preset"
+  ],
+  "dependencies": {
+    "indicators": [
+      "donchian",
+      "macd",
+      "vol_zscore",
+      "obv"
+    ],
+    "indicator_sets": [
+      "momentum_breakout_v1"
+    ],
+    "strategies": []
+  },
+  "steps": [
+    {
+      "description": "Load the 'Momentum Breakout' set and review components.",
+      "rationale": "Know what the scanner checks: range + trend + volume.",
+      "api": {
+        "method": "GET",
+        "path": "/catalog/indicator_set/momentum_breakout_v1"
+      },
+      "expects": "Components list and signal logic"
+    },
+    {
+      "description": "Evaluate the set on your universe at 5‑minute timeframe.",
+      "rationale": "Runs all components and returns matches.",
+      "api": {
+        "method": "POST",
+        "path": "/indicator_sets/momentum_breakout_v1/evaluate",
+        "body": {
+          "universe": [
+            "SPY",
+            "AAPL"
+          ],
+          "timeframe": "5m"
+        }
+      },
+      "expects": "ok:true and matches with confidence"
+    }
+  ],
+  "outputs": [
+    "Ranked list of breakout candidates"
+  ],
+  "best_when": [
+    "Post‑consolidation breakouts"
+  ],
+  "avoid_when": [
+    "Low liquidity, earnings day"
+  ],
+  "caveats": [
+    "Breakouts can fail; use stops"
+  ],
+  "media": {
+    "cover_uri": "/static/workflows/breakout_cover.png"
+  },
+  "links": {
+    "indicator_set": "/catalog/indicator_set/momentum_breakout_v1"
+  },
+  "research": {
+    "references": [
+      {
+        "title": "Turtle Trading (Donchian)",
+        "url": "https://en.wikipedia.org/wiki/Turtle_trading"
+      }
+    ]
+  },
+  "lineage": {
+    "content_version": "1.0.0"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Use a preset indicator set to catch breakouts confirmed by volume."
+}

@@ -1,0 +1,28 @@
+{
+  "strategy_id": "vwap_reversion_intraday",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "VWAP Reversion (Intraday)",
+  "objective": "Fade stretched moves back to VWAP on intraday timeframes.",
+  "entry_logic": "abs(price - vwap) / vwap > 0.005 and session_liquidity_ok",
+  "exit_logic": "reversion_to_vwap or time_stop 10m",
+  "risk": {"position_sizing": "fixed_risk", "stops_targets": "ATR(14) x1.0", "daily_loss_limit": "-2%"},
+  "execution_policy": {"slippage_model": "bps:1.0", "order_types": ["limit"], "hours": "RTH"},
+  "pre_reqs": {"datasets": ["intraday bars"], "indicator_sets_used": ["vwap_distance_obv_v1"]},
+  "performance_snapshot": {"sharpe_range": "0.8–1.2 typical", "dd_range": "5–12%"},
+  "caveats": "Choppy sessions and halts can degrade performance.",
+  "compliance_note": "For education only; not investment advice.",
+  "media": {"diagram_uri": "/static/catalog/strategies/vwap_flow.svg"},
+  "lineage": {"code_version": "1.0.0", "git_sha": "<sha>"}
+,
+  "novice_ready": true,
+  "beginner_summary": "Fade stretched intraday moves back to VWAP with tight risk controls.",
+  "simple_defaults": {"operation": "backtest", "timeframe": "1m"},
+  "guardrails": {"max_positions": 1, "max_daily_trades": 5, "loss_cap_bps": 50},
+  "assistant_hints": [
+    "Only trade liquid symbols during RTH.",
+    "Require volume support; avoid fading news spikes.",
+    "Use ATR-based stops and strict daily loss limits.",
+    "Prefer small, repeatable edges over home runs."
+  ]
+}

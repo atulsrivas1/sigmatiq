@@ -1,0 +1,42 @@
+{
+  "subtitle": "Daily VWAP — session average price reference.",
+  "tags": [
+    "volume",
+    "vwap",
+    "daily",
+    "reference"
+  ],
+  "measures": {
+    "how_to_read": "Price above daily VWAP suggests buyer control; below suggests seller control.",
+    "typical_ranges": "N/A — VWAP is a reference curve per session.",
+    "caveats": "Resets each day; intraday VWAP differs from prior day VWAP.",
+    "what_it_measures": "Daily Vwap derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "daily price",
+      "daily volume"
+    ],
+    "timeframe": "daily",
+    "lookback": null
+  },
+  "usage": {
+    "best_when": [
+      "Context for intraday entries"
+    ],
+    "avoid_when": [
+      "Comparing across sessions without context"
+    ],
+    "example_conditions": [
+      "close crosses above daily_vwap(underlying='SPY')"
+    ]
+  },
+  "assistant_hints": [
+    "Treat daily VWAP as a bias/reference, not a trigger.",
+    "Mind overnight gaps; prior-day VWAP may be far from open.",
+    "Pair with intraday VWAP and EMA for entries.",
+    "Avoid illiquid days where VWAP is unstable."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Daily VWAP — session average price reference."
+}

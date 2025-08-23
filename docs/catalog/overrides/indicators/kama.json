@@ -1,0 +1,40 @@
+{
+  "subtitle": "Kaufman Adaptive Moving Average — adapts speed to noise.",
+  "tags": [
+    "trend",
+    "adaptive",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Tracks trend while slowing in noise; compare price vs KAMA.",
+    "typical_ranges": "ER period ~10; fast/slow 2/30 typical.",
+    "caveats": "More complex; ensure parameter understanding.",
+    "what_it_measures": "Kama derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 10
+  },
+  "usage": {
+    "best_when": [
+      "Reducing whipsaw while following trend"
+    ],
+    "avoid_when": [
+      "Very fast scalping"
+    ],
+    "example_conditions": [
+      "kama(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "KAMA adapts speed to noise; smoother than EMA in chop.",
+    "Use as dynamic support/resistance with pullbacks.",
+    "Confirm with momentum or volume before entries.",
+    "Tune ER/fast/slow to instrument behavior."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Kaufman Adaptive Moving Average — adapts speed to noise."
+}

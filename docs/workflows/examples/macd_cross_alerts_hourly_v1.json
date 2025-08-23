@@ -1,0 +1,28 @@
+{
+  "workflow_id": "macd_cross_alerts_hourly_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "MACD Cross Alerts (5 minutes)",
+  "subtitle": "Get notified when momentum flips on your watchlist.",
+  "goal": "Set hourly MACD cross alerts.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 5,
+  "prerequisites": ["API at http://localhost:8001", "Watchlist or universe preset"],
+  "dependencies": {"indicators": ["macd"], "indicator_sets": [], "strategies": []},
+  "steps": [
+    {
+      "description": "Subscribe to MACD cross events via WebSocket.",
+      "rationale": "Receive alerts as momentum flips.",
+      "api": {"method": "WS", "path": "/ws/indicators", "body": {"action": "screen", "universe": ["SPY", "AAPL"], "condition": {"id": "macd", "params": {"fast": 12, "slow": 26, "signal": 9, "cross": "any"}}, "timeframe": "hourly", "throttle_ms": 60000}},
+      "expects": "match events with symbol and ts"
+    }
+  ],
+  "outputs": ["Alert stream of MACD crosses"],
+  "best_when": ["Trending markets"],
+  "avoid_when": ["Choppy ranges"],
+  "caveats": ["Lagging by design; confirm with trend"],
+  "links": {"indicator": "/catalog/indicator/macd"},
+  "novice_ready": true,
+  "beginner_summary": "Set hourly MACD cross alerts to catch momentum shifts."
+}

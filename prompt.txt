@@ -1,0 +1,302 @@
+# Engineering Research Prompt: Feature/Indicator Sets & Strategic Combinations
+
+## Objective
+Two engineers should research, design, and critically evaluate how indicators and features can be intelligently combined into sets/bundles that solve specific trading problems. Focus on creating meaningful combinations rather than individual indicators.
+
+## Research Assignment
+
+### Phase 1: Independent Research
+
+**Engineer A & Engineer B should separately:**
+
+1. **Study Existing Indicator Combinations**
+   - Research popular indicator sets (e.g., "Triple Screen Trading System", "Squeeze Momentum", "Volume Price Analysis")
+   - Analyze how professional traders combine indicators for confirmation
+   - Document which indicators complement vs. duplicate each other
+   - Study anti-patterns (indicator combinations that don't work well)
+
+2. **Define Feature/Indicator Set Categories**
+   
+   Research and create sets for different trading styles:
+   - **Momentum Sets**: Combinations that identify strong directional moves
+   - **Reversal Sets**: Indicators that together spot turning points
+   - **Volatility Sets**: Features for volatility-based strategies
+   - **Volume Profile Sets**: Volume-based analysis combinations
+   - **Market Regime Sets**: Identifying trending vs. ranging markets
+   - **Risk Management Sets**: Protective indicator combinations
+   - **Options-Specific Sets**: Greeks + underlying indicators
+   - **Scalping Sets**: Ultra-fast timeframe combinations
+   - **Swing Trading Sets**: Multi-timeframe analysis bundles
+   - **Fundamental-Technical Hybrid Sets**: Mixing data types
+
+3. **Document Each Set** with:
+   - Set name and purpose
+   - Component indicators/features (minimum 3, maximum 7)
+   - Why these specific indicators work together
+   - Conflicting signals handling
+   - Weighting/priority of each component
+   - Market conditions where set performs best/worst
+   - Backtesting results (if available)
+
+4. **Create Interaction Matrix**
+   Map how indicators interact:
+   - Complementary pairs (RSI + Volume)
+   - Redundant pairs (RSI + Stochastic)
+   - Conflicting pairs (Momentum + Mean Reversion)
+   - Enhancement relationships (MACD enhanced by Volume)
+
+### Phase 2: Collaborative Design Session
+
+**Agenda:**
+
+#### Part A: Set Architecture Design
+- How should sets be structured in the system?
+- Static sets vs. dynamic composition
+- Set inheritance and variations
+- Parameter optimization within sets
+- Version control for set definitions
+
+#### Part B: Smart Combination Engine
+Design a system that:
+- Prevents redundant indicator combinations
+- Suggests complementary indicators
+- Warns about conflicting signals
+- Optimizes computational efficiency
+- Handles different timeframes within a set
+
+#### Part C: Set Templates & Presets
+Create templates for:
+- Beginner-friendly sets
+- Professional day trading sets
+- Long-term investment sets
+- Crypto-specific sets
+- Options trading sets
+- Market-making sets
+
+#### Part D: Critical Analysis
+**Role reversal - challenge each other's sets:**
+
+**Engineer A challenges Engineer B's sets:**
+- Over-optimization risks
+- Market regime dependencies
+- Computational complexity
+- Signal clarity issues
+- Backtest overfitting potential
+
+**Engineer B challenges Engineer A's sets:**
+- Missing risk controls
+- Unclear entry/exit logic
+- Correlation problems
+- Latency implications
+- Data requirements feasibility
+
+### Phase 3: Advanced Set Features
+
+Explore and design:
+
+1. **Adaptive Sets**
+   ```
+   Sets that automatically adjust based on:
+   - Market volatility
+   - Time of day
+   - Liquidity conditions
+   - Recent performance
+   ```
+
+2. **Hierarchical Sets**
+   ```
+   Primary Set: Market Regime Detection
+   ├── If Trending: Apply Momentum Set
+   ├── If Ranging: Apply Mean Reversion Set
+   └── If Volatile: Apply Volatility Set
+   ```
+
+3. **Weighted Scoring Systems**
+   ```
+   Example: Bullish Confidence Score
+   - RSI > 50: +2 points
+   - MACD Cross: +3 points
+   - Volume Surge: +2 points
+   - Above 200 MA: +1 point
+   Total Score: 0-8 scale
+   ```
+
+4. **Cross-Asset Sets**
+   ```
+   Combining indicators from:
+   - Underlying stock
+   - Options chain
+   - Sector ETF
+   - Market index
+   - VIX
+   ```
+
+### Phase 4: Implementation Specification
+
+Create detailed specifications for:
+
+1. **Set Definition Schema**
+   ```json
+   {
+     "set_id": "momentum_breakout_v1",
+     "name": "Momentum Breakout Scanner",
+     "category": "momentum",
+     "components": [...],
+     "rules": {...},
+     "weights": {...},
+     "constraints": {...}
+   }
+   ```
+
+2. **Set Computation Pipeline**
+   - Dependency graph for indicator calculation
+   - Parallel vs. sequential processing
+   - Caching strategy for set results
+   - Incremental updates vs. full recalculation
+
+3. **Set Performance Metrics**
+   - Signal accuracy rate
+   - False positive/negative rates
+   - Computational cost per evaluation
+   - Average processing time
+   - Memory footprint
+
+4. **Set Testing Framework**
+   - Unit tests for individual components
+   - Integration tests for complete sets
+   - Performance regression tests
+   - Market regime stress tests
+
+## Key Research Questions
+
+### Strategic Questions
+1. Should sets be immutable or allow user customization?
+2. How do we handle conflicting signals within a set?
+3. What's the optimal number of indicators in a set?
+4. How do we prevent "indicator soup" (too many indicators)?
+5. Should sets include exit conditions or just entry?
+
+### Technical Questions
+1. How do we optimize calculation when multiple sets share indicators?
+2. Real-time set evaluation vs. batch processing?
+3. How to handle missing data for some indicators in a set?
+4. Should sets support machine learning weight optimization?
+5. How do we version control set definitions and handle migrations?
+
+### User Experience Questions
+1. How do users understand what each set does?
+2. Visual representation of multi-indicator signals?
+3. Set recommendation engine based on user goals?
+4. A/B testing different sets in paper trading?
+5. Set performance analytics and reporting?
+
+## Deliverables
+
+### Required Outputs
+1. **20+ Well-Defined Indicator Sets** with complete specifications
+2. **Indicator Interaction Matrix** showing relationships
+3. **Set Architecture Design Document**
+4. **API Specification** for set operations:
+   - Create/modify sets
+   - Evaluate sets
+   - Backtest sets
+   - Subscribe to set signals
+5. **Performance Analysis** for each set type
+6. **Set Template Library** with 10+ ready-to-use templates
+
+### Bonus Deliverables
+1. **ML-Optimized Sets** using feature importance analysis
+2. **Set Builder UI Mockups**
+3. **Set Marketplace Concept** for sharing custom sets
+4. **Academic Research** on indicator combinations that work
+
+## Anti-Patterns to Document
+
+Research and document why these DON'T work:
+1. Too many oscillators together (RSI + Stochastic + Williams %R)
+2. Conflicting timeframe signals without priority
+3. Lagging indicators only (no leading indicators)
+4. Over-reliance on correlated indicators
+5. Ignoring market regime in set selection
+
+## Competitive Analysis Focus
+
+Study how these platforms handle indicator sets:
+- **TradingView**: Pine Script strategies
+- **Thinkorswim**: Studies and strategies
+- **MetaTrader**: Expert Advisors
+- **Bloomberg**: BTST function sets
+- **QuantConnect**: Alpha combinations
+
+## Set Evaluation Criteria
+
+Each set should be evaluated on:
+- **Clarity**: Clear signal generation logic
+- **Reliability**: Consistent performance across market conditions
+- **Efficiency**: Computational resource usage
+- **Uniqueness**: Not duplicating existing sets
+- **Practicality**: Actionable in real trading
+- **Risk-Adjusted Returns**: Sharpe ratio improvement
+
+## Advanced Considerations
+
+### Multi-Timeframe Synchronization
+- How do sets handle 5-min RSI + 1-hour MACD + Daily MA?
+- Time alignment and signal aggregation
+- Preventing look-ahead bias
+
+### Market Microstructure Sets
+- Combining order flow with technical indicators
+- Incorporating Level 2 data into sets
+- Latency-sensitive indicator combinations
+
+### Alternative Data Integration
+- Social sentiment + technical indicators
+- News momentum + price action
+- Fundamental changes + technical triggers
+
+### Portfolio-Level Sets
+- Cross-sectional momentum sets
+- Pairs trading indicator combinations
+- Sector rotation signal sets
+
+## Testing Scenarios
+
+Design sets that handle:
+1. **Flash Crash**: Extreme volatility filtering
+2. **Earnings Season**: Fundamental + technical combination
+3. **Options Expiry**: Greeks-aware indicator sets
+4. **Pre-Market**: Limited data indicator sets
+5. **Crypto 24/7**: Continuous market indicators
+
+## Documentation Standards
+
+For each set, provide:
+1. **Mathematical Definition**: Precise formulas
+2. **Pseudocode**: Implementation logic
+3. **Backtest Results**: Historical performance
+4. **Market Examples**: When it worked/failed
+5. **Risk Warnings**: Limitations and dangers
+
+## Roleplay Perspectives
+
+During critique sessions, adopt these viewpoints:
+
+**The Quant Researcher**: "Show me the statistical significance"
+**The Day Trader**: "Too slow, I need signals in milliseconds"
+**The Risk Manager**: "What's the maximum drawdown?"
+**The Retail Investor**: "This is too complicated"
+**The Market Maker**: "How do I hedge this signal?"
+**The Regulator**: "Prove this isn't market manipulation"
+
+## Final Challenge
+
+Each engineer should create one "Ultimate Set" that:
+- Combines 5-7 indicators optimally
+- Works across multiple market regimes
+- Has clear entry AND exit rules
+- Includes risk management
+- Can be computed in under 50ms
+- Has backtested Sharpe > 1.5
+
+Then swap sets and try to break each other's "Ultimate Set" with edge cases, adverse market conditions, or computational challenges.

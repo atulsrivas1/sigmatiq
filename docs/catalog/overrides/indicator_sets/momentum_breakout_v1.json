@@ -1,0 +1,29 @@
+{
+  "set_id": "momentum_breakout_v1",
+  "version": "1.0.0",
+  "title": "Momentum Breakout Scanner",
+  "purpose": "Find breakouts with trend and volume confirmation.",
+  "components": [
+    {"indicator_id": "donchian", "params": {"window": 20}, "role": "range", "timeframe": "5m"},
+    {"indicator_id": "macd", "params": {"fast": 12, "slow": 26, "signal": 9}, "role": "trend", "timeframe": "5m"},
+    {"indicator_id": "vol_zscore", "params": {"window": 20}, "role": "volume", "timeframe": "5m"},
+    {"indicator_id": "obv", "params": {}, "role": "confirmation", "timeframe": "5m"}
+  ],
+  "rationale": "Breakouts validated by momentum (MACD) and activity (volume/OBV).",
+  "reading_guide": {"signal_logic": "Donchian_high AND MACD_up AND vol_z > 2", "timeframe_alignment": "5m"},
+  "data_requirements": {"inputs": ["OHLCV"], "timeframe": "5m"},
+  "novice_ready": true,
+  "beginner_summary": "Find breakouts confirmed by volume and trend. Use on 5m timeframe with a capped universe.",
+  "simple_defaults": { "timeframe": "5m" },
+  "guardrails": { "universe_cap": 200, "throttle_per_min": 2 },
+  "assistant_hints": [
+    "Breakouts work best after consolidations.",
+    "Use volume spike (Z > 2) as confirmation.",
+    "MACD up helps avoid false breaks in chop.",
+    "5m timeframe balances speed vs noise for most tickers."
+  ],
+  "anti_patterns": [
+    "Scanning during illiquid sessions.",
+    "Chasing without stop/target rules."
+  ]
+}

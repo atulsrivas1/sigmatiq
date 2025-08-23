@@ -1,0 +1,39 @@
+{
+  "subtitle": "Trend in open interest — multi-day accumulation or reduction.",
+  "tags": [
+    "options_flow",
+    "trend",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Rising OI trend suggests growing participation; falling suggests unwind.",
+    "typical_ranges": "Ticker dependent.",
+    "caveats": "OI direction alone doesn’t imply bullish/bearish without price context.",
+    "what_it_measures": "Oi Trend derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option chain OI"
+    ],
+    "timeframe": "daily",
+    "lookback": 5
+  },
+  "usage": {
+    "best_when": [
+      "Supporting evidence with price and IV"
+    ],
+    "avoid_when": [
+      "Data gaps"
+    ],
+    "example_conditions": [
+      "oi_trend(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Trend in open interest — multi-day accumulation or reduction.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

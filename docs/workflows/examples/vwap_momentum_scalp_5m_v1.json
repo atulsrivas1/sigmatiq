@@ -1,0 +1,26 @@
+{
+  "workflow_id": "vwap_momentum_scalp_5m_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "VWAP Momentum Scalp (5 minutes)",
+  "subtitle": "Trade quick bursts near VWAP only in liquid names.",
+  "goal": "Surface scalp candidates near VWAP with momentum/volume support.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 5,
+  "prerequisites": ["API at http://localhost:8001", "Liquid tickers"],
+  "dependencies": {"indicators": ["close_vs_vwap","obv","vol_zscore","momentum"], "indicator_sets": ["vwap_distance_obv_v1"], "strategies": ["vwap_momentum_scalp"]},
+  "steps": [
+    {"description": "Evaluate VWAP+OBV set at 5m to find stretched moves with flow support.",
+     "rationale": "Confirm momentum bursts near VWAP with volume/flow.",
+     "api": {"method": "POST", "path": "/indicator_sets/vwap_distance_obv_v1/evaluate", "body": {"universe": ["SPY","AAPL"], "timeframe": "5m"}},
+     "expects": "ok:true and candidates with distance/flow flags"}
+  ],
+  "outputs": ["Candidates with VWAP distance and OBV flags"],
+  "best_when": ["Liquid tickers during RTH"],
+  "avoid_when": ["First 1–3 minutes", "Thin names"],
+  "caveats": ["Stops must be tight; throttle entries"],
+  "links": {"indicator_set": "/catalog/indicator_set/vwap_distance_obv_v1", "strategy": "/catalog/strategy/vwap_momentum_scalp"},
+  "novice_ready": true,
+  "beginner_summary": "Find quick momentum bursts near VWAP with OBV/volume support."
+}

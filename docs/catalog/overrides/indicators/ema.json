@@ -1,0 +1,45 @@
+{
+  "subtitle": "Exponential moving average — faster trend line.",
+  "tags": [
+    "trend",
+    "intermediate",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Price above EMA suggests bullish bias; EMA crossovers can mark shifts.",
+    "typical_ranges": "9/20/50 common intraday/swing windows.",
+    "caveats": "More sensitive than SMA; whipsaws more in chop.",
+    "what_it_measures": "Exponential moving average of price to track trend."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Trending markets",
+      "Pullback entries to EMA"
+    ],
+    "avoid_when": [
+      "Sideways chop"
+    ],
+    "example_conditions": [
+      "close crosses above ema(window=20)"
+    ],
+    "step_by_step": [
+      "Pick window",
+      "Use slope or cross as confirmation"
+    ]
+  },
+  "assistant_hints": [
+    "Treat EMA as bias and dynamic level; not a guarantee.",
+    "Use slope and distance to judge quality of pullbacks.",
+    "Pair with higher timeframe EMA to avoid counter‑trend trades.",
+    "Avoid repeated entries if price grinds sideways around EMA."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Exponential moving average — faster trend line."
+}

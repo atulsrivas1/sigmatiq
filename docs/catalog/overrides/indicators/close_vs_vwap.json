@@ -1,0 +1,46 @@
+{
+  "subtitle": "Distance of price from VWAP — intraday stretch.",
+  "tags": [
+    "intraday",
+    "vwap",
+    "mean_reversion",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "Positive = above VWAP; negative = below; larger magnitude = more stretched.",
+    "typical_ranges": "Ticker/session dependent; use % of VWAP.",
+    "caveats": "Resets each session; don’t compare across days directly.",
+    "what_it_measures": "Distance of close from VWAP."
+  },
+  "data_requirements": {
+    "inputs": [
+      "price",
+      "volume"
+    ],
+    "timeframe": "1m | 5m",
+    "lookback": null
+  },
+  "usage": {
+    "best_when": [
+      "Intraday mean reversion"
+    ],
+    "avoid_when": [
+      "Illiquid or erratic open"
+    ],
+    "example_conditions": [
+      "close_vs_vwap(kind='pct') < -0.5%"
+    ],
+    "step_by_step": [
+      "Compute VWAP intraday",
+      "Alert on % deviation"
+    ]
+  },
+  "assistant_hints": [
+    "Set distance bounds to avoid chasing stretched moves.",
+    "VWAP resets daily; evaluate within the same session.",
+    "Avoid first 5–15 minutes if prints are erratic.",
+    "Combine with volume/OBV for better signal quality."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Distance of price from VWAP — intraday stretch."
+}

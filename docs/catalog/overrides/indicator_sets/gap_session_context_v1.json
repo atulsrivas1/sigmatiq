@@ -1,0 +1,63 @@
+{
+  "set_id": "gap_session_context_v1",
+  "version": "1.0.0",
+  "title": "Gap + Session Context",
+  "purpose": "Combine open gap size with first-15m session range and momentum gate.",
+  "components": [
+    {
+      "indicator_id": "open_gap_z",
+      "params": {
+        "ticker": "SPY",
+        "atr_period": 14,
+        "norm": "atr"
+      },
+      "role": "gap",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "first15m_range_z",
+      "params": {
+        "ticker": "SPY",
+        "window_mins": 15,
+        "norm": "atr"
+      },
+      "role": "session_vol",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "momentum",
+      "params": {
+        "column": "close",
+        "window": 10
+      },
+      "role": "momentum_gate",
+      "timeframe": "5m"
+    }
+  ],
+  "rationale": "Combine open gap size with first-15m session range and momentum gate.",
+  "reading_guide": {
+    "signal_logic": "abs(open_gap_z)<2 AND first15m_range_z within [0.3,1.5] AND momentum>0",
+    "timeframe_alignment": "5m"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "5m"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Gate trades after the open using gap size, early session range, and momentum.",
+  "simple_defaults": {
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Avoid extreme gaps.",
+    "Skip illiquid opens.",
+    "Wait for first 5–15 minutes to stabilize.",
+    "Throttle scans to avoid overtrading."
+  ]
+}

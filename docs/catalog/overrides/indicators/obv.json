@@ -1,0 +1,45 @@
+{
+  "subtitle": "On‑Balance Volume — cumulative volume flow with price direction.",
+  "tags": [
+    "volume",
+    "confirmation",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Rising OBV suggests accumulation; falling suggests distribution.",
+    "typical_ranges": "Unbounded; analyze slope/divergence vs price.",
+    "caveats": "Sensitive to gaps and noisy prints; smooth if needed.",
+    "what_it_measures": "On-Balance Volume — cumulative volume flow with price direction."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Confirming breakouts/trends"
+    ],
+    "avoid_when": [
+      "Erratic volume data"
+    ],
+    "example_conditions": [
+      "obv() slope > 0"
+    ],
+    "step_by_step": [
+      "Compute OBV",
+      "Compare slope vs price trend"
+    ]
+  },
+  "assistant_hints": [
+    "Use OBV slope/divergence with price for confirmation.",
+    "Smooth or aggregate if intraday noise is high.",
+    "Pair with breakout tools (Donchian/MACD) for conviction.",
+    "Beware of data glitches; volume quality matters."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "On‑Balance Volume — cumulative volume flow with price direction."
+}

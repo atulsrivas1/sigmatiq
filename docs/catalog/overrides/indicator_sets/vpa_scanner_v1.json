@@ -1,0 +1,24 @@
+{
+  "set_id": "vpa_scanner_v1",
+  "version": "1.0.0",
+  "title": "Volume Price Analysis (VPA) Scanner",
+  "purpose": "Surface unusual volume moves relative to VWAP with OBV trend alignment.",
+  "components": [
+    {"indicator_id": "vol_zscore", "params": {"window": 20}, "role": "volume_spike", "timeframe": "5m"},
+    {"indicator_id": "close_vs_vwap", "params": {"kind": "pct"}, "role": "distance_vwap", "timeframe": "5m"},
+    {"indicator_id": "obv", "params": {}, "role": "flow_trend", "timeframe": "5m"}
+  ],
+  "rationale": "Unusual volume plus favorable distance to VWAP and OBV alignment highlights actionable moves.",
+  "reading_guide": {"signal_logic": "vol_z>2 AND (|close-vwap|/vwap within bounds) AND obv slope aligned", "timeframe_alignment": "5m"},
+  "data_requirements": {"inputs": ["5m OHLCV"], "timeframe": "5m"},
+  "assistant_hints": [
+    "Prioritize volume spikes with OBV trend support.",
+    "Use VWAP distance bounds to avoid chasing extremes.",
+    "Debounce repeated spikes in choppy sessions.",
+    "Filter thinly traded symbols to reduce noise."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Highlights unusual volume moves near VWAP, aligned with OBV trend.",
+  "simple_defaults": { "timeframe": "5m" },
+  "guardrails": { "universe_cap": 200, "throttle_per_min": 2 }
+}

@@ -1,0 +1,110 @@
+{
+  "id": "quick_backtest_pipeline_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Quick Backtest (10 minutes)",
+  "subtitle": "Create model → build → backtest → leaderboard via API.",
+  "goal": "Run an end‑to‑end backtest and view results.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": [
+    "API at http://localhost:8001",
+    "DB configured"
+  ],
+  "dependencies": {
+    "indicators": [],
+    "indicator_sets": [
+      "momentum_breakout_v1"
+    ],
+    "strategies": []
+  },
+  "steps": [
+    {
+      "description": "Create model scaffold (SPY hourly).",
+      "rationale": "Set up config and policy.",
+      "api": {
+        "method": "POST",
+        "path": "/models",
+        "body": {
+          "ticker": "SPY",
+          "asset_type": "eq",
+          "horizon": "swing",
+          "cadence": "hourly",
+          "algo": "gbm",
+          "pack_id": "zerosigma"
+        }
+      },
+      "expects": "ok:true with model_id"
+    },
+    {
+      "description": "Build matrix (Jan–Mar).",
+      "rationale": "Prepare clean dataset.",
+      "api": {
+        "method": "POST",
+        "path": "/build_matrix",
+        "body": {
+          "model_id": "spy_eq_swing_hourly",
+          "pack_id": "zerosigma",
+          "start": "2024-01-01",
+          "end": "2024-03-31",
+          "ticker": "SPY"
+        }
+      },
+      "expects": "ok:true and out_csv path"
+    },
+    {
+      "description": "Backtest thresholds.",
+      "rationale": "Measure performance.",
+      "api": {
+        "method": "POST",
+        "path": "/backtest",
+        "body": {
+          "model_id": "spy_eq_swing_hourly",
+          "thresholds": "0.55,0.60,0.65",
+          "splits": 5,
+          "allowed_hours": "13,14,15",
+          "save": true,
+          "tag": "quick"
+        }
+      },
+      "expects": "ok:true with best_sharpe_hourly"
+    },
+    {
+      "description": "Open leaderboard.",
+      "rationale": "See ranked runs.",
+      "api": {
+        "method": "GET",
+        "path": "/leaderboard",
+        "query": {
+          "model_id": "spy_eq_swing_hourly",
+          "limit": 10
+        }
+      },
+      "expects": "rows list"
+    }
+  ],
+  "outputs": [
+    "Model id",
+    "CSV matrix path",
+    "Backtest run id",
+    "Leaderboard rows"
+  ],
+  "best_when": [
+    "DB configured and data available"
+  ],
+  "avoid_when": [
+    "No API keys"
+  ],
+  "media": {
+    "cover_uri": "/static/workflows/quick_backtest_cover.png"
+  },
+  "links": {
+    "docs": "/docs/PIPELINE_RUNBOOK"
+  },
+  "lineage": {
+    "content_version": "1.0.0"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Create model → build → backtest → leaderboard via API."
+}

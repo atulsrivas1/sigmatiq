@@ -1,0 +1,47 @@
+{
+  "strategy_id": "intraday_momentum",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Intraday Momentum",
+  "objective": "Pick top-confidence names by momentum/volume.",
+  "entry_logic": "momentum>threshold and vol_z>0",
+  "exit_logic": "quick profits; exit on reversal",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "vpa_scanner_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade strong intraday momentum only when volume supports.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 10,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Throttle to avoid overtrading.",
+    "Avoid thin names.",
+    "Use liquid hours.",
+    "Keep stops tight."
+  ]
+}

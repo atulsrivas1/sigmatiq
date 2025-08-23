@@ -1,0 +1,47 @@
+{
+  "strategy_id": "ema_trend_follow_adx_gate",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "EMA Trend Follow (ADX Gate)",
+  "objective": "Follow EMA trend only when ADX is above threshold.",
+  "entry_logic": "close>ema20 and adx>25",
+  "exit_logic": "exit on ema cross down or ATR trail",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "ema_trend_adx_filter_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Trade with EMA trend and require ADX>25 to avoid chop.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 6,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Use ADX to avoid whipsaws.",
+    "Confirm with higher timeframe.",
+    "Use ATR-based trailing stops.",
+    "Avoid news events."
+  ]
+}

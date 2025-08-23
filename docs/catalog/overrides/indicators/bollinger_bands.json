@@ -1,0 +1,48 @@
+{
+  "subtitle": "Bands around a moving average to spot relative extremes.",
+  "tags": [
+    "mean_reversion",
+    "bands",
+    "beginner",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Touches near upper band suggest overextension; lower band suggests oversold. Band width reflects volatility.",
+    "typical_ranges": "20‑period, 2.0 std is a common default.",
+    "caveats": "Bands expand/contract with volatility; touches are frequent in trends.",
+    "what_it_measures": "Moving average with upper/lower bands at N standard deviations."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "15m | hourly | daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Range‑bound markets",
+      "Fade extremes back to mid"
+    ],
+    "avoid_when": [
+      "Strong trends without mean reversion"
+    ],
+    "example_conditions": [
+      "close <= bb_lower_20",
+      "close crosses above bb_mid_20"
+    ],
+    "step_by_step": [
+      "Pick window (20)",
+      "Use 2.0 std",
+      "Alert on touch + exit near mid"
+    ]
+  },
+  "assistant_hints": [
+    "Wait for confirmation (rejection/close) at bands; don’t auto‑fade.",
+    "Target mid‑band for partial exits to reduce whipsaws.",
+    "Avoid fading during strong trends; use a trend filter.",
+    "Adjust std/window by timeframe and volatility."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Bands around a moving average to spot relative extremes."
+}

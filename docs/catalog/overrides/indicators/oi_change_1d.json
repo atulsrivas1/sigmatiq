@@ -1,0 +1,39 @@
+{
+  "subtitle": "Day-over-day change in options open interest — flow context.",
+  "tags": [
+    "options_flow",
+    "context",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "> 0 increasing positioning; < 0 decreasing.",
+    "typical_ranges": "Ticker dependent; use percent changes.",
+    "caveats": "OI updates lag; vendor differences.",
+    "what_it_measures": "Oi Change 1D derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option chain OI"
+    ],
+    "timeframe": "daily",
+    "lookback": 2
+  },
+  "usage": {
+    "best_when": [
+      "Context alongside price/volume"
+    ],
+    "avoid_when": [
+      "Sparse chain data"
+    ],
+    "example_conditions": [
+      "oi_change_1d(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Day-over-day change in options open interest — flow context.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

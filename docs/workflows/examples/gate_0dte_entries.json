@@ -1,0 +1,83 @@
+{
+  "id": "gate_0dte_entries_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Gate 0DTE Entries (10 minutes)",
+  "subtitle": "Use a momentum and session preset to gate intraday options entries.",
+  "goal": "Enable entries only when conditions are favorable.",
+  "persona": "options_trader",
+  "difficulty": "intermediate",
+  "time_to_complete": 10,
+  "prerequisites": [
+    "API at http://localhost:8001",
+    "Intraday data",
+    "IV access (optional)"
+  ],
+  "dependencies": {
+    "indicators": [
+      "momentum_score_total",
+      "first15m_range_z",
+      "open_gap_z",
+      "atr"
+    ],
+    "indicator_sets": [
+      "zerosigma_0dte_gate"
+    ],
+    "strategies": [
+      "0dte_scalping"
+    ]
+  },
+  "steps": [
+    {
+      "description": "Fetch gate preset and review thresholds.",
+      "rationale": "Understand gating reasons.",
+      "api": {
+        "method": "GET",
+        "path": "/catalog/indicator_set/zerosigma_0dte_gate"
+      },
+      "expects": "Components and thresholds"
+    },
+    {
+      "description": "Evaluate gate live with throttle (5s).",
+      "rationale": "Stream updates during session.",
+      "api": {
+        "method": "WS",
+        "path": "/ws/indicator_sets",
+        "body": {
+          "action": "subscribe",
+          "set_id": "zerosigma_0dte_gate",
+          "universe": [
+            "SPY"
+          ],
+          "timeframe": "5m",
+          "throttle_ms": 5000
+        }
+      },
+      "expects": "match events with gate=green/yellow/red"
+    }
+  ],
+  "outputs": [
+    "Gate status with reasons"
+  ],
+  "best_when": [
+    "Liquid underlyings during RTH"
+  ],
+  "avoid_when": [
+    "Halts, extreme gaps"
+  ],
+  "caveats": [
+    "Greeks/slippage not modeled here; use strategy policy"
+  ],
+  "media": {
+    "cover_uri": "/static/workflows/0dte_gate_cover.png"
+  },
+  "links": {
+    "indicator_set": "/catalog/indicator_set/zerosigma_0dte_gate",
+    "strategy": "/catalog/strategy/0dte_scalping"
+  },
+  "lineage": {
+    "content_version": "1.0.0"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Use a momentum and session preset to gate intraday options entries."
+}

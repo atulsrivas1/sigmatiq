@@ -1,0 +1,47 @@
+{
+  "strategy_id": "volatility_expansion_hedge",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Volatility Expansion Hedge",
+  "objective": "Reduce risk or hedge when vol expands.",
+  "entry_logic": "atr rising and band width expanding",
+  "exit_logic": "exit hedge when vol normalizes",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "volatility_expansion_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Hedge/risk-down in volatility expansions to preserve capital.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "max_positions": 3,
+    "max_daily_trades": 3,
+    "loss_cap_bps": 50
+  },
+  "assistant_hints": [
+    "Prefer index hedges.",
+    "Avoid over-hedging in calm regimes.",
+    "Scale in/out slowly.",
+    "Monitor drawdowns."
+  ]
+}

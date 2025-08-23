@@ -1,0 +1,28 @@
+{
+  "workflow_id": "mean_reversion_bands_hourly_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Mean Reversion at Bands (10 minutes)",
+  "subtitle": "Fade band extremes only with oscillator turn.",
+  "goal": "Scan for band extremes with confirmation.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": ["API at http://localhost:8001"],
+  "dependencies": {"indicators": ["bollinger_bands","rsi","stoch_rsi"], "indicator_sets": ["mean_reversion_bands_v1"], "strategies": ["mean_reversion_bands"]},
+  "steps": [
+    {
+      "description": "Evaluate mean-reversion bands at hourly timeframe.",
+      "rationale": "Hourly reduces noise for beginners.",
+      "api": {"method": "POST", "path": "/indicator_sets/mean_reversion_bands_v1/evaluate", "body": {"universe": ["SPY","AAPL"], "timeframe": "hourly"}},
+      "expects": "ok:true and matches with reasons"
+    }
+  ],
+  "outputs": ["Candidates with band/oscillator flags"],
+  "best_when": ["Range-bound conditions"],
+  "avoid_when": ["Strong trends"],
+  "caveats": ["Reversions can fail in trends"],
+  "links": {"indicator_set": "/catalog/indicator_set/mean_reversion_bands_v1", "strategy": "/catalog/strategy/mean_reversion_bands"},
+  "novice_ready": true,
+  "beginner_summary": "Scan hourly for band extremes only when RSI/StochRSI turn."
+}

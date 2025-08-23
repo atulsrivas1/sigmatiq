@@ -1,0 +1,25 @@
+{
+  "recipe_id": "zerosigma_0dte_gate_subscribe_5m",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "0DTE Gate (Subscribe 5m)",
+  "subtitle": "Only trade when intraday conditions are favorable.",
+  "beginner_summary": "Subscribe to 0DTE gate (5m) and act only when gate=green.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "zerosigma_0dte_gate",
+  "target_version": 1,
+  "defaults": {
+    "operation": "subscribe",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 50,
+    "throttle_per_min": 1
+  },
+  "risk_profile": "conservative",
+  "universe_preset": "watchlist",
+  "sort_rank": 70
+}

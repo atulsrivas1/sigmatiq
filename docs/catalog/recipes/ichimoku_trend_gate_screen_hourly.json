@@ -1,0 +1,25 @@
+{
+  "recipe_id": "ichimoku_trend_gate_screen_hourly",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Ichimoku Trend Gate (Hourly)",
+  "subtitle": "Trade with cloud bias and TK cross.",
+  "beginner_summary": "Screen hourly for cloud bias with Tenkan/Kijun cross.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "ichimoku_trend_gate_v1",
+  "target_version": 1,
+  "defaults": {
+    "operation": "screen",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 85
+}

@@ -1,0 +1,46 @@
+{
+  "subtitle": "Stochastic oscillator — position of close within recent range.",
+  "tags": [
+    "oscillator",
+    "mean_reversion",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "%K/%D above 80 often overbought; below 20 oversold. Crosses imply shifts.",
+    "typical_ranges": "%K=14, %D=3 common defaults.",
+    "caveats": "Overlaps with RSI; pick one to avoid redundancy.",
+    "what_it_measures": "Stochastic derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Range‑bound markets"
+    ],
+    "avoid_when": [
+      "Strong trends"
+    ],
+    "example_conditions": [
+      "stochastic(period_k=14, period_d=3) crosses below 20 then above"
+    ],
+    "step_by_step": [
+      "Pick windows",
+      "Alert on threshold crosses"
+    ]
+  },
+  "assistant_hints": [
+    "Prefer cross-through of 20/80 bands over raw levels.",
+    "Align with higher timeframe to avoid fading strong trends.",
+    "Avoid redundancy if RSI already used for the same purpose.",
+    "Smooth with %D to reduce noise on lower timeframes."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Stochastic oscillator — position of close within recent range."
+}

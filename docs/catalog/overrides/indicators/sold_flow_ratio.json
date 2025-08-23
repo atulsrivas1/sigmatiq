@@ -1,0 +1,39 @@
+{
+  "subtitle": "Sold flow ratio — fraction of sold options in total flow.",
+  "tags": [
+    "options_flow",
+    "risk",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Higher values indicate more selling activity relative to buying.",
+    "typical_ranges": "Depends on ticker and window.",
+    "caveats": "Classification depends on print interpretation; vendor differences.",
+    "what_it_measures": "Sold Flow Ratio derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "options prints"
+    ],
+    "timeframe": "intraday|daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Context for premium selling vs buying regimes"
+    ],
+    "avoid_when": [
+      "Low print reliability"
+    ],
+    "example_conditions": [
+      "sold_flow_ratio(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Sold flow ratio — fraction of sold options in total flow.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "set_id": "vwap_distance_obv_v1",
+  "version": "1.0.0",
+  "title": "VWAP Distance + OBV",
+  "purpose": "Detect overextension vs VWAP with OBV flow confirmation.",
+  "components": [
+    {
+      "indicator_id": "close_vs_vwap",
+      "params": {
+        "kind": "pct"
+      },
+      "role": "distance_vwap",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "obv",
+      "params": {},
+      "role": "flow_trend",
+      "timeframe": "5m"
+    }
+  ],
+  "rationale": "Detect overextension vs VWAP with OBV flow confirmation.",
+  "reading_guide": {
+    "signal_logic": "abs(close-vwap)/vwap > threshold AND obv slope aligned",
+    "timeframe_alignment": "5m"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "5m"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Highlight stretched moves vs VWAP with OBV confirmation.",
+  "simple_defaults": {
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Normalize distance by VWAP (pct).",
+    "Align with OBV slope to confirm flow.",
+    "Avoid chasing without pullbacks.",
+    "Use liquid sessions."
+  ]
+}

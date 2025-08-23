@@ -1,0 +1,46 @@
+{
+  "subtitle": "Slope of VIX term structure — contango vs backwardation.",
+  "tags": [
+    "regime",
+    "risk",
+    "intermediate",
+    "gating"
+  ],
+  "measures": {
+    "how_to_read": "Positive slope (contango) often calm regime; negative (backwardation) often stress.",
+    "typical_ranges": "Near‑far spread a few points in calm; flips negative in stress.",
+    "caveats": "Term structure can shift intraday; use daily for stability.",
+    "what_it_measures": "Slope of VIX term structure (contango/backwardation)."
+  },
+  "data_requirements": {
+    "inputs": [
+      "VIX term quotes"
+    ],
+    "timeframe": "daily",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Portfolio gating and tilt"
+    ],
+    "avoid_when": [
+      "Sparse/laggy data"
+    ],
+    "example_conditions": [
+      "vix_term_slope(near=30,far=90) < 0"
+    ],
+    "step_by_step": [
+      "Fetch near/far VIX",
+      "Compute slope",
+      "Gate risk when negative"
+    ]
+  },
+  "assistant_hints": [
+    "Positive slope (contango) generally calmer; negative (backwardation) caution.",
+    "Use daily data to avoid noisy intraday flips.",
+    "Treat as a context gate, not a standalone entry signal.",
+    "Combine with VIX level and IV rank for robustness."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Slope of VIX term structure — contango vs backwardation."
+}

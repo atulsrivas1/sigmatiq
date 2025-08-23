@@ -1,0 +1,26 @@
+{
+  "workflow_id": "keltner_channel_break_hourly_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Keltner Channel Break (10 minutes)",
+  "subtitle": "Continuation trades on channel breaks with EMA alignment.",
+  "goal": "Scan hourly for Keltner breaks aligned with EMA trend.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 10,
+  "prerequisites": ["API at http://localhost:8001"],
+  "dependencies": {"indicators": ["keltner","ema"], "indicator_sets": ["keltner_channel_trend_v1"], "strategies": ["keltner_channel_break"]},
+  "steps": [
+    {"description": "Evaluate Keltner trend set at hourly timeframe.",
+     "rationale": "Confirm break and EMA alignment.",
+     "api": {"method": "POST", "path": "/indicator_sets/keltner_channel_trend_v1/evaluate", "body": {"universe": ["SPY","AAPL"], "timeframe": "hourly"}},
+     "expects": "ok:true and break/alignment flags"}
+  ],
+  "outputs": ["Candidates with channel break and EMA flags"],
+  "best_when": ["Trending markets"],
+  "avoid_when": ["Choppy ranges"],
+  "caveats": ["Beware false breaks in low vol"],
+  "links": {"indicator_set": "/catalog/indicator_set/keltner_channel_trend_v1", "strategy": "/catalog/strategy/keltner_channel_break"},
+  "novice_ready": true,
+  "beginner_summary": "Scan hourly for Keltner channel breaks aligned with EMA trend."
+}

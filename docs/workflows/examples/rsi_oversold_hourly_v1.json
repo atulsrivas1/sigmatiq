@@ -1,0 +1,29 @@
+{
+  "workflow_id": "rsi_oversold_hourly_v1",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Find Oversold Stocks (5 minutes)",
+  "subtitle": "Use RSI to quickly surface oversold names on your watchlist.",
+  "goal": "Get a list of oversold candidates using hourly RSI < 30.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "time_to_complete": 5,
+  "prerequisites": ["API at http://localhost:8001", "Watchlist or universe preset"],
+  "dependencies": {"indicators": ["rsi"], "indicator_sets": [], "strategies": []},
+  "steps": [
+    {
+      "description": "Choose timeframe (hourly) and threshold (RSI < 30).",
+      "rationale": "Larger intraday bars reduce noise for beginners.",
+      "api": {"method": "POST", "path": "/screen", "body": {"universe": ["SPY", "AAPL"], "condition": {"id": "rsi", "params": {"period": 14}, "op": "<", "value": 30}, "timeframe": "hourly"}},
+      "expects": "ok:true and matches list"
+    }
+  ],
+  "outputs": ["List of matches { symbol, ts, value }"],
+  "best_when": ["Range-bound markets"],
+  "avoid_when": ["Major news or very low liquidity"],
+  "caveats": ["RSI can stay oversold in strong downtrends"],
+  "links": {"indicator": "/catalog/indicator/rsi"},
+  "novice_ready": true,
+  "beginner_summary": "Screen your watchlist for hourly RSI < 30 to find oversold names."
+}
+

@@ -1,0 +1,41 @@
+{
+  "subtitle": "Fisher Transform — normalizes price to enhance turning points.",
+  "tags": [
+    "oscillator",
+    "turns",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Look for sharp inflections and zero crosses.",
+    "typical_ranges": "Depends on period; values unbounded.",
+    "caveats": "Can be whippy; combine with filters.",
+    "what_it_measures": "Fisher Transform derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "timeframe": "any",
+    "lookback": 9
+  },
+  "usage": {
+    "best_when": [
+      "Spotting short-term reversals"
+    ],
+    "avoid_when": [
+      "Choppy low timeframes"
+    ],
+    "example_conditions": [
+      "fisher_transform(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Look for extremes and inflections; confirm with price action.",
+    "Smooth or lengthen window to reduce whipsaws.",
+    "Combine with bands/RSI or trend filter.",
+    "Avoid trading isolated signals during news."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Fisher Transform — normalizes price to enhance turning points."
+}

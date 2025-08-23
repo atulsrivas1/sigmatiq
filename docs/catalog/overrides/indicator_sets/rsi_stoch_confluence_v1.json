@@ -1,0 +1,50 @@
+{
+  "set_id": "rsi_stoch_confluence_v1",
+  "version": "1.0.0",
+  "title": "RSI + StochRSI Confluence",
+  "purpose": "Fade extremes only when RSI extreme aligns with a StochRSI turn.",
+  "components": [
+    {
+      "indicator_id": "rsi",
+      "params": {
+        "period": 14
+      },
+      "role": "oscillator",
+      "timeframe": "hourly"
+    },
+    {
+      "indicator_id": "stoch_rsi",
+      "params": {
+        "period": 14
+      },
+      "role": "turn_signal",
+      "timeframe": "hourly"
+    }
+  ],
+  "rationale": "Fade extremes only when RSI extreme aligns with a StochRSI turn.",
+  "reading_guide": {
+    "signal_logic": "(rsi<30 AND stoch_rsi up) OR (rsi>70 AND stoch_rsi down)",
+    "timeframe_alignment": "hourly"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "hourly"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Use RSI extremes with a StochRSI cross to time reversals.",
+  "simple_defaults": {
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Do not fade strong trends without additional context.",
+    "Prefer hourly to reduce noise.",
+    "Take profits near mean (e.g., EMA or band midline).",
+    "Avoid news-driven spikes."
+  ]
+}

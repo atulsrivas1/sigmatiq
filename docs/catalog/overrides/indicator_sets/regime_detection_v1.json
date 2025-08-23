@@ -1,0 +1,24 @@
+{
+  "set_id": "regime_detection_v1",
+  "version": "1.0.0",
+  "title": "Regime Detection Hierarchy",
+  "purpose": "Label market regime (calm/trend/choppy) to gate or tilt downstream sets.",
+  "components": [
+    {"indicator_id": "vix_level", "params": {"index_ticker": "^VIX"}, "role": "vol_regime", "timeframe": "daily"},
+    {"indicator_id": "iv_rank_52w", "params": {"underlying": "SPY", "window_days": 252}, "role": "iv_regime", "timeframe": "daily"},
+    {"indicator_id": "momentum", "params": {"column": "close", "window": 50}, "role": "trend_bias", "timeframe": "daily"}
+  ],
+  "rationale": "Use VIX level and IV rank for volatility context and daily momentum for directional bias.",
+  "reading_guide": {"signal_logic": "if VIX < 18 and momentum>0 => calm/trending; if VIX>25 => volatile", "timeframe_alignment": "daily"},
+  "data_requirements": {"inputs": ["daily OHLC", "VIX", "IV time series"], "timeframe": "daily"},
+  "novice_ready": true,
+  "beginner_summary": "Daily label for market regime (calm/trending vs volatile) to guide risk.",
+  "simple_defaults": {"timeframe": "daily"},
+  "guardrails": {"universe_cap": 1, "throttle_per_min": 1},
+  "assistant_hints": [
+    "Use regime as a gate/tilt, not a direct entry signal.",
+    "Update once daily to avoid noisy intraday flips.",
+    "Combine VIX level with price momentum for context.",
+    "Tighten risk and reduce size in volatile regimes."
+  ]
+}

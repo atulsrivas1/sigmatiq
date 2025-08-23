@@ -1,0 +1,40 @@
+{
+  "subtitle": "Put/Call Ratio by volume — session flow bias.",
+  "tags": [
+    "options_flow",
+    "ratio",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 1.0 more put volume; < 1.0 more call volume.",
+    "typical_ranges": "Varies by ticker/session.",
+    "caveats": "Intraday spikes can be event-driven; confirm.",
+    "what_it_measures": "Pcr Volume derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option volume"
+    ],
+    "timeframe": "intraday|daily",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Session bias context"
+    ],
+    "avoid_when": [
+      "Very illiquid chains"
+    ],
+    "example_conditions": [
+      "pcr_volume(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Intraday spikes often event-driven — confirm with price and IV.",
+    "Smooth or require minimum volume to reduce noise.",
+    "Ratios vary by ticker — compare to own history.",
+    "Use for context; avoid as standalone entry trigger."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Put/Call Ratio by volume — session flow bias."
+}

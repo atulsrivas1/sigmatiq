@@ -1,0 +1,40 @@
+{
+  "subtitle": "Daily returns over a window — momentum context for swings.",
+  "tags": [
+    "momentum",
+    "daily",
+    "context"
+  ],
+  "measures": {
+    "how_to_read": "Positive cumulative return indicates uptrend over the window.",
+    "typical_ranges": "Depends on window and ticker volatility.",
+    "caveats": "Sensitive to window choice; consider normalization.",
+    "what_it_measures": "Daily Ret derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "daily close"
+    ],
+    "timeframe": "daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Bias filter for swing entries"
+    ],
+    "avoid_when": [
+      "Very short horizon decisions"
+    ],
+    "example_conditions": [
+      "daily_ret(underlying='SPY', window=20) > 0"
+    ]
+  },
+  "assistant_hints": [
+    "Choose window to match horizon (e.g., 20d for swings).",
+    "Use as bias/context; not a precise entry signal.",
+    "Normalize or compare to volatility for robustness.",
+    "Re-evaluate after significant gaps or events."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Daily returns over a window — momentum context for swings."
+}

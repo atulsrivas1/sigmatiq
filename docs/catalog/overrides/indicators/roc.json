@@ -1,0 +1,38 @@
+{
+  "subtitle": "Rate of Change — percent change over N periods.",
+  "tags": [
+    "momentum",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "> 0 increasing; < 0 decreasing momentum.",
+    "typical_ranges": "Ticker/window dependent.",
+    "caveats": "Noisy on small windows; smooth if needed.",
+    "what_it_measures": "Roc derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 12
+  },
+  "usage": {
+    "best_when": [
+      "Momentum scans"
+    ],
+    "avoid_when": [
+      "Very low volume"
+    ],
+    "example_conditions": [
+      "roc(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Rate of Change — percent change over N periods.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

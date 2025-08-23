@@ -1,0 +1,25 @@
+{
+  "recipe_id": "vwap_momentum_scalp_5m",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "VWAP Momentum Scalp (5m)",
+  "subtitle": "Trade quick bursts near VWAP in liquid names.",
+  "beginner_summary": "Backtest quick momentum bursts near VWAP with OBV/volume support.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "strategy",
+  "target_id": "vwap_momentum_scalp",
+  "target_version": 1,
+  "defaults": {
+    "operation": "backtest",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 100
+}

@@ -1,0 +1,25 @@
+{
+  "recipe_id": "mean_reversion_bands_hourly",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Mean Reversion Bands (Hourly)",
+  "subtitle": "Fade extremes only with oscillator turn.",
+  "beginner_summary": "Scan hourly for band extremes with RSI/StochRSI confirmation.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "mean_reversion_bands_v1",
+  "target_version": 1,
+  "defaults": {
+    "operation": "screen",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 80
+}

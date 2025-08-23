@@ -1,0 +1,47 @@
+{
+  "strategy_id": "relative_strength_rotation",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Relative Strength Rotation",
+  "objective": "Rotate into leaders by momentum proxy with regime check.",
+  "entry_logic": "momentum strong vs peers; calm regime preferred",
+  "exit_logic": "exit on RS breakdown or regime flip",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "relative_strength_rotation_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Buy leaders, avoid laggards, and respect regime context.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "daily"
+  },
+  "guardrails": {
+    "max_positions": 10,
+    "max_daily_trades": 10,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Use diversified universe.",
+    "Avoid thin names.",
+    "Review weekly.",
+    "Limit per-symbol exposure."
+  ]
+}

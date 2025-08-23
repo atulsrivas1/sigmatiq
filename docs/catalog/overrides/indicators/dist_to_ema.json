@@ -1,0 +1,41 @@
+{
+  "subtitle": "Distance of price from EMA — stretch on chosen timeframe.",
+  "tags": [
+    "trend",
+    "risk",
+    "context"
+  ],
+  "measures": {
+    "how_to_read": "Positive = above EMA; negative = below; use normalized distance.",
+    "typical_ranges": "Normalize to z‑score for thresholds (e.g., > 1.5σ).",
+    "caveats": "Raw distances vary with price level; prefer normalized.",
+    "what_it_measures": "Dist To Ema derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Avoid stretched entries",
+      "Mean reversion checks"
+    ],
+    "avoid_when": [
+      "Flat EMA (no trend context)"
+    ],
+    "example_conditions": [
+      "dist_to_ema(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Normalize by ATR or z‑score for robust thresholds.",
+    "Use with EMA slope to avoid counter‑trend fades.",
+    "Favor entries after reversion signals, not on raw distance.",
+    "Beware news spikes that distort distance temporarily."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Distance of price from EMA — stretch on chosen timeframe."
+}

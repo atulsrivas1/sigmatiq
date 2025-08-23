@@ -1,0 +1,40 @@
+{
+  "subtitle": "Detrended Price Oscillator — removes trend to highlight cycles.",
+  "tags": [
+    "oscillator",
+    "cycle",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Oscillations around zero show short-term cycles independent of trend.",
+    "typical_ranges": "Window 20 common; interpret zero crosses.",
+    "caveats": "Not a standalone signal; use with context.",
+    "what_it_measures": "Dpo derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Cycle analysis within larger trends"
+    ],
+    "avoid_when": [
+      "Very noisy low timeframes"
+    ],
+    "example_conditions": [
+      "dpo(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Use to isolate cycles; confirm with range/band context.",
+    "Zero crosses and peaks help time entries/exits.",
+    "Avoid as a sole trigger in strong trends.",
+    "Tune window length to instrument behavior."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Detrended Price Oscillator — removes trend to highlight cycles."
+}

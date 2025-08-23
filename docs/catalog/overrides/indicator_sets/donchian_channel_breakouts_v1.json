@@ -1,0 +1,50 @@
+{
+  "set_id": "donchian_channel_breakouts_v1",
+  "version": "1.0.0",
+  "title": "Donchian Channel Breakouts",
+  "purpose": "Classic breakouts with volume confirmation to reduce false signals.",
+  "components": [
+    {
+      "indicator_id": "donchian",
+      "params": {
+        "window": 20
+      },
+      "role": "range",
+      "timeframe": "5m"
+    },
+    {
+      "indicator_id": "vol_zscore",
+      "params": {
+        "window": 20
+      },
+      "role": "volume_confirm",
+      "timeframe": "5m"
+    }
+  ],
+  "rationale": "Classic breakouts with volume confirmation to reduce false signals.",
+  "reading_guide": {
+    "signal_logic": "close>donchian_upper AND vol_z>2 (inverse for short)",
+    "timeframe_alignment": "5m"
+  },
+  "data_requirements": {
+    "inputs": [
+      "OHLCV"
+    ],
+    "timeframe": "5m"
+  },
+  "novice_ready": true,
+  "beginner_summary": "Enter on Donchian breaks only with a volume spike.",
+  "simple_defaults": {
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "assistant_hints": [
+    "Use close beyond channel, not intrabar wicks.",
+    "Avoid low-liquidity names.",
+    "Set stops just inside channel.",
+    "Take partials quickly in chop."
+  ]
+}

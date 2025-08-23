@@ -1,0 +1,40 @@
+{
+  "subtitle": "IV smile wings — average wing IV minus ATM IV (smile convexity).",
+  "tags": [
+    "options_volatility",
+    "smile",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "> 0 pronounced wings; < 0 inverted smile.",
+    "typical_ranges": "Varies by ticker and market regime.",
+    "caveats": "Sensitive to quote quality and wing selection.",
+    "what_it_measures": "Iv Smile Wings derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option quotes"
+    ],
+    "timeframe": "intraday",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Smile analysis for vol strategies"
+    ],
+    "avoid_when": [
+      "Sparse quotes"
+    ],
+    "example_conditions": [
+      "iv_smile_wings(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Steeper wings imply pricier tails; consider tail-hedge costs.",
+    "Compare within ticker/tenor; cross-asset smiles differ structurally.",
+    "Use as context for vol strategy selection; not an entry trigger.",
+    "Validate wing quotes; outliers can distort the measure."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "IV smile wings — average wing IV minus ATM IV (smile convexity)."
+}

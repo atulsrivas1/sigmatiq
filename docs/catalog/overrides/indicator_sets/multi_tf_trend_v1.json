@@ -1,0 +1,24 @@
+{
+  "set_id": "multi_tf_trend_v1",
+  "version": "1.0.0",
+  "title": "Multi‑Timeframe Trend Alignment",
+  "purpose": "Trade with alignment of daily and intraday trends.",
+  "components": [
+    {"indicator_id": "daily_ema", "params": {"underlying": "SPY", "window": 20}, "role": "htf_trend", "timeframe": "daily"},
+    {"indicator_id": "ema", "params": {"column": "close", "window": 20}, "role": "ltf_trend", "timeframe": "hourly"},
+    {"indicator_id": "ema_slope", "params": {"column": "close", "window": 20, "period": 1}, "role": "confirmation", "timeframe": "hourly"}
+  ],
+  "rationale": "Use daily EMA to set bias, then intraday EMA and its slope to time entries.",
+  "reading_guide": {"signal_logic": "daily_ema up AND close>ema20 AND ema_slope>0", "timeframe_alignment": "daily + hourly"},
+  "data_requirements": {"inputs": ["daily close", "hourly OHLC"], "timeframe": "daily+hourly"},
+  "novice_ready": true,
+  "beginner_summary": "Trade with the higher timeframe: only act when hourly trend matches daily trend.",
+  "simple_defaults": {"timeframe": "hourly"},
+  "guardrails": {"universe_cap": 200, "throttle_per_min": 1},
+  "assistant_hints": [
+    "Trade with daily bias; avoid counter-trend entries.",
+    "Wait for hourly EMA alignment and positive slope.",
+    "Skip setups when HTF and LTF disagree.",
+    "Re-evaluate after major daily shifts."
+  ]
+}

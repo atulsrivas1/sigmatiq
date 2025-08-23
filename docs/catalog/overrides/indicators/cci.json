@@ -1,0 +1,46 @@
+{
+  "subtitle": "Commodity Channel Index — deviation from moving average (oscillator).",
+  "tags": [
+    "oscillator",
+    "mean_reversion",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> +100 overbought; < -100 oversold.",
+    "typical_ranges": "Period 20 typical; thresholds ±100.",
+    "caveats": "Sensitive to volatility; consider smoothing.",
+    "what_it_measures": "Cci derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Range‑bound markets"
+    ],
+    "avoid_when": [
+      "High-volatility spikes"
+    ],
+    "example_conditions": [
+      "cci(period=20) < -100"
+    ],
+    "step_by_step": [
+      "Pick period",
+      "Screen for extremes"
+    ]
+  },
+  "assistant_hints": [
+    "Prefer crosses back through ±100 over static levels.",
+    "Consider smoothing or longer windows to reduce noise.",
+    "Combine with trend filter to avoid fading strong moves.",
+    "Normalize risk with ATR when trading extremes."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Commodity Channel Index — deviation from moving average (oscillator)."
+}

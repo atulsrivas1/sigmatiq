@@ -1,0 +1,47 @@
+{
+  "strategy_id": "rsi_stoch_reversal",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "RSI + StochRSI Reversal",
+  "objective": "Reversal entries using RSI extreme + StochRSI cross.",
+  "entry_logic": "(rsi<30 and stoch_rsi up) or (rsi>70 and stoch_rsi down)",
+  "exit_logic": "exit at mean or ATR target",
+  "risk": {
+    "position_sizing": "vol_scaled",
+    "stops_targets": "ATR-based"
+  },
+  "execution_policy": {
+    "order_types": [
+      "limit"
+    ],
+    "hours": "RTH",
+    "slippage_model": "bps:1.0"
+  },
+  "pre_reqs": {
+    "indicator_sets_used": [
+      "rsi_stoch_confluence_v1"
+    ]
+  },
+  "performance_snapshot": {
+    "sharpe_range": "contextual",
+    "dd_range": "contextual"
+  },
+  "caveats": "Use small size until validated; avoid illiquid names.",
+  "novice_ready": true,
+  "beginner_summary": "Fade extremes only when both oscillators align.",
+  "simple_defaults": {
+    "operation": "backtest",
+    "timeframe": "hourly"
+  },
+  "guardrails": {
+    "max_positions": 2,
+    "max_daily_trades": 6,
+    "loss_cap_bps": 75
+  },
+  "assistant_hints": [
+    "Avoid strong-trend days.",
+    "Take profits at mean first.",
+    "Use small size.",
+    "Confirm with volume context."
+  ]
+}

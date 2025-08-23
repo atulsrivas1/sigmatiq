@@ -1,0 +1,47 @@
+{
+  "subtitle": "Ichimoku Cloud — multi‑line trend and support/resistance system.",
+  "tags": [
+    "trend",
+    "support_resistance",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Price above cloud = bullish; below = bearish; crosses of Tenkan/Kijun add signals.",
+    "typical_ranges": "Tenkan 9, Kijun 26, Senkou 52 are defaults.",
+    "caveats": "Complex; ensure users understand line meanings before acting.",
+    "what_it_measures": "Ichimoku derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "hourly | daily",
+    "lookback": 52
+  },
+  "usage": {
+    "best_when": [
+      "Trend analysis with support/resistance"
+    ],
+    "avoid_when": [
+      "Very short timeframes"
+    ],
+    "example_conditions": [
+      "price enters cloud from below"
+    ],
+    "step_by_step": [
+      "Use defaults",
+      "Look for price/cloud relationships",
+      "Confirm with trend"
+    ]
+  },
+  "assistant_hints": [
+    "Wait for closes relative to the cloud to reduce noise.",
+    "Confirm with higher timeframe trend to avoid whipsaws.",
+    "Use Tenkan/Kijun crosses as context, not sole triggers.",
+    "Combine with EMA/MACD for clarity if new to Ichimoku."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Ichimoku Cloud — multi‑line trend and support/resistance system."
+}

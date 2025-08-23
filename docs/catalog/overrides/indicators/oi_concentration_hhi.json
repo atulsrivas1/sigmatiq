@@ -1,0 +1,39 @@
+{
+  "subtitle": "Herfindahl-Hirschman Index of OI — concentration across strikes.",
+  "tags": [
+    "options_structure",
+    "concentration",
+    "advanced"
+  ],
+  "measures": {
+    "how_to_read": "Higher HHI = OI concentrated at few strikes; lower = dispersed.",
+    "typical_ranges": "0–1; >0.2 indicates moderate concentration.",
+    "caveats": "Needs robust chain snapshots; differs by ticker.",
+    "what_it_measures": "Oi Concentration Hhi derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "option chain OI"
+    ],
+    "timeframe": "daily",
+    "lookback": 1
+  },
+  "usage": {
+    "best_when": [
+      "Structural context for support/resistance"
+    ],
+    "avoid_when": [
+      "Stale OI data"
+    ],
+    "example_conditions": [
+      "oi_concentration_hhi(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Herfindahl-Hirschman Index of OI — concentration across strikes.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "subtitle": "ATM IV z‑score — how unusual today’s implied vol is vs recent history.",
+  "tags": [
+    "options_volatility",
+    "iv_zscore",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 2.0 unusually high IV; < -2.0 unusually low.",
+    "typical_ranges": "Window 20 common; Z 2–3 marks extremes.",
+    "caveats": "Dependent on ATM measure and sampling window.",
+    "what_it_measures": "Atm Iv Zscore derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "ATM IV time series"
+    ],
+    "timeframe": "daily",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Event risk and premium selection"
+    ],
+    "avoid_when": [
+      "Noisy/missing IV"
+    ],
+    "example_conditions": [
+      "atm_iv_zscore(...) condition"
+    ]
+  },
+  "assistant_hints": [
+    "Use consistent ATM definition and window for comparability.",
+    "Z > 2 marks extremes; confirm with regime and events.",
+    "Avoid mixing venues/sources; data differences can mislead.",
+    "Treat as context for premium decisions, not timing alone."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "ATM IV z‑score — how unusual today’s implied vol is vs recent history."
+}

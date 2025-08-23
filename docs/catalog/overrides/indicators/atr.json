@@ -1,0 +1,54 @@
+{
+  "subtitle": "Average True Range — magnitude of price movement (volatility).",
+  "tags": [
+    "volatility",
+    "risk",
+    "beginner",
+    "sizing"
+  ],
+  "measures": {
+    "how_to_read": "Higher ATR means larger typical bar ranges. Use multiples to size stops/targets.",
+    "typical_ranges": "Ticker‑dependent. Compare to own history (percentile).",
+    "caveats": "ATR expands in volatile periods; absolute values aren’t comparable across symbols.",
+    "what_it_measures": "Average True Range — recent volatility of price moves."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Setting dynamic stops/targets",
+      "Volatility regime detection"
+    ],
+    "avoid_when": [
+      "Comparing cross‑ticker absolute values"
+    ],
+    "example_conditions": [
+      "atr(period=14) > pctile(80)"
+    ],
+    "step_by_step": [
+      "Pick timeframe",
+      "Compute ATR",
+      "Use x1.5–2.0 multiples for stop/target"
+    ]
+  },
+  "performance_hints": {
+    "cost_band": "low",
+    "latency_band": "rt_fast",
+    "stability": "high"
+  },
+  "assistant_hints": [
+    "Size stops/targets in ATR multiples (e.g., 1x/2x).",
+    "Compare ATR to own history (percentile) for regime context.",
+    "Avoid comparing absolute ATR across tickers; normalize if needed.",
+    "Expect expansion around events; reduce size accordingly."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Average True Range — magnitude of price movement (volatility)."
+}

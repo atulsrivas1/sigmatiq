@@ -1,0 +1,24 @@
+{
+  "set_id": "volatility_expansion_v1",
+  "version": "1.0.0",
+  "title": "Volatility Expansion Regime",
+  "purpose": "Detect shift into higher volatility regime for risk adjustments.",
+  "components": [
+    {"indicator_id": "atr", "params": {"period": 14}, "role": "vol"},
+    {"indicator_id": "rolling_std", "params": {"column": "close", "window": 20}, "role": "vol"},
+    {"indicator_id": "bollinger_bands", "params": {"column": "close", "window": 20, "num_std": 2.0}, "role": "band_width"}
+  ],
+  "rationale": "ATR, realized volatility, and band width together flag volatility regime changes.",
+  "reading_guide": {"signal_logic": "atr rising AND roll_std rising AND bb width expanding", "timeframe_alignment": "hourly|daily"},
+  "data_requirements": {"inputs": ["OHLC"], "timeframe": "hourly|daily"},
+  "assistant_hints": [
+    "Rising ATR and band width suggest caution and smaller size.",
+    "Prefer hourly/daily aggregation for regime detection.",
+    "Confirm expansion with realized volatility, not one bar spikes.",
+    "Widen stops or pause entries during sharp expansions."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Shows when volatility is expanding so you can reduce risk or avoid new entries.",
+  "simple_defaults": { "timeframe": "hourly" },
+  "guardrails": { "universe_cap": 200, "throttle_per_min": 1 }
+}

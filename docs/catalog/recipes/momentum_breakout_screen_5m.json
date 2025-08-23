@@ -1,0 +1,25 @@
+{
+  "recipe_id": "momentum_breakout_screen_5m",
+  "version": "1.0.0",
+  "status": "published",
+  "title": "Momentum Breakouts (5m)",
+  "subtitle": "Find real breakouts with momentum and volume.",
+  "beginner_summary": "Screen 5m for momentum breakouts confirmed by volume/OBV.",
+  "persona": "beginner",
+  "difficulty": "beginner",
+  "target_kind": "indicator_set",
+  "target_id": "momentum_breakout_v1",
+  "target_version": 1,
+  "defaults": {
+    "operation": "screen",
+    "timeframe": "5m"
+  },
+  "guardrails": {
+    "universe_preset": "watchlist",
+    "universe_cap": 200,
+    "throttle_per_min": 2
+  },
+  "risk_profile": "balanced",
+  "universe_preset": "watchlist",
+  "sort_rank": 35
+}

@@ -1,0 +1,39 @@
+{
+  "subtitle": "Rolling return over a window — simple momentum.",
+  "tags": [
+    "momentum",
+    "trend",
+    "beginner"
+  ],
+  "measures": {
+    "how_to_read": "> 0 positive momentum; < 0 negative.",
+    "typical_ranges": "Depends on window and volatility.",
+    "caveats": "Sensitive to outliers; compare with z‑score if needed.",
+    "what_it_measures": "Ret derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Trend bias checks"
+    ],
+    "avoid_when": [
+      "Event-driven spikes"
+    ],
+    "example_conditions": [
+      "ret(...) condition"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Rolling return over a window — simple momentum.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}

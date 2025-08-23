@@ -1,0 +1,46 @@
+{
+  "subtitle": "Trend overlay using ATR bands that flips on crosses.",
+  "tags": [
+    "trend",
+    "overlay",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "Price above Supertrend line implies bullish state; below implies bearish. Flips mark potential trend changes.",
+    "typical_ranges": "ATR period 10–14; multiplier 2–3 common.",
+    "caveats": "Lagging and can whipsaw in chop; treat flips as context not guarantee.",
+    "what_it_measures": "Supertrend derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "5m | hourly | daily",
+    "lookback": 14
+  },
+  "usage": {
+    "best_when": [
+      "Trend following with pullback entries"
+    ],
+    "avoid_when": [
+      "Tight ranges"
+    ],
+    "example_conditions": [
+      "supertrend(period=10,multiplier=3) flips to bullish"
+    ],
+    "step_by_step": [
+      "Pick ATR period/multiplier",
+      "Watch for flip + confirm with price action"
+    ]
+  },
+  "assistant_hints": [
+    "Treat flips as context; wait for candle close or retest before entries.",
+    "Tune ATR multiplier by timeframe/volatility to reduce whipsaws.",
+    "Combine with trend filters (EMA/MACD) for alignment.",
+    "Avoid relying on Supertrend alone in range-bound markets."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "Trend overlay using ATR bands that flips on crosses."
+}

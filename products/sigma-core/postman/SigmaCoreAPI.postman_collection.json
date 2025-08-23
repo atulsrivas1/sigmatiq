@@ -1,0 +1,87 @@
+{
+  "info": {
+    "name": "Sigma Core API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "d3a7a3a4-5c6a-4a8c-9e7e-000000000001",
+    "description": "Collection for Sigma Core endpoints with sample requests. Set baseUrl and X-User-Id as needed."
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {"method": "GET", "url": "{{baseUrl}}/healthz"}
+    },
+    {
+      "name": "Presets / List",
+      "request": {"method": "GET", "url": "{{baseUrl}}/presets"}
+    },
+    {
+      "name": "Presets / Symbols",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/presets/{{presetId}}/symbols?limit=10", "host": ["{{baseUrl}}"], "path": ["presets", "{{presetId}}", "symbols"], "query": [{"key":"limit","value":"10"}]}}
+    },
+    {
+      "name": "Watchlists / List",
+      "request": {"method": "GET", "header":[{"key":"X-User-Id","value":"demo"}], "url": "{{baseUrl}}/watchlists"}
+    },
+    {
+      "name": "Watchlists / Create",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-User-Id","value":"demo"}], "body": {"mode":"raw","raw": "{\n  \"name\": \"starter\",\n  \"description\": \"demo list\",\n  \"visibility\": \"private\",\n  \"is_default\": true\n}"}, "url": "{{baseUrl}}/watchlists"}
+    },
+    {
+      "name": "Universe / Resolve",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-User-Id","value":"demo"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"sp500\",\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/universe/resolve"}
+    },
+    {
+      "name": "Catalog / Indicators",
+      "request": {"method": "GET", "url": "{{baseUrl}}/catalog/indicators?fields=summary&novice_only=true"}
+    },
+    {
+      "name": "Indicators / Validate",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"name\": \"rsi\",\n  \"params\": {\"period\": 14}\n}"}, "url": "{{baseUrl}}/indicators/validate"}
+    },
+    {
+      "name": "Indicators / Compute",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"name\": \"rsi\",\n  \"params\": {\"period\": 14},\n  \"data\": [\n    {\"timestamp\": \"2024-06-01\", \"open\": 1, \"high\": 2, \"low\": 1, \"close\": 2, \"volume\": 1000}\n  ]\n}"}, "url": "{{baseUrl}}/indicators/compute"}
+    },
+    {
+      "name": "Screen / Single (data-supplied)",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"name\": \"rsi\",\n  \"params\": {\"period\": 14},\n  \"data\": {\n    \"AAPL\": [{\"timestamp\": \"2024-06-01\", \"open\": 1, \"high\": 2, \"low\": 1, \"close\": 2, \"volume\": 1000}]\n  },\n  \"rule\": {\"column\": \"rsi_14\", \"op\": ">\", \"value\": 70}\n}"}, "url": "{{baseUrl}}/screen"}
+    },
+    {
+      "name": "Screen / Auto (preset)",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"sp500\",\n  \"timeframe\": \"day\",\n  \"name\": \"rsi\",\n  \"params\": {\"period\": 14},\n  \"rule\": {\"column\": \"rsi_14\", \"op\": ">\", \"value\": 70},\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/screen/auto"}
+    },
+    {
+      "name": "Set / Auto Build",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"liquid_etfs\",\n  \"timeframe\": \"day\",\n  \"set_id\": \"macd_trend_pullback_v1\",\n  \"version\": 1,\n  \"cap\": 25\n}"}, "url": "{{baseUrl}}/indicator_sets/auto_build"}
+    },
+    {
+      "name": "Set / Auto Screen",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"sp500\",\n  \"timeframe\": \"5m\",\n  \"set_id\": \"keltner_channel_trend_v1\",\n  \"version\": 1,\n  \"rules\": [\n    {\"column\": \"rsi_14\", \"op\": ">\", \"value\": 60},\n    {\"column\": \"macd_hist_12_26_9\", \"op\": ">\", \"value\": 0}\n  ],\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/indicator_sets/auto_screen"}
+    },
+    {
+      "name": "Strategy / Auto Build",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"liquid_etfs\",\n  \"timeframe\": \"day\",\n  \"strategy_id\": \"macd_trend_pullback\",\n  \"version\": 1,\n  \"cap\": 25\n}"}, "url": "{{baseUrl}}/strategies/auto_build"}
+    },
+    {
+      "name": "Strategy / Auto Screen",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"preset_id\": \"sp500\",\n  \"timeframe\": \"hour\",\n  \"strategy_id\": \"trend_follow_alignment\",\n  \"version\": 1,\n  \"rule_expr\": \"macd_hist_12_26_9 > 0 and rsi_14 < 70\",\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/strategies/auto_screen"}
+    },
+    {
+      "name": "Recipes / List",
+      "request": {"method": "GET", "url": "{{baseUrl}}/recipes"}
+    },
+    {
+      "name": "Recipes / Run",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"recipe_id\": \"macd_trend_pullback_screen_5m\",\n  \"preset_id\": \"sp500\",\n  \"rule_expr\": \"macd_hist_12_26_9 > 0 and rsi_14 < 70\",\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/recipes/run"}
+    },
+    {
+      "name": "Workflows / Run",
+      "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"workflow_id\": \"breakout_pullback_scan_5m_v1\",\n  \"preset_id\": \"sp500\",\n  \"timeframe\": \"5m\",\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/workflows/run"}
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8050"},
+    {"key": "presetId", "value": "sp500"}
+  ]
+}
+

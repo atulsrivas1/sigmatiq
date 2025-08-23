@@ -1,0 +1,52 @@
+{
+  "subtitle": "Trend momentum via fast/slow EMAs and signal line.",
+  "tags": [
+    "momentum",
+    "trend",
+    "intermediate",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "MACD above signal is bullish; below is bearish. Histogram expansion implies strengthening trend.",
+    "typical_ranges": "Defaults 12/26/9; shorter windows are faster and noisier.",
+    "caveats": "Lagging by design; avoid as sole trigger in choppy markets.",
+    "what_it_measures": "Macd derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "5m | hourly | daily",
+    "lookback": 26
+  },
+  "usage": {
+    "best_when": [
+      "Trending markets",
+      "Pullback entries in trend"
+    ],
+    "avoid_when": [
+      "Range/chop"
+    ],
+    "example_conditions": [
+      "macd(fast=12,slow=26,signal=9) crosses above signal"
+    ],
+    "step_by_step": [
+      "Pick timeframe",
+      "Use defaults (12/26/9)",
+      "Alert on cross + volume confirm"
+    ]
+  },
+  "performance_hints": {
+    "cost_band": "low",
+    "latency_band": "rt_fast",
+    "stability": "high"
+  },
+  "assistant_hints": [
+    "Wait for MACD cross with histogram confirming (expanding).",
+    "Align with higher timeframe trend to reduce whipsaws.",
+    "Use as confirmation for pullbacks; avoid as sole trigger in chop.",
+    "Shorter windows (e.g., 8/21/5) trade faster but increase noise."
+  ],
+  "novice_ready": true,
+  "beginner_summary": "MACD crossing its signal line can mark momentum turning points. Use alerts on crosses and confirm with trend."
+}

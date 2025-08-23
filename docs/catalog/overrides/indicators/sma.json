@@ -1,0 +1,44 @@
+{
+  "subtitle": "Simple moving average — baseline trend line.",
+  "tags": [
+    "trend",
+    "beginner",
+    "screening"
+  ],
+  "measures": {
+    "how_to_read": "Price above SMA implies uptrend bias; below implies downtrend.",
+    "typical_ranges": "20/50/200 periods are common.",
+    "caveats": "Lagging indicator; whipsaws in chop.",
+    "what_it_measures": "Simple moving average of price."
+  },
+  "data_requirements": {
+    "inputs": [
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 20
+  },
+  "usage": {
+    "best_when": [
+      "Smoother trend filters",
+      "Regime checks"
+    ],
+    "avoid_when": [
+      "Micro‑scalping"
+    ],
+    "example_conditions": [
+      "close > sma(window=200)"
+    ],
+    "step_by_step": [
+      "Pick window (e.g., 200d)",
+      "Filter signals by SMA direction"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Simple moving average — baseline trend line.",
+  "assistant_hints": [
+    "SMA is slower than EMA.",
+    "Use crossovers cautiously due to lag.",
+    "Confirm with price structure."
+  ]
+}

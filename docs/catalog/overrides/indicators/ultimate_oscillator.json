@@ -1,0 +1,45 @@
+{
+  "subtitle": "Ultimate Oscillator — multi-window momentum to reduce false signals.",
+  "tags": [
+    "momentum",
+    "oscillator",
+    "intermediate"
+  ],
+  "measures": {
+    "how_to_read": "> 50 bullish bias; < 50 bearish; extremes over 70/under 30 flag overbought/oversold.",
+    "typical_ranges": "Short/mid/long defaults often 7/14/28.",
+    "caveats": "Complexity may not add value over simpler oscillators for beginners.",
+    "what_it_measures": "Ultimate Oscillator derived from market data."
+  },
+  "data_requirements": {
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "timeframe": "any",
+    "lookback": 28
+  },
+  "usage": {
+    "best_when": [
+      "Reducing whipsaw vs single‑window oscillators"
+    ],
+    "avoid_when": [
+      "Overly complex screens"
+    ],
+    "example_conditions": [
+      "ultimate_oscillator(short=7,mid=14,long=28) > 50"
+    ],
+    "step_by_step": [
+      "Use defaults",
+      "Filter extremes or 50‑line crosses"
+    ]
+  },
+  "novice_ready": true,
+  "beginner_summary": "Ultimate Oscillator — multi-window momentum to reduce false signals.",
+  "assistant_hints": [
+    "Use with a trend filter.",
+    "Avoid thinly traded symbols.",
+    "Validate on your timeframe."
+  ]
+}
