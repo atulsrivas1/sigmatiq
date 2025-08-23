@@ -237,7 +237,7 @@ Latest Updates (ongoing)
 - API: Added `fields=full` support for list endpoints of indicators, indicator sets, strategies, workflows; includes novice-friendly details blocks. Fixed `novice_only` filters and indentation bugs.
 - DB: Migration `0014_sc_enforce_guardrails.sql` enforces presence of `guardrails` on novice_ready published indicator sets and strategies.
 - Presets: Introduced loader script and Makefile target to ingest full symbol rosters from CSV and update counts.
-- Backtesting: `/backtest/run` now returns a `summary` and enforces universal caps (≤ 90 days, ≤ 50 symbols); added simple‑mode defaults via a sweep preset.
+- Backtesting: `/backtest/run` now supports `mode: simple` (uses `rth_thresholds_basic` defaults) and includes a `summary` in the response; universal caps enforced (≤ 90 days, ≤ 50 symbols).
 - Consensus: Implemented pack backtests with policy variants (`weighted`, `majority`, `all`).
 - Pipeline: Added model pipeline endpoints with `sc.model_pipeline_runs` (build → sweep → train stub).
  - Error handling: Add plain‑language 400s across endpoints; global exception handler pending.
@@ -276,8 +276,8 @@ Backtest TODOs (high‑priority)
 
 Backtest/Consensus TODOs (implementation)
 - Universal caps: DONE for `/backtest/run` and `/models/dataset/build`; verify coverage with plain‑language 400s and hints across related endpoints.
- - Global error handler: PENDING — add FastAPI middleware to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
- - Summaries: PENDING — include `summary` field directly in `/backtest/run` response (persisted runs have it; response lacks it).
+- Global error handler: PENDING — add FastAPI middleware to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
+- Summaries: DONE — `/backtest/run`, model sweep, and pack endpoints return `summary` in responses.
 - Pack sweep simple mode: support `mode: simple` on `/packs/{id}/backtest/sweep` and default to `rth_thresholds_basic` when grid absent.
 - Postman: UPDATED — confirm examples for simple mode (`/backtest/run`, model sweep) and add consensus policies (pack run: majority, pack sweep: all) where missing.
 - Visibility guardrails: implement presetable listing filter by `visibility` and `owner_user_id`; require guardrails on public presets.
@@ -312,8 +312,8 @@ Approvals for Next Session
 Novice Audit TODOs (Sigma Core)
 - Centralize error messages: PENDING — add a global FastAPI exception handler and extend mappings/examples for common DB/network failures.
 - Cap inputs universally: DONE for `/backtest/run` and `/models/dataset/build`; ensure consistent caps and plain‑language guidance across related endpoints.
-- Simple presets for backtests: PARTIAL — pack endpoints and sweeps support simple defaults; wire preset defaults for `/backtest/run` end‑to‑end.
-- Plain‑language summaries: PENDING — include `summary` in `/backtest/run` and `/models/{id}/backtest/sweep` responses (not just persisted runs).
+- Simple presets for backtests: DONE — `/backtest/run` supports `mode: simple` with preset defaults; sweeps and pack endpoints have simple defaults coverage.
+- Plain‑language summaries: DONE — `/backtest/run`, model sweep, and pack endpoints include `summary` in responses.
 - Glossary fields: add beginner translations for metrics like Sharpe (e.g., `metrics_explained`) whenever returned to novices.
 - Visibility guardrails: require `visibility` + `owner_user_id` on sweep preset creation; enforce public presets to include guardrails (`max_combos`, `min_trades`, caps).
 - Rate limits/budgets: add optional per‑user soft limits on auto endpoints (screen/auto, set/auto_build) to prevent runaway workloads (novice safety).
