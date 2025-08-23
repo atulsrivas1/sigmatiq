@@ -240,7 +240,7 @@ Latest Updates (ongoing)
 - Backtesting: `/backtest/run` now returns a `summary` and enforces universal caps (≤ 90 days, ≤ 50 symbols); added simple‑mode defaults via a sweep preset.
 - Consensus: Implemented pack backtests with policy variants (`weighted`, `majority`, `all`).
 - Pipeline: Added model pipeline endpoints with `sc.model_pipeline_runs` (build → sweep → train stub).
-- Error handling: Global novice‑friendly FastAPI exception handler with API key guidance.
+ - Error handling: Add plain‑language 400s across endpoints; global exception handler pending.
 - Seeds/Migrations: Added backtest, sweep preset, and pipeline run migrations; Postman collection updated.
 - Tooling: Added `lint-training-cfg` script/target.
 
@@ -275,9 +275,9 @@ Backtest TODOs (high‑priority)
 - Add Postman variants to demonstrate consensus policies `majority` and `all` (with `min_quorum`, `min_score`) for `/packs/{id}/backtest/run` and `/packs/{id}/backtest/sweep`.
 
 Backtest/Consensus TODOs (implementation)
-- Universal caps: DONE for `/backtest/run`; PENDING for `/models/dataset/build`. Ensure plain‑language 400s and hints on all endpoints.
-- Global error handler: DONE — FastAPI middleware added to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
-- Summaries: DONE — `/backtest/run` includes `summary` (parity with pack endpoints).
+- Universal caps: DONE for `/backtest/run` and `/models/dataset/build`; verify coverage with plain‑language 400s and hints across related endpoints.
+ - Global error handler: PENDING — add FastAPI middleware to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
+ - Summaries: PENDING — include `summary` field directly in `/backtest/run` response (persisted runs have it; response lacks it).
 - Pack sweep simple mode: support `mode: simple` on `/packs/{id}/backtest/sweep` and default to `rth_thresholds_basic` when grid absent.
 - Postman: UPDATED — confirm examples for simple mode (`/backtest/run`, model sweep) and add consensus policies (pack run: majority, pack sweep: all) where missing.
 - Visibility guardrails: implement presetable listing filter by `visibility` and `owner_user_id`; require guardrails on public presets.
@@ -286,7 +286,7 @@ Backtest/Consensus TODOs (implementation)
 - Compatibility validation: pre‑run checks that pack component models share compatible `label_cfg`/timeframes; fail fast with plain guidance.
 - Budgets/limits: add soft per‑user compute limits for auto endpoints (screen/auto, auto_build) with clear throttling errors.
 - Fail‑safe computes: audit indicators/feature paths to ensure zeros/empties instead of exceptions; expand unit coverage if needed.
-- CI: DONE — `lint-training-cfg` added; PENDING — add `lint-sweep-presets` and wire into CI; block PRs on violations.
+ - CI: DONE — `lint-training-cfg` added; PENDING — add `lint-sweep-presets` and wire into CI; block PRs on violations.
 
 Next Session Plan (North‑Star Aligned)
 - Postman (novice‑ready): verify and finalize examples for simple‑mode, consensus, and pipeline; keep requests copy/paste runnable and safe by default.
@@ -310,10 +310,10 @@ Approvals for Next Session
 - Ensure sandbox is `workspace-write` and network access ON if needed; DB env set in `products/sigma-core/.env`.
 
 Novice Audit TODOs (Sigma Core)
-- Centralize error messages: DONE — global FastAPI exception handler added; NEXT: extend mappings and examples for common DB/network failures.
-- Cap inputs universally: DONE for `/backtest/run`; ensure consistent caps and plain‑language guidance across related endpoints.
-- Simple presets for backtests: DONE — `/backtest/run` supports `mode: simple` with defaults via sweep preset.
-- Plain‑language summaries: DONE for `/backtest/run`; add to `/models/{id}/backtest/sweep` if missing.
+- Centralize error messages: PENDING — add a global FastAPI exception handler and extend mappings/examples for common DB/network failures.
+- Cap inputs universally: DONE for `/backtest/run` and `/models/dataset/build`; ensure consistent caps and plain‑language guidance across related endpoints.
+- Simple presets for backtests: PARTIAL — pack endpoints and sweeps support simple defaults; wire preset defaults for `/backtest/run` end‑to‑end.
+- Plain‑language summaries: PENDING — include `summary` in `/backtest/run` and `/models/{id}/backtest/sweep` responses (not just persisted runs).
 - Glossary fields: add beginner translations for metrics like Sharpe (e.g., `metrics_explained`) whenever returned to novices.
 - Visibility guardrails: require `visibility` + `owner_user_id` on sweep preset creation; enforce public presets to include guardrails (`max_combos`, `min_trades`, caps).
 - Rate limits/budgets: add optional per‑user soft limits on auto endpoints (screen/auto, set/auto_build) to prevent runaway workloads (novice safety).
