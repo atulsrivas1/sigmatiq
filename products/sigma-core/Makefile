@@ -17,6 +17,7 @@ help:
 	@echo "  gen-recipes-seed    - generate SQL seed for sc.simple_recipes from examples"
 	@echo "  lint-models         - validate model registry rows (novice, taxonomy, branding, scope)"
 	@echo "  lint-model-packs    - validate model pack registry and consensus"
+	@echo "  lint-training-cfg   - validate model training_cfg selection for novice safety"
 	@echo "  lint-all            - run all linters (catalog, strategies, workflows, recipes, presets, models, packs)"
 	@echo "  db-migrate          - apply SQL migrations in this package (uses products/sigma-core/.env)"
 	@echo "  db-migrate-dry      - list SQL migrations without applying"
@@ -26,6 +27,8 @@ help:
 	@echo "  run-indicator       - run single indicator on CSV (NAME=, PARAMS=, IN=, OUT=)"
 	@echo "  run-set-features    - build features from set on CSV (SET_JSON= or SET_ID=/VERSION=, IN=, OUT=)"
 	@echo "  run-screen          - screen symbols in CSV by indicator rule (NAME=, PARAMS=, RULE=, IN=, SYM=, OUT=)"
+	@echo "  run-backtest        - run CV backtest on a CSV (IN=, [SET_JSON=], [LABEL=], [LABEL_PARAMS=], [THRESHOLDS=], [TOP_PCT=])"
+	@echo "  quick-sweep         - migrate DB then run a sample sweep (MODEL=, PRESET=, CAP=, BASE=http://localhost:8050)"
 	@echo "  watchlist-create    - create watchlist (USER=, NAME=, SYMBOLS=, DEFAULT=0/1)"
 	@echo "  watchlist-list      - list watchlists for a user (USER=)"
 
@@ -78,6 +81,9 @@ lint-models:
 lint-model-packs:
 	python3 scripts/lint_model_packs.py
 
+lint-training-cfg:
+	python3 scripts/lint_training_cfg.py
+
 lint-all:
 	$(MAKE) lint-catalog
 	$(MAKE) lint-strategies
@@ -86,6 +92,7 @@ lint-all:
 	$(MAKE) lint-presets
 	$(MAKE) lint-models
 	$(MAKE) lint-model-packs
+	$(MAKE) lint-training-cfg
 
 # --- DB Migrations (Sigma Core) ---
 MIGRATIONS_DIR ?= migrations
@@ -140,6 +147,27 @@ run-screen:
 		exit 1; \
 	fi
 	python3 scripts/runner.py screen --name $(NAME) --params '$(PARAMS)' --rule '$(RULE)' --input $(IN) --symbol-col $(SYM) --output $(OUT)
+
+run-backtest:
+	@if [ -z "$(IN)" ]; then \
+		echo "Usage: make run-backtest IN=./data.csv SET_JSON=./set.json LABEL=hourly_direction LABEL_PARAMS='{}' THRESHOLDS='[0.55,0.6,0.65]' TOP_PCT=0.1 OUT=./bt.json"; \
+		exit 1; \
+	fi
+	python3 scripts/runner.py backtest --input $(IN) $(if $(SET_JSON),--set-json $(SET_JSON),) --label $(if $(LABEL),$(LABEL),hourly_direction) --label-params '$(if $(LABEL_PARAMS),$(LABEL_PARAMS),{})' --thresholds '$(if $(THRESHOLDS),$(THRESHOLDS),[0.55,0.6,0.65])' $(if $(TOP_PCT),--top-pct $(TOP_PCT),) $(if $(ALLOWED_HOURS),--allowed-hours $(ALLOWED_HOURS),) $(if $(OUT),--output $(OUT),)
+
+quick-sweep:
+	@if [ -z "$(MODEL)" ]; then \
+		echo "Usage: make quick-sweep MODEL=sq_macd_trend_pullback_5m PRESET=liquid_etfs CAP=20 BASE=http://localhost:8050"; \
+		exit 1; \
+	fi
+	$(MAKE) db-migrate
+	@echo "Running sweep for $(MODEL) on $(PRESET) (cap=$(CAP)) via $(if $(BASE),$(BASE),http://localhost:8050)"
+	curl -sS -X POST "$(if $(BASE),$(BASE),http://localhost:8050)/models/$(MODEL)/backtest/sweep" -H "Content-Type: application/json" -d '{
+	  "universe": {"preset_id": "$(if $(PRESET),$(PRESET),liquid_etfs)", "cap": $(if $(CAP),$(CAP),20)},
+	  "grid": {"thresholds_list": [[0.55,0.6,0.65,0.7]], "allowed_hours_list": [[9,10,11,12,13,14,15]], "max_combos": 20, "min_trades": 50},
+	  "persist": true,
+	  "tag": "quick-sweep"
+	}' | sed -e 's/{/\n{/g' -e 's/,/\n  ,/g'
 
 watchlist-create:
 	@if [ -z "$(USER)" ] || [ -z "$(NAME)" ]; then \

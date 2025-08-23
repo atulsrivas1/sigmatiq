@@ -18,9 +18,11 @@
 - FeatureSet: binds to indicator_set or strategy IDs; synthetic indicator lists allowed via featureset.indicators[].
 
 ## 4. Data & Pipelines
-- Reuse Sigma Core: `/indicator_sets/auto_build` (or strategy) to compute features; Polygon cached loaders for offline.
-- Never cache today to avoid stale live data; ensure tz-aware indices.
-- Cohort runners resolve universes via presets/watchlists.
+- Reuse Sigma Core: `/indicator_sets/auto_build` (or strategy) to compute features; Polygon cached loaders for offline parity.
+- Caching rules: never cache “today”; prefer adjusted=true for daily bars to avoid split/dividend artifacts (record in `training_cfg`).
+- Universes: cohort runners resolve via presets/watchlists; per‑ticker scope only when declared.
+- Datasets: Parquet partitioned by timeframe/date; hash datasets/features and record in `sc.model_training_runs`.
+- CV: forward‑chaining, grouped by symbol; record `fold` and `cv` policy.
 
 ## 5. Serving & APIs
 - Internal Scoring Service: gRPC/HTTP endpoint `POST /score` with batch support; stateless; model registry on disk/S3.

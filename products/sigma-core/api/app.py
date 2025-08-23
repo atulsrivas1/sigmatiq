@@ -10,6 +10,8 @@ from typing import Any, Dict
 import json
 from datetime import date, timedelta
 import pandas as pd
+import os
+import hashlib
 
 # Load local .env (self-sufficient)
 try:
@@ -29,6 +31,10 @@ from sigma_core.data.sources.polygon import (
     get_polygon_hourly_bars,
     get_polygon_agg_bars,
 )
+from sigma_core.labels.hourly_direction import label_next_hour_direction
+from sigma_core.labels.forward import label_forward_return_days
+from sigma_core.backtest.engine import run_backtest as engine_run_backtest
+from datetime import datetime
 
 app = FastAPI(title="Sigma Core Catalog API", version="0.1.0")
 
@@ -291,6 +297,9 @@ def screen_auto(payload: AutoScreenRequest, user: User = Depends(get_current_use
     start_date, end_date = payload.start_date, payload.end_date
     if not start_date or not end_date:
         start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
     # Resolve universe
     symbols: List[str] = []
     with get_db() as conn:
@@ -310,8 +319,15 @@ def screen_auto(payload: AutoScreenRequest, user: User = Depends(get_current_use
                     (payload.watchlist_id,),
                 )
                 symbols = [r[0] for r in cur.fetchall()]
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
     cap = max(1, int(payload.cap or 50))
-    symbols = symbols[:cap]
+    symbols = symbols[:min(cap, 50)]
     # Prepare indicator
     try:
         cls = get_indicator_cls(payload.name)
@@ -326,6 +342,24 @@ def screen_auto(payload: AutoScreenRequest, user: User = Depends(get_current_use
     matched: List[str] = []
     fetched = 0
     skipped = 0
+    # Simple mode defaults
+    thresholds_use = payload.thresholds
+    top_pct_use = payload.top_pct
+    hours_use = payload.allowed_hours
+    if (getattr(payload, 'mode', None) or '').lower() == 'simple' and thresholds_use is None and top_pct_use is None:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT grid FROM sc.backtest_sweep_presets WHERE preset_id = 'rth_thresholds_basic'")
+                    rr = cur.fetchone()
+                    if rr and rr[0]:
+                        grid = rr[0] or {}
+                        thr_list = (grid.get('thresholds_list') or [[]])
+                        thresholds_use = thr_list[0] if thr_list and thr_list[0] else payload.thresholds
+                        hrs_list = (grid.get('allowed_hours_list') or [[]])
+                        hours_use = hrs_list[0] if hrs_list and hrs_list[0] else payload.allowed_hours
+        except Exception:
+            pass
     for sym in symbols:
         try:
             df = _fetch_bars(sym, payload.timeframe, start_date, end_date)
@@ -393,6 +427,9 @@ def indicator_set_auto_build(payload: AutoSetFeaturesRequest, user: User = Depen
     start_date, end_date = payload.start_date, payload.end_date
     if not start_date or not end_date:
         start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
     # Build FBIndicatorSet from DB
     with get_db() as conn:
         with conn.cursor() as cur:
@@ -426,8 +463,15 @@ def indicator_set_auto_build(payload: AutoSetFeaturesRequest, user: User = Depen
                     (payload.watchlist_id,),
                 )
                 symbols = [x[0] for x in cur.fetchall()]
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
     cap = max(1, int(payload.cap or 50))
-    symbols = symbols[:cap]
+    symbols = symbols[:min(cap, 50)]
     fb_set = FBIndicatorSet(
         name=str(payload.set_id),
         version=int(payload.version),
@@ -504,6 +548,9 @@ def indicator_set_auto_screen(payload: AutoSetScreenRequest, user: User = Depend
     start_date, end_date = payload.start_date, payload.end_date
     if not start_date or not end_date:
         start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
     # Build rules
     rules: List[ScreenRule] = []
     if payload.rules:
@@ -547,8 +594,15 @@ def indicator_set_auto_screen(payload: AutoSetScreenRequest, user: User = Depend
                     (payload.watchlist_id,),
                 )
                 symbols = [x[0] for x in cur.fetchall()]
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
     cap = max(1, int(payload.cap or 50))
-    symbols = symbols[:cap]
+    symbols = symbols[:min(cap, 50)]
     fb_set = FBIndicatorSet(
         name=str(payload.set_id),
         version=int(payload.version),
@@ -605,6 +659,366 @@ def indicator_set_auto_screen(payload: AutoSetScreenRequest, user: User = Depend
             skipped += 1
             continue
     return AutoScreenOut(matched=sorted(set(matched)), evaluated=len(symbols), fetched=fetched, skipped=skipped)
+
+
+# --- Dataset Builder for Models (training/backtest datasets) ---
+class DatasetBuildRequest(BaseModel):
+    model_id: str
+    version: Optional[int] = None  # latest published if not provided
+    # Universe overrides (else derive from model scope)
+    preset_id: Optional[str] = None
+    watchlist_id: Optional[str] = None
+    symbols: Optional[List[str]] = None
+    # Timeframe/date overrides (else use spec.timeframe and training_cfg.data_window)
+    timeframe: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    cap: Optional[int] = 50
+    include_labels: bool = True
+    output: Optional[str] = "summary"  # summary|csv
+    out_dir: Optional[str] = "data_dumps"
+
+
+class DatasetBuildOut(BaseModel):
+    run_id: Optional[str] = None
+    model_id: str
+    version: int
+    timeframe: str
+    symbols: int
+    rows: int
+    features: int
+    wrote_path: Optional[str] = None
+
+
+def _get_latest_model_version(cur, model_id: str) -> Optional[int]:
+    cur.execute("SELECT version FROM sc.v_model_specs_published WHERE model_id=%s", (model_id,))
+    r = cur.fetchone()
+    return r[0] if r else None
+
+
+def _load_model_spec(cur, model_id: str, version: int) -> Dict[str, Any]:
+    cur.execute(
+        """
+        SELECT model_id, version, status, timeframe, market, instrument,
+               featureset, label_cfg, thresholds, guardrails, artifacts, plan_template,
+               scope, training_cfg
+        FROM sc.model_specs WHERE model_id=%s AND version=%s
+        """,
+        (model_id, version),
+    )
+    r = cur.fetchone()
+    if not r:
+        raise HTTPException(status_code=404, detail="model not found")
+    cols = [d[0] for d in cur.description]
+    return dict(zip(cols, r))
+
+
+def _resolve_symbols_for_model(scope: Optional[Dict[str, Any]], override: Dict[str, Any], user: User) -> List[str]:
+    # Priority: explicit symbols > preset_id/watchlist_id > scope.allow_presets/allow_symbols
+    if override.get("symbols"):
+        return list(dict.fromkeys([str(s).upper() for s in override["symbols"]]))
+    sym: List[str] = []
+    if override.get("preset_id") or override.get("watchlist_id"):
+        # Reuse universe resolver
+        req = UniverseRequest(preset_id=override.get("preset_id"), watchlist_id=override.get("watchlist_id"), cap=override.get("cap"))
+        return resolve_universe(req, user)  # type: ignore[arg-type]
+    if scope:
+        t = scope.get("type")
+        if t == "cohort" and scope.get("allow_presets"):
+            # Take first preset and resolve
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT symbol FROM sc.universe_preset_symbols WHERE preset_id = %s ORDER BY symbol", (scope["allow_presets"][0],))
+                    sym = [r[0] for r in cur.fetchall()]
+        elif t == "per_ticker" and scope.get("allow_symbols"):
+            sym = [str(s).upper() for s in scope["allow_symbols"]]
+    return sym
+
+
+def _build_fb_for_featureset(cur, featureset: Dict[str, Any]) -> FeatureBuilder:
+    # Build FeatureBuilder from featureset config: set_id+version | strategy_id+version | indicators[]
+    if featureset.get("set_id"):
+        set_id = featureset["set_id"]
+        set_version = int(featureset.get("version") or 1)
+        # Build from DB set components
+        payload = AutoSetFeaturesRequest(set_id=set_id, version=set_version, timeframe="day")  # timeframe unused here
+        # reuse code path to load components
+        with get_db() as conn:
+            with conn.cursor() as cur2:
+                cur2.execute(
+                    "SELECT indicator_id, indicator_version, params FROM sc.indicator_set_components WHERE set_id=%s AND set_version=%s ORDER BY ord",
+                    (set_id, set_version),
+                )
+                comps = cur2.fetchall()
+        fb_set = FBIndicatorSet(name=str(set_id), version=int(set_version), description="from_registry", indicators=[FBIndicatorSpec(name=rr[0], version=int(rr[1] or 1), params=(rr[2] or {})) for rr in comps])
+        return FeatureBuilder(indicator_set=fb_set)
+    if featureset.get("strategy_id"):
+        sid = featureset["strategy_id"]
+        sver = int(featureset.get("strategy_version") or 1)
+        fb_set = _build_fb_set_for_strategy(sid, sver)
+        return FeatureBuilder(indicator_set=fb_set)
+    if featureset.get("indicators"):
+        inds = [FBIndicatorSpec(name=i.get("id"), version=int(i.get("version") or 1), params=(i.get("params") or {})) for i in featureset.get("indicators") or []]
+        fb_set = FBIndicatorSet(name="synthetic", version=1, description="synthetic", indicators=inds)
+        return FeatureBuilder(indicator_set=fb_set)
+    raise HTTPException(status_code=400, detail="invalid featureset config")
+
+
+def _compute_labels_stock(df: pd.DataFrame, tp_pct: float, sl_pct: float, max_hold: int) -> pd.DataFrame:
+    out = pd.DataFrame(index=df.index)
+    if not {"close", "high", "low"}.issubset(df.columns):
+        out["label"] = None
+        out["outcome"] = None
+        out["realized_return"] = 0.0
+        return out
+    close = df["close"].astype(float).values
+    high = df["high"].astype(float).values
+    low = df["low"].astype(float).values
+    n = len(df)
+    H = int(max(1, max_hold))
+    label = [None]*n
+    outcome = [None]*n
+    realized = [0.0]*n
+    for i in range(n):
+        entry = close[i]
+        tp = entry * (1.0 + tp_pct/100.0)
+        sl = entry * (1.0 - sl_pct/100.0)
+        hit_tp_at = None
+        hit_sl_at = None
+        last = min(n-1, i+H)
+        k = i+1
+        while k <= last:
+            if hit_tp_at is None and high[k] >= tp:
+                hit_tp_at = k
+            if hit_sl_at is None and low[k] <= sl:
+                hit_sl_at = k
+            if hit_tp_at is not None or hit_sl_at is not None:
+                # if both happened same bar, treat whichever check found first
+                break
+            k += 1
+        if hit_tp_at is not None and (hit_sl_at is None or hit_tp_at <= hit_sl_at):
+            label[i] = 1
+            outcome[i] = "tp_hit"
+            realized[i] = (tp - entry) / entry
+        elif hit_sl_at is not None and (hit_tp_at is None or hit_sl_at < hit_tp_at):
+            label[i] = 0
+            outcome[i] = "sl_hit"
+            realized[i] = (sl - entry) / entry
+        else:
+            label[i] = 0
+            outcome[i] = "max_hold"
+            realized[i] = (close[last] - entry) / entry
+    out["label"] = label
+    out["outcome"] = outcome
+    out["realized_return"] = realized
+    return out
+
+
+@app.post(
+    "/models/dataset/build",
+    response_model=DatasetBuildOut,
+    summary="Build dataset for a model (training/backtest)",
+    description="Resolves cohort, fetches bars, computes features using the model's featureset, and optionally generates stock labels. Writes CSV if requested and records a training run."
+)
+def build_model_dataset(
+    payload: DatasetBuildRequest = Body(
+        ..., example={
+            "model_id": "sq_macd_trend_pullback_5m",
+            "timeframe": "5m",
+            "preset_id": "liquid_etfs",
+            "start_date": "2024-06-01",
+            "end_date": "2024-06-15",
+            "cap": 10,
+            "include_labels": True,
+            "output": "csv",
+            "out_dir": "data_dumps"
+        }
+    ),
+    user: User = Depends(get_current_user)
+):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            ver = payload.version
+            if ver is None:
+                ver = _get_latest_model_version(cur, payload.model_id)
+                if ver is None:
+                    raise HTTPException(status_code=404, detail="no published version for model")
+            spec = _load_model_spec(cur, payload.model_id, int(ver))
+    timeframe = payload.timeframe or spec.get("timeframe") or "day"
+    # Dates
+    if payload.start_date and payload.end_date:
+        sd, ed = payload.start_date, payload.end_date
+    else:
+        tc = spec.get("training_cfg") or {}
+        win = tc.get("data_window") or {}
+        sd, ed = win.get("start"), win.get("end")
+        if not sd or not ed:
+            sd, ed = _default_dates()
+    # Symbols
+    symbols = _resolve_symbols_for_model(spec.get("scope"), payload.dict(), user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved; provide preset/watchlist/symbols or model scope")
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
+    cap = max(1, int(payload.cap or 50))
+    symbols = symbols[:min(cap, 50)]
+    # Feature builder
+    fb = _build_fb_for_featureset(None, spec.get("featureset") or {})
+    rows_total = 0
+    feats_cols: set[str] = set()
+    frames: List[pd.DataFrame] = []
+    # Label cfg
+    lc = spec.get("label_cfg") or {}
+    tp_pct = float(lc.get("tp_pct") or 0.0)
+    sl_pct = float(lc.get("sl_pct") or 0.0)
+    max_hold = int(lc.get("max_hold_bars") or 0)
+    for sym in symbols:
+        df = _fetch_bars(sym, timeframe, sd, ed)
+        if df is None or df.empty:
+            continue
+        # Ensure expected columns
+        # df already has 'date','open','high','low','close','volume'
+        fdf = fb.add_indicator_features(df)
+        new_cols = [c for c in fdf.columns if c not in df.columns]
+        feats_cols.update(new_cols)
+        res = fdf.copy()
+        if payload.include_labels and tp_pct > 0 and sl_pct > 0 and max_hold > 0:
+            lbl = _compute_labels_stock(res, tp_pct, sl_pct, max_hold)
+            res = pd.concat([res, lbl], axis=1)
+        res.insert(0, "symbol", sym)
+        rows_total += len(res)
+        frames.append(res)
+    if not frames:
+        raise HTTPException(status_code=400, detail="no data computed for symbols/timeframe/date range")
+    out_df = pd.concat(frames, axis=0, ignore_index=True)
+    # Optional CV fold assignment
+    if payload.fold_count and int(payload.fold_count) > 1:
+        try:
+            import numpy as _np  # type: ignore
+        except Exception:
+            raise HTTPException(status_code=400, detail="fold assignment requires numpy; please install it")
+        k = int(payload.fold_count)
+        gap = int(payload.gap_bars or 0)
+        if 'date' in out_df.columns:
+            out_df.sort_values(['symbol','date'], inplace=True, kind='mergesort')
+        else:
+            out_df.sort_values(['symbol'], inplace=True, kind='mergesort')
+        folds: List[int] = []
+        for _, g in out_df.groupby('symbol', sort=False):
+            n = len(g)
+            if n <= k:
+                f = list(range(min(n, k))) + [k-1]*(max(0, n-k))
+            else:
+                edges = (_np.linspace(0, n, k+1)).astype(int)
+                ff = _np.zeros(n, dtype=int)
+                for i in range(k):
+                    start = edges[i]
+                    end = edges[i+1]
+                    ff[start:end] = i
+                    if gap > 0 and i < k-1:
+                        ff[max(start, end-gap):end] = -1
+                f = ff.tolist()
+            folds.extend(f)
+        out_df['fold'] = folds
+
+    wrote_path = None
+    run_id = None
+    _out = (payload.output or "").lower()
+    if _out == "csv":
+        out_dir = payload.out_dir or "data_dumps"
+        os.makedirs(out_dir, exist_ok=True)
+        fname = f"dataset_{payload.model_id}_v{ver}_{timeframe}_{sd}_{ed}.csv".replace(':','-')
+        path = os.path.join(out_dir, fname)
+        out_df.to_csv(path, index=False)
+        wrote_path = path
+        # hash file
+        try:
+            h = hashlib.sha1(Path(path).read_bytes()).hexdigest()
+        except Exception:
+            h = None
+        # record training run
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_training_runs (model_id, model_version, status, training_cfg, data_window, dataset_hash, features_hash, git_sha, metrics, started_at, finished_at)
+                        VALUES (%s,%s,'success',%s,%s,%s,%s,%s,%s,NOW(),NOW())
+                        RETURNING train_id
+                        """,
+                        (
+                            payload.model_id,
+                            int(ver),
+                            json.dumps(spec.get("training_cfg") or {}),
+                            json.dumps({"start": sd, "end": ed}),
+                            h,
+                            None,
+                            None,
+                            json.dumps({"rows": len(out_df), "symbols": len(symbols)}),
+                        ),
+                    )
+                    run_id = cur.fetchone()[0]
+                    conn.commit()
+        except Exception:
+            run_id = None
+    elif _out == "parquet":
+        try:
+            import pyarrow as _pa  # noqa: F401
+            import pyarrow.parquet as _pq  # noqa: F401
+        except Exception:
+            raise HTTPException(status_code=400, detail="parquet output requires pyarrow; please install it")
+        out_dir = payload.out_dir or "data_dumps"
+        os.makedirs(out_dir, exist_ok=True)
+        fname = f"dataset_{payload.model_id}_v{ver}_{timeframe}_{sd}_{ed}.parquet".replace(':','-')
+        path = os.path.join(out_dir, fname)
+        try:
+            out_df.to_parquet(path, index=False)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"failed to write parquet: {e}")
+        wrote_path = path
+        try:
+            h = hashlib.sha1(Path(path).read_bytes()).hexdigest()
+        except Exception:
+            h = None
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_training_runs (model_id, model_version, status, training_cfg, data_window, dataset_hash, features_hash, git_sha, metrics, started_at, finished_at)
+                        VALUES (%s,%s,'success',%s,%s,%s,%s,%s,%s,NOW(),NOW())
+                        RETURNING train_id
+                        """,
+                        (
+                            payload.model_id,
+                            int(ver),
+                            json.dumps(spec.get("training_cfg") or {}),
+                            json.dumps({"start": sd, "end": ed}),
+                            h,
+                            None,
+                            None,
+                            json.dumps({"rows": len(out_df), "symbols": len(symbols)}),
+                        ),
+                    )
+                    run_id = cur.fetchone()[0]
+                    conn.commit()
+        except Exception:
+            run_id = None
+    return DatasetBuildOut(
+        run_id=str(run_id) if run_id else None,
+        model_id=payload.model_id,
+        version=int(ver),
+        timeframe=timeframe,
+        symbols=len(symbols),
+        rows=rows_total,
+        features=len(feats_cols),
+        wrote_path=wrote_path,
+    )
 
 
 # --- Recipes runner (Simple Mode) ---
@@ -994,9 +1408,19 @@ def strategy_auto_build(payload: AutoStrategyBase, user: User = Depends(get_curr
     start_date, end_date = payload.start_date, payload.end_date
     if not start_date or not end_date:
         start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
     symbols = _resolve_universe_symbols(payload.preset_id, payload.watchlist_id, user)
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
     cap = max(1, int(payload.cap or 50))
-    symbols = symbols[:cap]
+    symbols = symbols[:min(cap, 50)]
 
     fb_set = _build_fb_set_for_strategy(payload.strategy_id, payload.version)
     fb = FeatureBuilder(indicator_set=fb_set)
@@ -1047,6 +1471,9 @@ def strategy_auto_screen(payload: AutoStrategyScreenRequest, user: User = Depend
     start_date, end_date = payload.start_date, payload.end_date
     if not start_date or not end_date:
         start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
     rules: List[ScreenRule] = []
     if payload.rules:
         rules = payload.rules
@@ -1059,8 +1486,15 @@ def strategy_auto_screen(payload: AutoStrategyScreenRequest, user: User = Depend
         raise HTTPException(status_code=400, detail="rules or rule_expr required")
 
     symbols = _resolve_universe_symbols(payload.preset_id, payload.watchlist_id, user)
+    # Novice caps: 90 days and 50 symbols
+    try:
+        from datetime import datetime as _dt
+        if (_dt.strptime(ed, "%Y-%m-%d") - _dt.strptime(sd, "%Y-%m-%d")).days > 90:
+            raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    except Exception:
+        pass
     cap = max(1, int(payload.cap or 50))
-    symbols = symbols[:cap]
+    symbols = symbols[:min(cap, 50)]
 
     fb_set = _build_fb_set_for_strategy(payload.strategy_id, payload.version)
     fb = FeatureBuilder(indicator_set=fb_set)
@@ -1488,7 +1922,7 @@ def list_watchlists(user: User = Depends(get_current_user)):
 
 
 @app.post("/watchlists", status_code=201, summary="Create or update a watchlist")
-def create_watchlist(payload: WatchlistCreate = Body(..., example={"name":"starter","description":"demo list","visibility":"private","is_default":true}), user: User = Depends(get_current_user)):
+def create_watchlist(payload: WatchlistCreate = Body(..., example={"name":"starter","description":"demo list","visibility":"private","is_default":True}), user: User = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1604,7 +2038,7 @@ class IndicatorSetCreateIn(BaseModel):
 
 
 @app.post("/indicator_sets", status_code=201, summary="Create an indicator set version")
-def create_indicator_set(payload: IndicatorSetCreateIn = Body(..., example={"set_id":"demo_set","version":1,"status":"draft","title":"Demo Set","purpose":"Testing","novice_ready":false,"components":[{"indicator_id":"rsi","indicator_version":1,"params":{"period":14}}]})):
+def create_indicator_set(payload: IndicatorSetCreateIn = Body(..., example={"set_id":"demo_set","version":1,"status":"draft","title":"Demo Set","purpose":"Testing","novice_ready":False,"components":[{"indicator_id":"rsi","indicator_version":1,"params":{"period":14}}]})):
     if payload.novice_ready and payload.status == "published" and not payload.guardrails:
         raise HTTPException(status_code=400, detail="guardrails required for novice_ready published sets")
     with get_db() as conn:
@@ -1766,7 +2200,7 @@ class StrategyCreateIn(BaseModel):
 
 
 @app.post("/strategies", status_code=201, summary="Create a strategy version")
-def create_strategy(payload: StrategyCreateIn = Body(..., example={"strategy_id":"trend_follow_alignment","version":1,"status":"draft","title":"Trend Follow Alignment","novice_ready":false,"indicator_sets":[{"set_id":"macd_trend_pullback_v1","set_version":1}]})):
+def create_strategy(payload: StrategyCreateIn = Body(..., example={"strategy_id":"trend_follow_alignment","version":1,"status":"draft","title":"Trend Follow Alignment","novice_ready":False,"indicator_sets":[{"set_id":"macd_trend_pullback_v1","set_version":1}]})):
     if payload.novice_ready and payload.status == "published" and not payload.guardrails:
         raise HTTPException(status_code=400, detail="guardrails required for novice_ready published strategies")
     with get_db() as conn:
@@ -1905,7 +2339,7 @@ class StrategyValidateOut(BaseModel):
 
 
 @app.post("/strategies/validate", response_model=StrategyValidateOut, summary="Validate a strategy payload")
-def validate_strategy(payload: StrategyValidateIn = Body(..., example={"strategy":{"strategy_id":"trend_follow_alignment","version":1,"status":"draft","title":"Trend Follow Alignment","novice_ready":false,"indicator_sets":[{"set_id":"macd_trend_pullback_v1","set_version":1}]}})):
+def validate_strategy(payload: StrategyValidateIn = Body(..., example={"strategy":{"strategy_id":"trend_follow_alignment","version":1,"status":"draft","title":"Trend Follow Alignment","novice_ready":False,"indicator_sets":[{"set_id":"macd_trend_pullback_v1","set_version":1}]}})):
     errs: List[str] = []
     s = payload.strategy
     if s.novice_ready and (s.status == "published") and not s.guardrails:
@@ -1967,3 +2401,1393 @@ def build_set_features(payload: BuildSetFeaturesIn = Body(..., example={"set_id"
     cols_new = [c for c in out_df.columns if c not in df.columns]
     return BuildSetFeaturesOut(columns=cols_new, data=out_df[cols_new].to_dict(orient="records"))
 
+
+# --- Backtest Runner ---
+class BacktestLabelCfg(BaseModel):
+    kind: str  # 'hourly_direction' | 'forward_days'
+    params: Dict[str, Any] | None = None
+
+
+class BacktestFeaturesCfg(BaseModel):
+    set_id: str
+    version: int
+
+
+class BacktestUniverseIn(BaseModel):
+    preset_id: Optional[str] = None
+    watchlist_id: Optional[str] = None
+    symbols: Optional[List[str]] = None
+    cap: Optional[int] = 50
+
+
+class BacktestRequest(BaseModel):
+    timeframe: str = "hour"  # hour|day|<N>m
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    universe: BacktestUniverseIn
+    features: BacktestFeaturesCfg
+    label: BacktestLabelCfg
+    # Engine params
+    thresholds: Optional[List[float]] = [0.55, 0.6, 0.65, 0.7]
+    top_pct: Optional[float] = None
+    splits: int = 5
+    embargo: float = 0.0
+    size_by_conf: bool = False
+    conf_cap: float = 1.0
+    allowed_hours: Optional[List[int]] = None
+    momentum_gate: bool = False
+    momentum_min: float = 0.0
+    momentum_column: str = 'momentum_score_total'
+
+
+class BacktestSymbolResult(BaseModel):
+    symbol: str
+    threshold_results: List[Dict[str, Any]]
+    top_pct_result: Optional[Dict[str, Any]] = None
+    rows: int
+
+
+class BacktestRunOut(BaseModel):
+    scope: str
+    timeframe: str
+    symbols_evaluated: int
+    symbols_skipped: int
+    per_symbol: List[BacktestSymbolResult]
+    pooled_result: Optional[Dict[str, Any]] = None
+    warnings: Optional[List[str]] = None
+    summary: Optional[str] = None
+
+
+def _resolve_symbols_from_universe(u: BacktestUniverseIn, user: User) -> List[str]:
+    if u.symbols:
+        syms = [str(s).upper() for s in u.symbols]
+        cap = max(1, int(u.cap or len(syms)))
+        return syms[:cap]
+    syms: List[str] = []
+    if not u.preset_id and not u.watchlist_id:
+        return syms
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            if u.preset_id:
+                cur.execute(
+                    "SELECT symbol FROM sc.universe_preset_symbols WHERE preset_id = %s ORDER BY symbol",
+                    (u.preset_id,),
+                )
+                syms = [r[0] for r in cur.fetchall()]
+            else:
+                cur.execute("SELECT 1 FROM sc.watchlists WHERE watchlist_id = %s AND user_id = %s", (u.watchlist_id, user.user_id))
+                if not cur.fetchone():
+                    raise HTTPException(status_code=404, detail="watchlist not found")
+                cur.execute(
+                    "SELECT symbol FROM sc.watchlist_symbols WHERE watchlist_id = %s ORDER BY sort NULLS LAST, symbol",
+                    (u.watchlist_id,),
+                )
+                syms = [r[0] for r in cur.fetchall()]
+    cap = max(1, int(u.cap or 50))
+    return syms[:cap]
+
+
+def _build_fb_set_from_db(set_id: str, version: int) -> FBIndicatorSet:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT title FROM sc.indicator_sets WHERE set_id=%s AND version=%s",
+                (set_id, version),
+            )
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="indicator set not found")
+            desc = r[0] or ""
+            cur.execute(
+                "SELECT indicator_id, indicator_version, params FROM sc.indicator_set_components WHERE set_id=%s AND set_version=%s ORDER BY ord",
+                (set_id, version),
+            )
+            comps = cur.fetchall()
+    return FBIndicatorSet(
+        name=str(set_id),
+        version=int(version),
+        description=str(desc),
+        indicators=[FBIndicatorSpec(name=rr[0], version=int(rr[1] or 1), params=(rr[2] or {})) for rr in comps],
+    )
+
+
+def _maybe_add_hour_et(df: pd.DataFrame) -> pd.DataFrame:
+    if 'date' in df.columns and 'hour_et' not in df.columns:
+        try:
+            dt = pd.to_datetime(df['date'])
+            try:
+                df['hour_et'] = dt.dt.tz_convert('US/Eastern').dt.hour
+            except Exception:
+                df['hour_et'] = dt.dt.hour
+        except Exception:
+            pass
+    return df
+
+
+def _apply_label(df: pd.DataFrame, label: BacktestLabelCfg) -> pd.DataFrame:
+    kind = (label.kind or '').lower().strip()
+    params = dict(label.params or {})
+    if kind in ('hour', 'hourly', 'hourly_direction'):
+        return label_next_hour_direction(df, **params)
+    if kind in ('forward_days', 'fwd_days', 'fwd'):
+        return label_forward_return_days(df, **params)
+    # Default: passthrough
+    return df
+
+
+@app.post(
+    "/backtest/run",
+    response_model=BacktestRunOut,
+    summary="Run cross-validated backtest over a set of symbols",
+    description="Fetches bars for a universe, builds features from an indicator set, applies labels, and runs a CV backtest per symbol with an optional pooled summary."
+)
+def run_backtest(
+    payload: BacktestRequest = Body(
+        ..., example={
+            "timeframe": "hour",
+            "start_date": "2024-06-01",
+            "end_date": "2024-06-15",
+            "universe": {"preset_id": "liquid_etfs", "cap": 5},
+            "features": {"set_id": "macd_trend_pullback_v1", "version": 1},
+            "label": {"kind": "hourly_direction", "params": {"k_sigma": 0.3}},
+            "thresholds": [0.55, 0.6, 0.65],
+            "splits": 5,
+            "embargo": 0.1,
+            "size_by_conf": False,
+            "conf_cap": 1.0
+        }
+    ),
+    user: User = Depends(get_current_user),
+    persist: bool = Query(False, description="Persist backtest summary and folds to DB"),
+    tag: Optional[str] = Query(None, description="Optional tag for persisted run"),
+    pack_id: Optional[str] = Query(None, description="Optional pack_id to associate this run with")
+):
+    start_date = payload.start_date
+    end_date = payload.end_date
+    if not start_date or not end_date:
+        start_date, end_date = _default_dates()
+    # Novice cap: 90-day window
+    if _days_between(start_date, end_date) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    symbols = _resolve_symbols_from_universe(payload.universe, user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved; provide universe (preset/watchlist/symbols)")
+    # Novice cap: 50 symbols
+    symbols = symbols[:50]
+    fb_set = _build_fb_set_from_db(payload.features.set_id, int(payload.features.version))
+    fb = FeatureBuilder(indicator_set=fb_set)
+
+    per_symbol: List[BacktestSymbolResult] = []
+    skipped = 0
+    frames_all: List[pd.DataFrame] = []
+    for sym in symbols:
+        try:
+            df = _fetch_bars(sym, payload.timeframe, start_date, end_date)
+            if df is None or df.empty:
+                skipped += 1
+                continue
+            df = _maybe_add_hour_et(df)
+            fdf = fb.add_indicator_features(df)
+            ldf = _apply_label(fdf, payload.label)
+            # Ensure target column
+            target_col = 'y' if 'y' in ldf.columns else ('y_syn' if 'y_syn' in ldf.columns else None)
+            if not target_col:
+                skipped += 1
+                continue
+            res = engine_run_backtest(
+                ldf,
+                target_col=target_col,
+                thresholds=thresholds_use or [],
+                splits=int(payload.splits or 5),
+                embargo=float(payload.embargo or 0.0),
+                top_pct=top_pct_use,
+                allowed_hours=hours_use,
+                slippage_bps=1.0,
+                size_by_conf=bool(payload.size_by_conf),
+                conf_cap=float(payload.conf_cap or 1.0),
+                momentum_gate=bool(payload.momentum_gate),
+                momentum_min=float(payload.momentum_min or 0.0),
+                momentum_column=str(payload.momentum_column or 'momentum_score_total'),
+            )
+            per_symbol.append(BacktestSymbolResult(symbol=sym, threshold_results=res.get('threshold_results') or [], top_pct_result=res.get('top_pct_result'), rows=len(ldf)))
+            frames_all.append(ldf)
+        except Exception:
+            skipped += 1
+            continue
+    pooled_result: Optional[Dict[str, Any]] = None
+    if frames_all:
+        try:
+            pooled_df = pd.concat(frames_all, axis=0, ignore_index=True)
+            target_col = 'y' if 'y' in pooled_df.columns else ('y_syn' if 'y_syn' in pooled_df.columns else None)
+            if target_col:
+                pooled_result = engine_run_backtest(
+                    pooled_df,
+                    target_col=target_col,
+                    thresholds=thresholds_use or [],
+                    splits=int(payload.splits or 5),
+                    embargo=float(payload.embargo or 0.0),
+                    top_pct=top_pct_use,
+                    allowed_hours=hours_use,
+                    slippage_bps=1.0,
+                    size_by_conf=bool(payload.size_by_conf),
+                    conf_cap=float(payload.conf_cap or 1.0),
+                    momentum_gate=bool(payload.momentum_gate),
+                    momentum_min=float(payload.momentum_min or 0.0),
+                    momentum_column=str(payload.momentum_column or 'momentum_score_total'),
+                )
+        except Exception:
+            pooled_result = None
+    # Optional: persist run
+    if persist:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    start_dt = datetime.utcnow()
+                    metrics = {}
+                    folds = []
+                    if pooled_result:
+                        folds = pooled_result.get('threshold_results') or []
+                        # compute simple aggregates
+                        try:
+                            import numpy as _np  # type: ignore
+                            if folds:
+                                sh = [float(r.get('sharpe_hourly', 0.0)) for r in folds]
+                                tr = [int(r.get('trades', 0)) for r in folds]
+                                cr = [float(r.get('cum_ret', 0.0)) for r in folds]
+                                metrics = {
+                                    'avg_sharpe_hourly': float(_np.mean(sh)),
+                                    'trades_total': int(sum(tr)),
+                                    'cum_ret_sum': float(sum(cr)),
+                                }
+                        except Exception:
+                            metrics = {}
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_backtest_runs
+                          (model_id, model_version, pack_id, timeframe, data_window, universe, featureset, label_cfg, params, metrics, best_config, summary, git_sha, tag, started_at, finished_at)
+                        VALUES
+                          (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                        RETURNING run_id
+                        """,
+                        (
+                            None, None, pack_id, payload.timeframe,
+                            json.dumps({'start': start_date, 'end': end_date}),
+                            json.dumps(payload.universe.dict() if hasattr(payload.universe, 'dict') else {}),
+                            json.dumps({'set_id': payload.features.set_id, 'version': int(payload.features.version)}),
+                            json.dumps(payload.label.dict() if hasattr(payload.label, 'dict') else {}),
+                            json.dumps({'thresholds': payload.thresholds, 'top_pct': payload.top_pct, 'splits': payload.splits, 'embargo': payload.embargo}),
+                            json.dumps(metrics),
+                            json.dumps(None),
+                            (f"Backtest on {len(symbols)} symbols ({payload.timeframe}) — avg_sharpe={metrics.get('avg_sharpe_hourly',0):.3f}, trades={metrics.get('trades_total',0)}" if metrics else None),
+                            None,
+                            tag,
+                        ),
+                    )
+                    rid = cur.fetchone()[0]
+                    # persist folds
+                    if folds:
+                        for r in folds:
+                            cur.execute(
+                                """
+                                INSERT INTO sc.model_backtest_folds (run_id, fold, thr_used, cum_ret, sharpe_hourly, trades)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                """,
+                                (
+                                    rid,
+                                    int(r.get('fold', 0)),
+                                    (float(r.get('thr')) if r.get('thr') is not None else None),
+                                    float(r.get('cum_ret', 0.0)),
+                                    float(r.get('sharpe_hourly', 0.0)),
+                                    int(r.get('trades', 0)),
+                                ),
+                            )
+                    conn.commit()
+        except Exception:
+            pass
+    # Novice summary
+    summary = f"Backtested {len(symbols)} symbols ({payload.timeframe}) from {start_date} to {end_date}. Skipped {skipped}."
+    return BacktestRunOut(
+        scope="per_symbol",
+        timeframe=payload.timeframe,
+        symbols_evaluated=len(symbols),
+        symbols_skipped=skipped,
+        per_symbol=per_symbol,
+        pooled_result=pooled_result,
+        warnings=[],
+    )
+
+
+# --- Backtest sweep for a model ---
+class BacktestSweepGrid(BaseModel):
+    thresholds_list: Optional[List[List[float]]] = None
+    top_pct_list: Optional[List[float]] = None
+    allowed_hours_list: Optional[List[List[int]]] = None
+    label_params_list: Optional[List[Dict[str, Any]]] = None
+    size_by_conf_list: Optional[List[bool]] = None
+    conf_cap_list: Optional[List[float]] = None
+    max_combos: int = 50
+    min_trades: int = 50
+
+
+class BacktestSweepRequest(BaseModel):
+    mode: Optional[str] = None  # simple|advanced
+    version: Optional[int] = None
+    timeframe: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    universe: BacktestUniverseIn
+    sweep_preset_id: Optional[str] = None
+    grid: BacktestSweepGrid
+    persist: bool = True
+    tag: Optional[str] = None
+    pack_id: Optional[str] = None
+
+
+class BacktestSweepOut(BaseModel):
+    run_id: Optional[str] = None
+    best_config: Dict[str, Any]
+    metrics: Dict[str, Any]
+    summary: str
+
+
+# --- Model Pipeline (build -> sweep/backtest -> leaderboard -> conditional train)
+class PipelineGuardrails(BaseModel):
+    min_trades: Optional[int] = 50
+    min_sharpe: Optional[float] = 0.2
+    max_position_rate: Optional[float] = None
+
+
+class PipelineUniverse(BacktestUniverseIn):
+    pass
+
+
+class ModelPipelineRunRequest(BaseModel):
+    version: Optional[int] = None
+    timeframe: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    universe: PipelineUniverse
+    mode: Optional[str] = 'simple'
+    sweep_preset_id: Optional[str] = None
+    grid: Optional[BacktestSweepGrid] = None
+    guardrails: Optional[PipelineGuardrails] = None
+    persist: Optional[bool] = True
+    dry_run: Optional[bool] = False
+
+
+class ModelPipelineRunOut(BaseModel):
+    pipeline_run_id: str
+    status: str
+    dataset: Optional[Dict[str, Any]] = None
+    backtests: Optional[Dict[str, Any]] = None
+    chosen: Optional[Dict[str, Any]] = None
+    training: Optional[Dict[str, Any]] = None
+    summary: Optional[str] = None
+    next_steps: Optional[List[str]] = None
+
+
+def _cap_dates_and_symbols(sd: str, ed: str, symbols: List[str]) -> tuple[str, str, List[str]]:
+    # Enforce 90-day and 50-symbol caps
+    if _days_between(sd, ed) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    cap_syms = symbols[:50]
+    return sd, ed, cap_syms
+
+
+@app.post("/models/{model_id}/pipeline/run", response_model=ModelPipelineRunOut, summary="Run model pipeline: dataset -> sweep/backtest -> conditional train")
+def model_pipeline_run(model_id: str, payload: ModelPipelineRunRequest = Body(...), user: User = Depends(get_current_user)):
+    # Resolve model version and defaults
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            ver = payload.version
+            if ver is None:
+                cur.execute("SELECT version FROM sc.v_model_specs_published WHERE model_id=%s", (model_id,))
+                r = cur.fetchone(); ver = int(r[0]) if r else None
+            if ver is None:
+                raise HTTPException(status_code=404, detail="no published version for model")
+            cur.execute("SELECT timeframe, featureset, label_cfg, scope FROM sc.model_specs WHERE model_id=%s AND version=%s", (model_id, int(ver)))
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="model not found")
+            m_timeframe, m_featureset, m_label, m_scope = r[0], r[1] or {}, r[2] or {}, r[3] or {}
+    timeframe = payload.timeframe or m_timeframe or 'day'
+    sd, ed = payload.start_date, payload.end_date
+    if not sd or not ed:
+        sd, ed = _default_dates()
+    # Resolve universe and apply caps
+    symbols = _resolve_symbols_from_universe(payload.universe, user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved; choose a preset like 'sp500' or add a watchlist")
+    sd, ed, symbols = _cap_dates_and_symbols(sd, ed, symbols)
+
+    # Create pipeline run row (running)
+    pipeline_run_id = None
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO sc.model_pipeline_runs (model_id, model_version, timeframe, universe, sweep, guardrails, status, summary)
+                    VALUES (%s,%s,%s,%s,%s,%s,'running',%s) RETURNING pipeline_run_id
+                    """,
+                    (
+                        model_id,
+                        int(ver),
+                        timeframe,
+                        json.dumps(payload.universe.dict() if hasattr(payload.universe,'dict') else {}),
+                        json.dumps({'preset': payload.sweep_preset_id, 'mode': payload.mode}),
+                        json.dumps(payload.guardrails.dict() if payload.guardrails else {}),
+                        f"Starting pipeline for {model_id}@{ver} on {len(symbols)} symbols ({timeframe}) over {sd}..{ed}",
+                    ),
+                )
+                pipeline_run_id = str(cur.fetchone()[0]); conn.commit()
+    except Exception:
+        pipeline_run_id = pipeline_run_id or ""
+
+    # Phase: Dataset (simple: optional summary only)
+    dataset_info: Dict[str, Any] = { 'rows': None, 'symbols': len(symbols) }
+    # Keep this phase lightweight for now to avoid heavy writes; sweeps will fetch data too
+
+    # Phase: Sweep/backtest
+    # Build BacktestSweepRequest using simple or provided preset/grid
+    grid = payload.grid or BacktestSweepGrid()
+    sweep_req = BacktestSweepRequest(
+        version=int(ver),
+        timeframe=timeframe,
+        start_date=sd,
+        end_date=ed,
+        universe=BacktestUniverseIn(**payload.universe.dict()),
+        sweep_preset_id=(payload.sweep_preset_id or ('rth_thresholds_basic' if (payload.mode or 'simple').lower()=='simple' else None)),
+        grid=grid,
+        persist=True,
+        tag="pipeline"
+    )
+    try:
+        sweep_res = model_backtest_sweep(model_id, sweep_req, user)  # reuse internal function
+    except HTTPException as e:
+        # Update pipeline run and bubble a novice-friendly message
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE sc.model_pipeline_runs SET status='error', errors=%s, finished_at=NOW() WHERE pipeline_run_id=%s", (json.dumps({'error': e.detail}), pipeline_run_id)); conn.commit()
+        raise
+    backtests_info = { 'run_ids': [sweep_res.run_id] if sweep_res.run_id else [], 'leaderboard': [] }
+
+    # Evaluate guardrails and optionally "train"
+    gr = payload.guardrails or PipelineGuardrails()
+    metrics = sweep_res.metrics or {}
+    chosen_ok = (
+        (metrics.get('trades_total', 0) >= int(gr.min_trades or 50)) and
+        (metrics.get('avg_sharpe_hourly', 0.0) >= float(gr.min_sharpe or 0.2))
+    )
+    training_info = None
+    if chosen_ok and not payload.dry_run:
+        # Record a training run stub (no auto-publish)
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_training_runs (model_id, model_version, status, training_cfg, data_window, dataset_hash, features_hash, git_sha, metrics, started_at, finished_at)
+                        VALUES (%s,%s,'success',%s,%s,%s,%s,%s,%s,NOW(),NOW())
+                        RETURNING train_id
+                        """,
+                        (
+                            model_id,
+                            int(ver),
+                            json.dumps({'selection': sweep_res.best_config}),
+                            json.dumps({'start': sd, 'end': ed}),
+                            None, None, None,
+                            json.dumps({'note': 'pipeline training stub'}),
+                        ),
+                    )
+                    train_id = cur.fetchone()[0]; conn.commit()
+                    training_info = { 'run_id': str(train_id), 'status': 'success' }
+        except Exception:
+            training_info = { 'run_id': None, 'status': 'error' }
+
+    # Compose summary and next steps
+    summary = (
+        f"Tried safe configurations across {len(symbols)} symbols ({timeframe}) from {sd} to {ed}. "
+        f"Best avg_sharpe={metrics.get('avg_sharpe_hourly',0):.3f}, trades={metrics.get('trades_total',0)}. "
+        + ("Training started." if training_info else "Guardrails not met; review leaderboard and adjust.")
+    )
+    next_steps = [
+        "Review best backtest metrics",
+        "Apply training config (Critic Gate)",
+        "Optionally rerun with a different preset or date window"
+    ]
+
+    # Update pipeline run row
+    try:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE sc.model_pipeline_runs
+                    SET backtest_run_ids = %s, training_run_id = %s, status = 'success', summary = %s, finished_at = NOW()
+                    WHERE pipeline_run_id = %s
+                    """,
+                    (
+                        json.dumps(backtests_info['run_ids']),
+                        (training_info or {}).get('run_id'),
+                        summary,
+                        pipeline_run_id,
+                    ),
+                ); conn.commit()
+    except Exception:
+        pass
+
+    return ModelPipelineRunOut(
+        pipeline_run_id=pipeline_run_id,
+        status='success',
+        dataset=dataset_info,
+        backtests=backtests_info,
+        chosen={'config': sweep_res.best_config, 'metrics': metrics},
+        training=training_info,
+        summary=summary,
+        next_steps=next_steps,
+    )
+
+
+class ModelPipelineGetOut(BaseModel):
+    pipeline_run_id: str
+    model_id: str
+    version: int
+    timeframe: Optional[str] = None
+    status: str
+    dataset_run_id: Optional[str] = None
+    backtest_run_ids: List[str] = []
+    training_run_id: Optional[str] = None
+    summary: Optional[str] = None
+    created_at: Optional[str] = None
+    finished_at: Optional[str] = None
+
+
+@app.get("/models/pipeline/runs/{pipeline_run_id}", response_model=ModelPipelineGetOut, summary="Get pipeline run status")
+def get_model_pipeline_run(pipeline_run_id: str):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT pipeline_run_id, model_id, model_version, timeframe, status, dataset_run_id, backtest_run_ids, training_run_id, summary, created_at, finished_at FROM sc.model_pipeline_runs WHERE pipeline_run_id = %s",
+                (pipeline_run_id,),
+            )
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="pipeline run not found")
+            return ModelPipelineGetOut(
+                pipeline_run_id=str(r[0]), model_id=r[1], version=int(r[2] or 0), timeframe=r[3], status=r[4],
+                dataset_run_id=(str(r[5]) if r[5] else None), backtest_run_ids=(list(r[6]) if r[6] else []), training_run_id=(str(r[7]) if r[7] else None),
+                summary=r[8], created_at=str(r[9]) if r[9] else None, finished_at=str(r[10]) if r[10] else None,
+            )
+
+
+def _days_between(sd: str, ed: str) -> int:
+    try:
+        from datetime import datetime as _dt
+        s = _dt.strptime(sd, '%Y-%m-%d'); e = _dt.strptime(ed, '%Y-%m-%d')
+        return (e - s).days
+    except Exception:
+        return 0
+
+
+@app.post("/models/{model_id}/backtest/sweep", response_model=BacktestSweepOut, summary="Grid-search backtest to pick best config")
+def model_backtest_sweep(
+    model_id: str,
+    payload: BacktestSweepRequest = Body(
+        ..., example={
+            "universe": {"preset_id": "liquid_etfs", "cap": 20},
+            "grid": {
+                "thresholds_list": [[0.55, 0.6, 0.65, 0.7]],
+                "allowed_hours_list": [[9,10,11,12,13,14,15]],
+                "max_combos": 20,
+                "min_trades": 50
+            },
+            "persist": True,
+            "tag": "sweep-demo"
+        }
+    ),
+    user: User = Depends(get_current_user)
+):
+    # Load model spec
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            ver = payload.version
+            if ver is None:
+                cur.execute("SELECT version FROM sc.v_model_specs_published WHERE model_id=%s", (model_id,))
+                r = cur.fetchone()
+                if not r:
+                    raise HTTPException(status_code=404, detail="no published version for model")
+                ver = int(r[0])
+            cur.execute(
+                "SELECT timeframe, featureset, label_cfg FROM sc.model_specs WHERE model_id=%s AND version=%s",
+                (model_id, int(ver)),
+            )
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="model not found")
+            m_timeframe, m_featureset, m_label = r[0], r[1] or {}, r[2] or {}
+    timeframe = payload.timeframe or m_timeframe or 'day'
+    # Dates guardrail (<= 90 days)
+    sd, ed = payload.start_date, payload.end_date
+    if not sd or not ed:
+        sd, ed = _default_dates()
+    if _days_between(sd, ed) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    # Resolve universe
+    symbols = _resolve_symbols_from_universe(payload.universe, user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved for sweep")
+    if len(symbols) > 50:
+        raise HTTPException(status_code=400, detail="universe too large; cap to 50 symbols")
+    # Build features
+    fb = _build_fb_for_featureset(None, m_featureset)
+    frames: List[pd.DataFrame] = []
+    for sym in symbols:
+        try:
+            df = _fetch_bars(sym, timeframe, sd, ed)
+            if df is None or df.empty:
+                continue
+            df = _maybe_add_hour_et(df)
+            fdf = fb.add_indicator_features(df)
+            frames.append(fdf)
+        except Exception:
+            continue
+    if not frames:
+        raise HTTPException(status_code=400, detail="no data for sweep")
+    pooled = pd.concat(frames, axis=0, ignore_index=True)
+    # Label with model's default
+    label_cfg = BacktestLabelCfg(kind=(m_label.get('kind') or 'hourly_direction'), params=m_label.get('params') or {})
+    pooled = _apply_label(pooled, label_cfg)
+    target_col = 'y' if 'y' in pooled.columns else ('y_syn' if 'y_syn' in pooled.columns else None)
+    if not target_col:
+        raise HTTPException(status_code=400, detail="labels not available for pooled dataset")
+    # Build grid (optionally from preset)
+    g = payload.grid
+    if payload.sweep_preset_id:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT grid, guardrails FROM sc.backtest_sweep_presets WHERE preset_id = %s", (payload.sweep_preset_id,))
+                    r = cur.fetchone()
+                    if r:
+                        pg, guard = r[0] or {}, r[1] or {}
+                        if not g or not any([g.thresholds_list, g.top_pct_list, g.allowed_hours_list, g.label_params_list, g.size_by_conf_list, g.conf_cap_list]):
+                            # adopt entire preset grid
+                            g = BacktestSweepGrid(**pg)
+                        # adopt guardrails if present
+                        if guard.get('max_combos') and not (payload.grid and payload.grid.max_combos):
+                            g.max_combos = int(guard.get('max_combos'))
+                        if guard.get('min_trades') and not (payload.grid and payload.grid.min_trades):
+                            g.min_trades = int(guard.get('min_trades'))
+        except Exception:
+            pass
+    candidates = []
+    thresholds_list = g.thresholds_list or []
+    top_pct_list = g.top_pct_list or []
+    if thresholds_list and top_pct_list:
+        raise HTTPException(status_code=400, detail="provide thresholds_list or top_pct_list, not both")
+    if not thresholds_list and not top_pct_list:
+        thresholds_list = [[0.55,0.6,0.65,0.7]]
+    allowed_hours_list = g.allowed_hours_list or [[]]
+    label_params_list = g.label_params_list or [{}]
+    size_by_conf_list = g.size_by_conf_list or [False]
+    conf_cap_list = g.conf_cap_list or [1.0]
+    for thrs in thresholds_list or [None]:
+        for tpct in top_pct_list or [None]:
+            for hrs in allowed_hours_list:
+                for lp in label_params_list:
+                    for sbc in size_by_conf_list:
+                        for cc in conf_cap_list:
+                            candidates.append({'thresholds': thrs, 'top_pct': tpct, 'allowed_hours': hrs, 'label_params': lp, 'size_by_conf': sbc, 'conf_cap': cc})
+    if len(candidates) > int(g.max_combos or 50):
+        raise HTTPException(status_code=400, detail=f"too many grid combos ({len(candidates)}); cap to {g.max_combos}")
+    # Evaluate
+    best = None
+    best_metrics = None
+    for cfg in candidates:
+        # relabel if label params vary
+        if cfg['label_params']:
+            pooled_l = _apply_label(pooled.copy(), BacktestLabelCfg(kind=label_cfg.kind, params=cfg['label_params']))
+        else:
+            pooled_l = pooled
+        res = engine_run_backtest(
+            pooled_l,
+            target_col=target_col,
+            thresholds=(cfg['thresholds'] or []),
+            top_pct=cfg['top_pct'],
+            splits=5,
+            embargo=0.0,
+            allowed_hours=(cfg['allowed_hours'] or None),
+            size_by_conf=bool(cfg['size_by_conf']),
+            conf_cap=float(cfg['conf_cap'] or 1.0),
+        )
+        folds = res.get('threshold_results') or []
+        try:
+            import numpy as _np
+            sh = [float(r.get('sharpe_hourly', 0.0)) for r in folds]
+            tr = [int(r.get('trades', 0)) for r in folds]
+            avg_sh = float(_np.mean(sh)) if sh else 0.0
+            trades_total = int(sum(tr))
+        except Exception:
+            avg_sh = 0.0; trades_total = 0
+        if trades_total < int(g.min_trades or 50):
+            continue
+        score = avg_sh
+        if (best is None) or (score > best[0]):
+            best = (score, cfg, folds)
+            best_metrics = {'avg_sharpe_hourly': avg_sh, 'trades_total': trades_total}
+    if not best:
+        raise HTTPException(status_code=400, detail="no configuration met the minimum trades or produced metrics")
+    _, best_cfg, best_folds = best
+    summary = f"Best config: {'top_pct='+str(best_cfg['top_pct']) if best_cfg.get('top_pct') is not None else 'thresholds'} with avg_sharpe_hourly={best_metrics['avg_sharpe_hourly']:.3f}, trades_total={best_metrics['trades_total']} over {len(symbols)} symbols."
+    run_id = None
+    if payload.persist:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_backtest_runs
+                          (model_id, model_version, pack_id, timeframe, data_window, universe, featureset, label_cfg, params, metrics, best_config, summary, git_sha, tag, started_at, finished_at)
+                        VALUES
+                          (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                        RETURNING run_id
+                        """,
+                        (
+                            model_id,
+                            int(ver),
+                            payload.pack_id,
+                            timeframe,
+                            json.dumps({'start': sd, 'end': ed}),
+                            json.dumps(payload.universe.dict() if hasattr(payload.universe, 'dict') else {}),
+                            json.dumps(m_featureset or {}),
+                            json.dumps(label_cfg.dict() if hasattr(label_cfg, 'dict') else {}),
+                            json.dumps({'grid': payload.grid.dict() if hasattr(payload.grid, 'dict') else {}, 'chosen': best_cfg}),
+                            json.dumps(best_metrics or {}),
+                            json.dumps(best_cfg),
+                            summary,
+                            None,
+                            payload.tag,
+                        ),
+                    )
+                    rid = cur.fetchone()[0]
+                    for r in (best_folds or []):
+                        cur.execute(
+                            """
+                            INSERT INTO sc.model_backtest_folds (run_id, fold, thr_used, cum_ret, sharpe_hourly, trades)
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                            """,
+                            (
+                                rid,
+                                int(r.get('fold', 0)),
+                                (float(r.get('thr')) if r.get('thr') is not None else None),
+                                float(r.get('cum_ret', 0.0)),
+                                float(r.get('sharpe_hourly', 0.0)),
+                                int(r.get('trades', 0)),
+                            ),
+                        )
+                    conn.commit()
+                    run_id = str(rid)
+        except Exception:
+            run_id = None
+    return BacktestSweepOut(run_id=run_id, best_config=best_cfg, metrics=best_metrics or {}, summary=summary)
+
+
+# --- Leaderboard endpoint (top backtest runs) ---
+class LeaderboardRow(BaseModel):
+    run_id: str
+    model_id: Optional[str] = None
+    model_version: Optional[int] = None
+    timeframe: str
+    metrics: Dict[str, Any]
+    best_config: Dict[str, Any] | None = None
+    tag: Optional[str] = None
+    started_at: Optional[str] = None
+    pack_id: Optional[str] = None
+    summary: Optional[str] = None
+
+
+@app.get("/backtests/leaderboard", response_model=List[LeaderboardRow], summary="Top backtest runs")
+def backtests_leaderboard(
+    model_id: Optional[str] = Query(None),
+    tag: Optional[str] = Query(None),
+    timeframe: Optional[str] = Query(None),
+    pack_id: Optional[str] = Query(None),
+    limit: int = Query(20, ge=1, le=200),
+    order_by: str = Query("avg_sharpe_hourly", description="one of: avg_sharpe_hourly|cum_ret_sum|trades_total"),
+):
+    # Build SQL
+    order_expr = "(metrics->>'avg_sharpe_hourly')::float DESC"
+    if order_by == 'cum_ret_sum':
+        order_expr = "(metrics->>'cum_ret_sum')::float DESC"
+    elif order_by == 'trades_total':
+        order_expr = "(metrics->>'trades_total')::int DESC"
+    where = []
+    params: List[Any] = []
+    if model_id:
+        where.append("model_id = %s"); params.append(model_id)
+    if tag:
+        where.append("tag = %s"); params.append(tag)
+    if timeframe:
+        where.append("timeframe = %s"); params.append(timeframe)
+    if pack_id:
+        where.append("pack_id = %s"); params.append(pack_id)
+    sql = "SELECT run_id, model_id, model_version, timeframe, metrics, best_config, tag, started_at, pack_id, summary FROM sc.model_backtest_runs"
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+    sql += f" ORDER BY {order_expr}, started_at DESC LIMIT %s"
+    params.append(int(limit))
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, params)
+            rows = cur.fetchall()
+            out: List[LeaderboardRow] = []
+            for r in rows:
+                out.append(LeaderboardRow(
+                    run_id=str(r[0]),
+                    model_id=r[1],
+                    model_version=r[2],
+                    timeframe=r[3],
+                    metrics=r[4] or {},
+                    best_config=r[5] or None,
+                    tag=r[6],
+                    started_at=str(r[7]) if r[7] else None,
+                    pack_id=r[8],
+                    summary=r[9],
+                ))
+            return out
+
+
+# --- Sweep preset CRUD ---
+class SweepPresetIn(BaseModel):
+    preset_id: str
+    title: str
+    description: Optional[str] = None
+    grid: Dict[str, Any]
+    guardrails: Optional[Dict[str, Any]] = None
+
+
+@app.post("/backtests/sweep_presets", status_code=201)
+def create_sweep_preset(payload: SweepPresetIn = Body(...)):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO sc.backtest_sweep_presets (preset_id, title, description, grid, guardrails)
+                VALUES (%s,%s,%s,%s,%s)
+                ON CONFLICT (preset_id) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, grid=EXCLUDED.grid, guardrails=EXCLUDED.guardrails, updated_at=NOW()
+                RETURNING preset_id
+                """,
+                (payload.preset_id, payload.title, payload.description, json.dumps(payload.grid or {}), json.dumps(payload.guardrails or {})),
+            )
+            rid = cur.fetchone()[0]; conn.commit(); return {"preset_id": str(rid)}
+
+
+@app.get("/backtests/sweep_presets", response_model=List[SweepPresetIn])
+def list_sweep_presets():
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT preset_id, title, description, grid, guardrails FROM sc.backtest_sweep_presets ORDER BY preset_id")
+            rows = cur.fetchall()
+            return [SweepPresetIn(preset_id=r[0], title=r[1], description=r[2], grid=r[3] or {}, guardrails=r[4] or {}) for r in rows]
+
+
+@app.get("/backtests/sweep_presets/{preset_id}", response_model=SweepPresetIn)
+def get_sweep_preset(preset_id: str):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT preset_id, title, description, grid, guardrails FROM sc.backtest_sweep_presets WHERE preset_id=%s", (preset_id,))
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="preset not found")
+            return SweepPresetIn(preset_id=r[0], title=r[1], description=r[2], grid=r[3] or {}, guardrails=r[4] or {})
+
+
+class ApplyBestCfgRequest(BaseModel):
+    run_id: str
+    confirm: bool = False
+
+
+@app.post("/models/{model_id}/training_cfg/apply_best", summary="Apply best config from a backtest run to the model's training_cfg")
+def apply_best_training_cfg(
+    model_id: str,
+    payload: ApplyBestCfgRequest = Body(..., example={"run_id": "00000000-0000-0000-0000-000000000000", "confirm": True})
+):
+    if not payload.confirm:
+        raise HTTPException(status_code=400, detail="confirmation required; set confirm=true to proceed")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT model_version, best_config FROM sc.model_backtest_runs WHERE run_id = %s AND model_id = %s", (payload.run_id, model_id))
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="backtest run not found for model")
+            ver, best_cfg = r[0], r[1]
+            if not ver:
+                # default to latest published
+                cur.execute("SELECT version FROM sc.v_model_specs_published WHERE model_id=%s", (model_id,))
+                rr = cur.fetchone()
+                if not rr:
+                    raise HTTPException(status_code=404, detail="model has no published version to update")
+                ver = int(rr[0])
+            # Merge best_cfg into training_cfg.selection
+            cur.execute("SELECT training_cfg FROM sc.model_specs WHERE model_id=%s AND version=%s", (model_id, int(ver)))
+            rr = cur.fetchone()
+            tc = rr[0] or {}
+            sel = tc.get('selection', {}) if isinstance(tc, dict) else {}
+            sel.update(best_cfg or {})
+            tc['selection'] = sel
+            cur.execute("UPDATE sc.model_specs SET training_cfg = %s, updated_at = NOW() WHERE model_id=%s AND version=%s", (json.dumps(tc), model_id, int(ver)))
+            conn.commit()
+            return {"model_id": model_id, "version": int(ver), "training_cfg": tc}
+
+
+# --- Consensus backtest for model packs ---
+class PackBacktestRequest(BaseModel):
+    timeframe: str = "hour"
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    universe: BacktestUniverseIn
+    thresholds: Optional[List[float]] = [0.55, 0.6, 0.65]
+    top_pct: Optional[float] = None
+    splits: int = 5
+    embargo: float = 0.0
+    size_by_conf: bool = False
+    conf_cap: float = 1.0
+    allowed_hours: Optional[List[int]] = None
+    mode: Optional[str] = None  # simple|advanced
+    consensus_override: Optional[Dict[str, Any]] = None
+
+
+def _combine_probs_weighted(y_proba_list: List[Dict[str, Any]], weights: List[float]) -> Dict[str, Any]:
+    import numpy as np
+    w = np.array(weights, dtype=float)
+    w = np.where(w > 0, w, 0.0)
+    wsum = w.sum() if w.sum() > 0 else 1.0
+    p_up_acc = None; p_down_acc = None
+    for i, fo in enumerate(y_proba_list):
+        classes = fo['classes']
+        c2i = {c: idx for idx, c in enumerate(classes)}
+        arr = np.array(fo['y_proba'], dtype=float)
+        p_up = arr[:, c2i.get('UP', 0)] if 'UP' in c2i else np.zeros(arr.shape[0])
+        p_down = arr[:, c2i.get('DOWN', 1)] if 'DOWN' in c2i else np.zeros(arr.shape[0])
+        if p_up_acc is None:
+            p_up_acc = w[i] * p_up
+            p_down_acc = w[i] * p_down
+        else:
+            p_up_acc += w[i] * p_up
+            p_down_acc += w[i] * p_down
+    p_up_comb = (p_up_acc / wsum) if p_up_acc is not None else np.zeros_like(y_proba_list[0]['y_proba'])
+    p_down_comb = (p_down_acc / wsum) if p_down_acc is not None else np.zeros_like(y_proba_list[0]['y_proba'])
+    return { 'p_up': p_up_comb, 'p_down': p_down_comb }
+
+
+def _positions_from_probs(p_up, p_down, *, thresholds: Optional[List[float]], top_pct: Optional[float], size_by_conf: bool, conf_cap: float):
+    import numpy as np
+    sign_dir = np.where(p_up >= p_down, 1.0, -1.0)
+    if top_pct is not None and top_pct != "":
+        conf = np.maximum(p_up, p_down)
+        n = len(conf)
+        k = max(1, int(np.floor(float(top_pct) * n)))
+        idx = np.argsort(-conf)[:k]
+        pos = np.zeros(n, dtype=float)
+        pos[idx] = sign_dir[idx]
+        if size_by_conf:
+            conf_sel = np.maximum(0.0, 2.0 * conf[idx] - 1.0)
+            pos[idx] = pos[idx] * np.minimum(conf_sel, float(conf_cap))
+        return pos, None
+    best = None
+    for thr in (thresholds or []):
+        long = (p_up >= thr) & (p_up > p_down)
+        short = (p_down >= thr) & (p_down > p_up)
+        pos = np.where(long, 1.0, np.where(short, -1.0, 0.0)).astype(float)
+        if size_by_conf:
+            conf = np.maximum(p_up, p_down)
+            size = np.minimum(np.maximum(0.0, 2.0 * conf - 1.0), float(conf_cap))
+            pos = pos * size
+        sc = float(np.mean(pos != 0.0))
+        if best is None or sc > best[0]:
+            best = (sc, float(thr), pos)
+    return (best[2] if best else (np.zeros_like(p_up))), (best[1] if best else None)
+
+
+def _positions_from_policy(yps: List[Dict[str, Any]], weights: List[float], consensus: Dict[str, Any] | None, *, thresholds: Optional[List[float]], top_pct: Optional[float], size_by_conf: bool, conf_cap: float):
+    import numpy as np
+    policy = (consensus or {}).get('policy', 'weighted')
+    if policy == 'weighted':
+        comb = _combine_probs_weighted(yps, weights)
+        return _positions_from_probs(comb['p_up'], comb['p_down'], thresholds=thresholds, top_pct=top_pct, size_by_conf=size_by_conf, conf_cap=conf_cap)
+    # Voting policies
+    min_score = float((consensus or {}).get('min_score') or 0.5)
+    quorum = (consensus or {}).get('min_quorum')
+    # Determine total weight for normalization/quorum default
+    w = np.array(weights, dtype=float)
+    w = np.where(w > 0, w, 0.0)
+    W = float(w.sum() if w.sum() > 0 else len(weights))
+    if quorum is None:
+        quorum = 0.5 * W
+    else:
+        try:
+            quorum = float(quorum)
+        except Exception:
+            quorum = 0.5 * W
+    # Build votes per model
+    n = len(yps[0]['y_proba']) if yps else 0
+    vote_sum = np.zeros(n, dtype=float)
+    agree_all = np.ones(n, dtype=bool)
+    for i, fo in enumerate(yps):
+        classes = fo['classes']; c2i = {c: idx for idx, c in enumerate(classes)}
+        arr = np.array(fo['y_proba'], dtype=float)
+        p_up = arr[:, c2i.get('UP', 0)] if 'UP' in c2i else np.zeros(n)
+        p_down = arr[:, c2i.get('DOWN', 1)] if 'DOWN' in c2i else np.zeros(n)
+        conf = np.maximum(p_up, p_down)
+        sign = np.where((p_up > p_down) & (conf >= min_score), 1.0, np.where((p_down > p_up) & (conf >= min_score), -1.0, 0.0))
+        vote_sum += w[i] * sign
+        agree_all &= (sign != 0) & (sign == np.sign(vote_sum))
+    policy_l = policy.lower()
+    if policy_l == 'all':
+        pos = np.where(agree_all, np.sign(vote_sum), 0.0).astype(float)
+    else:  # majority or others
+        pos = np.where(np.abs(vote_sum) >= float(quorum), np.sign(vote_sum), 0.0).astype(float)
+    if size_by_conf:
+        # scale by normalized vote strength
+        scale = np.minimum(np.abs(vote_sum) / (W + 1e-9), float(conf_cap))
+        pos = pos * scale
+    return pos, None
+
+
+@app.post("/packs/{pack_id}/backtest/run", summary="Consensus backtest for a model pack")
+def pack_backtest_run(
+    pack_id: str,
+    payload: PackBacktestRequest = Body(
+        ..., example={
+            "timeframe": "hour",
+            "universe": {"preset_id": "liquid_etfs", "cap": 10},
+            "thresholds": [0.55, 0.6, 0.65],
+            "consensus_override": {"policy": "majority", "min_quorum": 1.5, "min_score": 0.6}
+        }
+    ),
+    user: User = Depends(get_current_user),
+    persist: bool = Query(False),
+    tag: Optional[str] = Query(None)
+):
+    # Load pack and components
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT version, consensus FROM sc.v_model_packs_published WHERE pack_id=%s", (pack_id,))
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="pack not found")
+            pver, consensus = int(r[0]), r[1] or {}
+            cur.execute("SELECT model_id, model_version, weight FROM sc.model_pack_components WHERE pack_id=%s AND pack_version=%s ORDER BY ord", (pack_id, pver))
+            comps = cur.fetchall()
+            if not comps:
+                raise HTTPException(status_code=400, detail="pack has no components")
+            models = [(c[0], int(c[1] or 1), float(c[2] or 1.0)) for c in comps]
+            model_specs = {}
+            for mid, mver, _w in models:
+                cur.execute("SELECT featureset, label_cfg FROM sc.model_specs WHERE model_id=%s AND version=%s", (mid, mver))
+                rr = cur.fetchone()
+                if not rr:
+                    raise HTTPException(status_code=404, detail=f"model {mid}@{mver} not found")
+                model_specs[(mid, mver)] = { 'featureset': rr[0] or {}, 'label_cfg': rr[1] or {} }
+    # Apply optional consensus override
+    if payload.consensus_override:
+        try:
+            consensus = {**(consensus or {}), **(payload.consensus_override or {})}
+        except Exception:
+            pass
+    # Dates/universe
+    sd, ed = payload.start_date, payload.end_date
+    if not sd or not ed:
+        sd, ed = _default_dates()
+    if _days_between(sd, ed) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    symbols = _resolve_symbols_from_universe(payload.universe, user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved for pack backtest")
+    symbols = symbols[:max(1, int(payload.universe.cap or 50))]
+    # Base data + label
+    frames = []
+    for sym in symbols:
+        df = _fetch_bars(sym, payload.timeframe, sd, ed)
+        if df is None or df.empty:
+            continue
+        df = _maybe_add_hour_et(df)
+        frames.append(df)
+    if not frames:
+        raise HTTPException(status_code=400, detail="no data fetched for pack backtest")
+    base = pd.concat(frames, axis=0, ignore_index=True)
+    first_mid, first_ver, _ = models[0]
+    first_label = model_specs[(first_mid, first_ver)]['label_cfg'] or {}
+    label_def = BacktestLabelCfg(kind=(first_label.get('kind') or 'hourly_direction'), params=first_label.get('params') or {})
+    base_l = _apply_label(base, label_def)
+    target_col = 'y' if 'y' in base_l.columns else ('y_syn' if 'y_syn' in base_l.columns else None)
+    if not target_col:
+        raise HTTPException(status_code=400, detail="labels not available for pack dataset")
+    # Determine effective thresholds/top_pct/allowed_hours (simple mode)
+    thresholds_use = payload.thresholds
+    top_pct_use = payload.top_pct
+    hours_use = payload.allowed_hours
+    if (payload.mode or '').lower() == 'simple' and thresholds_use is None and top_pct_use is None:
+        # Try preset 'rth_thresholds_basic'
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT grid FROM sc.backtest_sweep_presets WHERE preset_id = 'rth_thresholds_basic'")
+                    rr = cur.fetchone()
+                    if rr and rr[0]:
+                        grid = rr[0] or {}
+                        thr_list = (grid.get('thresholds_list') or [[]])
+                        thresholds_use = thr_list[0] if thr_list and thr_list[0] else [0.55, 0.6, 0.65]
+                        hrs_list = (grid.get('allowed_hours_list') or [[]])
+                        hours_use = hrs_list[0] if hrs_list and hrs_list[0] else [9,10,11,12,13,14,15]
+        except Exception:
+            thresholds_use = thresholds_use or [0.55, 0.6, 0.65]
+            hours_use = hours_use or [9,10,11,12,13,14,15]
+    # Per-model fold outputs
+    fold_outputs_per_model: List[List[Dict[str, Any]]] = []
+    weights: List[float] = []
+    for mid, mver, w in models:
+        fb = _build_fb_for_featureset(None, model_specs[(mid, mver)]['featureset'])
+        dfm = fb.add_indicator_features(base_l)
+        res = engine_run_backtest(
+            dfm,
+            target_col=target_col,
+            thresholds=thresholds_use or [],
+            splits=int(payload.splits or 5),
+            embargo=float(payload.embargo or 0.0),
+            top_pct=top_pct_use,
+            allowed_hours=hours_use,
+            size_by_conf=bool(payload.size_by_conf),
+            conf_cap=float(payload.conf_cap or 1.0),
+            return_fold_outputs=True,
+        )
+        fold_outputs_per_model.append(res.get('fold_outputs') or [])
+        weights.append(float(w))
+    # Combine per-fold
+    import numpy as np
+    threshold_results: List[Dict[str, Any]] = []
+    for k in range(len(fold_outputs_per_model[0])):
+        yps = [fold_outputs_per_model[i][k] for i in range(len(fold_outputs_per_model))]
+        pos, thr_used = _positions_from_policy(yps, weights, consensus, thresholds=thresholds_use, top_pct=top_pct_use, size_by_conf=bool(payload.size_by_conf), conf_cap=float(payload.conf_cap or 1.0))
+        test_idx = yps[0]['test_idx']
+        y_all = base_l[target_col].astype(str).values
+        y_dir = np.where(y_all == 'UP', 1.0, np.where(y_all == 'DOWN', -1.0, 0.0))
+        pnl = (pos * y_dir[test_idx]); pnl -= np.where(pos != 0, 1.0/10000.0, 0.0)
+        threshold_results.append({ 'fold': k, 'thr': thr_used, 'cum_ret': float(np.sum(pnl)), 'sharpe_hourly': float(np.mean(pnl)/(np.std(pnl)+1e-9)), 'trades': int(np.sum(np.abs(pos)>0)) })
+    # Aggregate + persist
+    try:
+        import numpy as _np
+        sh = [float(r.get('sharpe_hourly', 0.0)) for r in threshold_results]
+        tr = [int(r.get('trades', 0)) for r in threshold_results]
+        cr = [float(r.get('cum_ret', 0.0)) for r in threshold_results]
+        metrics = { 'avg_sharpe_hourly': float(_np.mean(sh)), 'trades_total': int(sum(tr)), 'cum_ret_sum': float(sum(cr)) }
+    except Exception:
+        metrics = {}
+    summary = f"Pack {pack_id} on {len(symbols)} symbols ({payload.timeframe}) — avg_sharpe={metrics.get('avg_sharpe_hourly',0):.3f}, trades={metrics.get('trades_total',0)}"
+    if persist:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_backtest_runs (pack_id, timeframe, data_window, universe, featureset, label_cfg, params, metrics, best_config, summary, tag, started_at, finished_at)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),NOW()) RETURNING run_id
+                        """,
+                        (
+                            pack_id,
+                            payload.timeframe,
+                            json.dumps({'start': sd, 'end': ed}),
+                            json.dumps(payload.universe.dict() if hasattr(payload.universe, 'dict') else {}),
+                            json.dumps({'pack_version': pver, 'models': [{'model_id': mid, 'version': mver} for mid, mver, _ in models]}),
+                            json.dumps(label_def.dict() if hasattr(label_def, 'dict') else {}),
+                            json.dumps({'thresholds': payload.thresholds, 'top_pct': payload.top_pct, 'splits': payload.splits, 'embargo': payload.embargo, 'policy': consensus}),
+                            json.dumps(metrics or {}),
+                            json.dumps({'consensus': consensus}),
+                            summary,
+                            tag,
+                        ),
+                    )
+                    rid = cur.fetchone()[0]
+                    for r in threshold_results:
+                        cur.execute("INSERT INTO sc.model_backtest_folds (run_id, fold, thr_used, cum_ret, sharpe_hourly, trades) VALUES (%s,%s,%s,%s,%s,%s)", (rid, int(r.get('fold',0)), (float(r.get('thr')) if r.get('thr') is not None else None), float(r.get('cum_ret',0.0)), float(r.get('sharpe_hourly',0.0)), int(r.get('trades',0))))
+                    conn.commit()
+        except Exception:
+            pass
+    return { 'threshold_results': threshold_results, 'metrics': metrics, 'summary': summary }
+
+
+class PackBacktestSweepGrid(BaseModel):
+    thresholds_list: Optional[List[List[float]]] = None
+    top_pct_list: Optional[List[float]] = None
+    max_combos: int = 50
+    min_trades: int = 50
+
+
+class PackBacktestSweepRequest(BaseModel):
+    mode: Optional[str] = None  # simple|advanced
+    timeframe: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    universe: BacktestUniverseIn
+    grid: PackBacktestSweepGrid
+    persist: bool = True
+    tag: Optional[str] = None
+    consensus_override: Optional[Dict[str, Any]] = None
+
+
+@app.post("/packs/{pack_id}/backtest/sweep", summary="Grid-search consensus backtest for a model pack")
+def pack_backtest_sweep(
+    pack_id: str,
+    payload: PackBacktestSweepRequest = Body(
+        ..., example={
+            "universe": {"preset_id": "liquid_etfs", "cap": 20},
+            "grid": {"thresholds_list": [[0.55, 0.6, 0.65]]},
+            "persist": True,
+            "tag": "pack-sweep-demo",
+            "consensus_override": {"policy": "all", "min_score": 0.6}
+        }
+    ),
+    user: User = Depends(get_current_user)
+):
+    # Load pack and models
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT version, consensus, timeframe FROM sc.v_model_packs_published WHERE pack_id=%s", (pack_id,))
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="pack not found")
+            pver, consensus, p_tf = int(r[0]), (r[1] or {}), (r[2] or None)
+            cur.execute("SELECT model_id, model_version, weight FROM sc.model_pack_components WHERE pack_id=%s AND pack_version=%s ORDER BY ord", (pack_id, pver))
+            comps = cur.fetchall()
+            if not comps:
+                raise HTTPException(status_code=400, detail="pack has no components")
+            models = [(c[0], int(c[1] or 1), float(c[2] or 1.0)) for c in comps]
+            model_specs = {}
+            for mid, mver, _w in models:
+                cur.execute("SELECT featureset, label_cfg FROM sc.model_specs WHERE model_id=%s AND version=%s", (mid, mver))
+                rr = cur.fetchone()
+                if not rr:
+                    raise HTTPException(status_code=404, detail=f"model {mid}@{mver} not found")
+                model_specs[(mid, mver)] = { 'featureset': rr[0] or {}, 'label_cfg': rr[1] or {} }
+    # Apply optional consensus override
+    if payload.consensus_override:
+        try:
+            consensus = {**(consensus or {}), **(payload.consensus_override or {})}
+        except Exception:
+            pass
+    timeframe = payload.timeframe or p_tf or 'day'
+    sd, ed = payload.start_date, payload.end_date
+    if not sd or not ed:
+        sd, ed = _default_dates()
+    if _days_between(sd, ed) > 90:
+        raise HTTPException(status_code=400, detail="date window too large; limit to <= 90 days")
+    symbols = _resolve_symbols_from_universe(payload.universe, user)
+    if not symbols:
+        raise HTTPException(status_code=400, detail="no symbols resolved for sweep")
+    symbols = symbols[:max(1, int(payload.universe.cap or 50))]
+    # Base + label
+    frames = []
+    for sym in symbols:
+        df = _fetch_bars(sym, timeframe, sd, ed)
+        if df is None or df.empty:
+            continue
+        df = _maybe_add_hour_et(df)
+        frames.append(df)
+    if not frames:
+        raise HTTPException(status_code=400, detail="no data for sweep")
+    base = pd.concat(frames, axis=0, ignore_index=True)
+    first_mid, first_ver, _ = models[0]
+    first_label = model_specs[(first_mid, first_ver)]['label_cfg'] or {}
+    label_def = BacktestLabelCfg(kind=(first_label.get('kind') or 'hourly_direction'), params=first_label.get('params') or {})
+    base_l = _apply_label(base, label_def)
+    target_col = 'y' if 'y' in base_l.columns else ('y_syn' if 'y_syn' in base_l.columns else None)
+    if not target_col:
+        raise HTTPException(status_code=400, detail="labels unavailable for sweep")
+    # Fold outputs per model (one pass)
+    fold_outputs_per_model: List[List[Dict[str, Any]]] = []
+    weights: List[float] = []
+    for mid, mver, w in models:
+        fb = _build_fb_for_featureset(None, model_specs[(mid, mver)]['featureset'])
+        dfm = fb.add_indicator_features(base_l)
+        # Simple mode: default to RTH hours
+        hours_use = [9,10,11,12,13,14,15] if ((payload.mode or 'advanced').lower()=='simple') else None
+        res = engine_run_backtest(dfm, target_col=target_col, thresholds=[0.5], splits=5, embargo=0.0, allowed_hours=hours_use, return_fold_outputs=True)
+        fold_outputs_per_model.append(res.get('fold_outputs') or [])
+        weights.append(float(w))
+    # Grid
+    g = payload.grid
+    thresholds_list = g.thresholds_list or []
+    top_pct_list = g.top_pct_list or []
+    if thresholds_list and top_pct_list:
+        raise HTTPException(status_code=400, detail="provide thresholds_list or top_pct_list, not both")
+    if not thresholds_list and not top_pct_list:
+        thresholds_list = [[0.55, 0.6, 0.65]]
+    candidates = []
+    for thrs in thresholds_list or [None]:
+        for tpct in top_pct_list or [None]:
+            candidates.append({'thresholds': thrs, 'top_pct': tpct})
+    if len(candidates) > int(g.max_combos or 50):
+        raise HTTPException(status_code=400, detail=f"too many grid combos ({len(candidates)})")
+    # Evaluate
+    import numpy as np
+    best = None; best_metrics = None
+    for cfg in candidates:
+        threshold_results = []
+        for k in range(len(fold_outputs_per_model[0])):
+            yps = [fold_outputs_per_model[i][k] for i in range(len(fold_outputs_per_model))]
+            pos, thr_used = _positions_from_policy(yps, weights, consensus, thresholds=cfg['thresholds'], top_pct=cfg['top_pct'], size_by_conf=False, conf_cap=1.0)
+            test_idx = yps[0]['test_idx']
+            y_all = base_l[target_col].astype(str).values
+            y_dir = np.where(y_all == 'UP', 1.0, np.where(y_all == 'DOWN', -1.0, 0.0))
+            pnl = (pos * y_dir[test_idx]); pnl -= np.where(pos != 0, 1.0/10000.0, 0.0)
+            threshold_results.append({'fold': k, 'thr': thr_used, 'cum_ret': float(np.sum(pnl)), 'sharpe_hourly': float(np.mean(pnl)/(np.std(pnl)+1e-9)), 'trades': int(np.sum(np.abs(pos)>0))})
+        try:
+            import numpy as _np
+            sh = [float(r.get('sharpe_hourly', 0.0)) for r in threshold_results]
+            tr = [int(r.get('trades', 0)) for r in threshold_results]
+            avg_sh = float(_np.mean(sh)) if sh else 0.0
+            trades_total = int(sum(tr))
+        except Exception:
+            avg_sh = 0.0; trades_total = 0
+        if trades_total < int(g.min_trades or 50):
+            continue
+        score = avg_sh
+        if (best is None) or (score > best[0]):
+            best = (score, cfg, threshold_results)
+            best_metrics = {'avg_sharpe_hourly': avg_sh, 'trades_total': trades_total}
+    if not best:
+        raise HTTPException(status_code=400, detail="no configuration met minimum trades or produced metrics")
+    _, best_cfg, best_folds = best
+    summary = f"Pack {pack_id} best: {'top_pct='+str(best_cfg['top_pct']) if best_cfg.get('top_pct') is not None else 'thresholds'} avg_sharpe={best_metrics['avg_sharpe_hourly']:.3f}, trades_total={best_metrics['trades_total']}"
+    run_id = None
+    if payload.persist:
+        try:
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO sc.model_backtest_runs (pack_id, timeframe, data_window, universe, featureset, label_cfg, params, metrics, best_config, summary, tag, started_at, finished_at)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),NOW()) RETURNING run_id
+                        """,
+                        (
+                            pack_id,
+                            timeframe,
+                            json.dumps({'start': sd, 'end': ed}),
+                            json.dumps(payload.universe.dict() if hasattr(payload.universe, 'dict') else {}),
+                            json.dumps({'pack_version': pver, 'models': [{'model_id': mid, 'version': mver} for mid, mver, _ in models]}),
+                            json.dumps(label_def.dict() if hasattr(label_def, 'dict') else {}),
+                            json.dumps({'grid': payload.grid.dict() if hasattr(payload.grid, 'dict') else {}, 'chosen': best_cfg}),
+                            json.dumps(best_metrics or {}),
+                            json.dumps(best_cfg),
+                            summary,
+                            payload.tag,
+                        ),
+                    )
+                    rid = cur.fetchone()[0]
+                    for r in (best_folds or []):
+                        cur.execute("INSERT INTO sc.model_backtest_folds (run_id, fold, thr_used, cum_ret, sharpe_hourly, trades) VALUES (%s,%s,%s,%s,%s,%s)", (rid, int(r.get('fold',0)), (float(r.get('thr')) if r.get('thr') is not None else None), float(r.get('cum_ret',0.0)), float(r.get('sharpe_hourly',0.0)), int(r.get('trades',0))))
+                    conn.commit(); run_id = str(rid)
+        except Exception:
+            run_id = None
+    return { 'run_id': run_id, 'best_config': best_cfg, 'metrics': best_metrics or {}, 'summary': summary }

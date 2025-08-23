@@ -81,6 +81,7 @@ def run_backtest(
     momentum_gate: bool = False,
     momentum_min: float = 0.0,
     momentum_column: str = 'momentum_score_total',
+    return_fold_outputs: bool = False,
 ) -> Dict[str, any]:
     if allowed_hours and 'hour_et' in df.columns:
         df = df[df['hour_et'].isin(allowed_hours)].copy()
@@ -93,6 +94,7 @@ def run_backtest(
     splitter = PurgedEmbargoedWalkForwardSplit(n_splits=splits, embargo=embargo)
     results = []
     cum_rets = []
+    fold_outputs = []
     for fold, (train_idx, test_idx) in enumerate(splitter.split(X)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
@@ -112,6 +114,13 @@ def run_backtest(
         classes = list(getattr(final, 'classes_', le.classes_))
         p_up, p_down = _extract_dir_probs(y_proba, classes)
         conf = _confidence_from_probs(p_up, p_down)
+        if return_fold_outputs:
+            fold_outputs.append({
+                'fold': int(fold),
+                'test_idx': test_idx.tolist(),
+                'classes': classes,
+                'y_proba': y_proba.tolist(),
+            })
 
         if top_pct is not None and top_pct != "":
             pos = _positions_top_pct(y_proba, classes, float(top_pct), size_by_conf=size_by_conf, conf_cap=conf_cap)
@@ -160,4 +169,7 @@ def run_backtest(
         best_idx = int(np.argmax(df_res['sharpe_hourly'].values))
         top_result = df_res.iloc[best_idx].to_dict()
 
-    return {"threshold_results": results, "top_pct_result": top_result}
+    out = {"threshold_results": results, "top_pct_result": top_result}
+    if return_fold_outputs:
+        out["fold_outputs"] = fold_outputs
+    return out

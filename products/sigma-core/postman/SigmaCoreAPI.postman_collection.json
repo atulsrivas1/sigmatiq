@@ -11,6 +11,68 @@
       "request": {"method": "GET", "url": "{{baseUrl}}/healthz"}
     },
     {
+      "name": "Packs / Backtest Run (persist)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"timeframe\": \"hour\",\n  \"universe\": {\n    \"preset_id\": \"liquid_etfs\",\n    \"cap\": 10\n  },\n  \"thresholds\": [0.55, 0.6, 0.65]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/packs/consensus_v1/backtest/run?persist=true&tag=pack-demo",
+          "host": ["{{baseUrl}}"],
+          "path": ["packs","consensus_v1","backtest","run"],
+          "query": [
+            {"key":"persist","value":"true"},
+            {"key":"tag","value":"pack-demo"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Packs / Backtest Sweep",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"universe\": {\n    \"preset_id\": \"liquid_etfs\",\n    \"cap\": 20\n  },\n  \"grid\": {\n    \"thresholds_list\": [[0.55, 0.6, 0.65]]\n  },\n  \"persist\": true,\n  \"tag\": \"pack-sweep\"\n}"
+        },
+        "url": "{{baseUrl}}/packs/consensus_v1/backtest/sweep"
+      }
+    },
+    {
+      "name": "Backtests / Leaderboard",
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/backtests/leaderboard?limit=10&order_by=avg_sharpe_hourly", "host": ["{{baseUrl}}"], "path": ["backtests","leaderboard"], "query": [{"key":"limit","value":"10"},{"key":"order_by","value":"avg_sharpe_hourly"}]}}
+    },
+    {
+      "name": "Backtests / Sweep Preset Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"preset_id\": \"rth_thresholds_basic\",\n  \"title\": \"RTH thresholds basic\",\n  \"description\": \"Basic grid for RTH hours and common thresholds\",\n  \"grid\": {\n    \"thresholds_list\": [[0.55, 0.6, 0.65, 0.7]],\n    \"allowed_hours_list\": [[9,10,11,12,13,14,15]]\n  },\n  \"guardrails\": {\n    \"max_combos\": 20,\n    \"min_trades\": 50\n  }\n}"
+        },
+        "url": "{{baseUrl}}/backtests/sweep_presets"
+      }
+    },
+    {
+      "name": "Backtests / Sweep Preset List",
+      "request": {"method": "GET", "url": "{{baseUrl}}/backtests/sweep_presets"}
+    },
+    {
+      "name": "Backtests / Sweep Preset Get",
+      "request": {"method": "GET", "url": "{{baseUrl}}/backtests/sweep_presets/rth_thresholds_basic"}
+    },
+    {
       "name": "Presets / List",
       "request": {"method": "GET", "url": "{{baseUrl}}/presets"}
     },
@@ -77,6 +139,71 @@
     {
       "name": "Workflows / Run",
       "request": {"method": "POST", "header":[{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw": "{\n  \"workflow_id\": \"breakout_pullback_scan_5m_v1\",\n  \"preset_id\": \"sp500\",\n  \"timeframe\": \"5m\",\n  \"cap\": 50\n}"}, "url": "{{baseUrl}}/workflows/run"}
+    },
+    {
+      "name": "Models / Dataset Build",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model_id\": \"sq_macd_trend_pullback_5m\",\n  \"timeframe\": \"5m\",\n  \"preset_id\": \"liquid_etfs\",\n  \"start_date\": \"2024-06-01\",\n  \"end_date\": \"2024-06-15\",\n  \"cap\": 10,\n  \"include_labels\": true,\n  \"output\": \"csv\",\n  \"out_dir\": \"data_dumps\"\n}"
+        },
+        "url": "{{baseUrl}}/models/dataset/build"
+      }
+    },
+    {
+      "name": "Backtest / Run (persist)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"timeframe\": \"hour\",\n  \"start_date\": \"2024-06-01\",\n  \"end_date\": \"2024-06-15\",\n  \"universe\": {\n    \"preset_id\": \"liquid_etfs\",\n    \"cap\": 5\n  },\n  \"features\": {\n    \"set_id\": \"macd_trend_pullback_v1\",\n    \"version\": 1\n  },\n  \"label\": {\n    \"kind\": \"hourly_direction\",\n    \"params\": {\"k_sigma\": 0.3}\n  },\n  \"thresholds\": [0.55, 0.6, 0.65],\n  \"splits\": 5,\n  \"embargo\": 0.1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/backtest/run?persist=true&tag=demo&pack_id=consensus_v1",
+          "host": ["{{baseUrl}}"],
+          "path": ["backtest","run"],
+          "query": [
+            {"key":"persist","value":"true"},
+            {"key":"tag","value":"demo"},
+            {"key":"pack_id","value":"consensus_v1"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Models / Backtest Sweep",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"universe\": {\n    \"preset_id\": \"liquid_etfs\",\n    \"cap\": 20\n  },\n  \"grid\": {\n    \"thresholds_list\": [[0.55, 0.6, 0.65, 0.7]],\n    \"allowed_hours_list\": [[9,10,11,12,13,14,15]],\n    \"max_combos\": 20,\n    \"min_trades\": 50\n  },\n  \"persist\": true,\n  \"tag\": \"sweep-demo\"\n}"
+        },
+        "url": "{{baseUrl}}/models/sq_macd_trend_pullback_5m/backtest/sweep"
+      }
+    },
+    {
+      "name": "Models / Apply Best Training Config",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"run_id\": \"00000000-0000-0000-0000-000000000000\",\n  \"confirm\": true\n}"
+        },
+        "url": "{{baseUrl}}/models/sq_macd_trend_pullback_5m/training_cfg/apply_best"
+      }
     }
   ],
   "variable": [
@@ -84,4 +211,3 @@
     {"key": "presetId", "value": "sp500"}
   ]
 }
-

@@ -41,6 +41,9 @@ import pandas as pd
 from sigma_core.indicators.registry import get_indicator
 from sigma_core.features.sets import IndicatorSet as FBIndicatorSet, IndicatorSpec as FBIndicatorSpec
 from sigma_core.features.builder import FeatureBuilder
+from sigma_core.backtest.engine import run_backtest as engine_run_backtest
+from sigma_core.labels.hourly_direction import label_next_hour_direction
+from sigma_core.labels.forward import label_forward_return_days
 
 
 def load_csv(path: Path) -> pd.DataFrame:
@@ -216,7 +219,81 @@ def build_parser() -> argparse.ArgumentParser:
     p3.add_argument("--output", help="optional output file for matched symbols (one per line)")
     p3.set_defaults(func=cmd_screen)
 
+    p4 = sp.add_parser("backtest", help="run a CV backtest on a features CSV (optional: build features + labels)")
+    p4.add_argument("--input", required=True, help="input CSV path (must include OHLCV if building features)")
+    p4.add_argument("--set-json", help="indicator set JSON (to build features; optional)")
+    p4.add_argument("--label", default="hourly_direction", help="label kind: hourly_direction|forward_days")
+    p4.add_argument("--label-params", default="{}", help="JSON params for label (e.g., {\"k_sigma\":0.3} or {\"days\":5,\"band\":0.001}")
+    p4.add_argument("--target-col", default="y", help="target column if already present (default: y)")
+    p4.add_argument("--thresholds", default="[0.55,0.6,0.65,0.7]", help="JSON list of probability thresholds")
+    p4.add_argument("--top-pct", type=float, help="select top pct by confidence (0-1); overrides thresholds if set")
+    p4.add_argument("--splits", type=int, default=5, help="number of CV splits")
+    p4.add_argument("--embargo", type=float, default=0.0, help="embargo fraction around test fold")
+    p4.add_argument("--size-by-conf", action="store_true", help="size positions by confidence")
+    p4.add_argument("--conf-cap", type=float, default=1.0, help="cap for confidence sizing")
+    p4.add_argument("--slippage-bps", type=float, default=1.0, help="slippage per trade in basis points")
+    p4.add_argument("--allowed-hours", help="comma-separated list of hours (ET) to include")
+    p4.add_argument("--output", help="optional JSON output path for results")
+    p4.set_defaults(func=cmd_backtest)
+
     return ap
+
+
+def _maybe_build_features_and_label(df: pd.DataFrame, set_json: Optional[str], label_kind: str, label_params_s: str) -> tuple[pd.DataFrame, str]:
+    out = df.copy()
+    if set_json:
+        fb_set = _load_set_from_json(Path(set_json))
+        fb = FeatureBuilder(indicator_set=fb_set)
+        out = fb.add_indicator_features(out)
+    # add hour_et if possible
+    if 'date' in out.columns and 'hour_et' not in out.columns:
+        try:
+            dt = pd.to_datetime(out['date'])
+            out['hour_et'] = getattr(dt.dt, 'hour', None)
+        except Exception:
+            pass
+    params = parse_params(label_params_s)
+    lk = label_kind.lower().strip()
+    if lk in ("hourly", "hourly_direction", "hour"):
+        out = label_next_hour_direction(out, **params)
+        tgt = 'y'
+    elif lk in ("forward_days", "fwd", "fwd_days"):
+        out = label_forward_return_days(out, **params)
+        tgt = 'y'
+    else:
+        tgt = 'y' if 'y' in out.columns else ( 'y_syn' if 'y_syn' in out.columns else 'y')
+    return out, tgt
+
+
+def cmd_backtest(args: argparse.Namespace) -> None:
+    df = load_csv(Path(args.input))
+    thresholds = parse_params(args.thresholds)
+    allowed_hours = None
+    if args.allowed_hours:
+        try:
+            allowed_hours = [int(x.strip()) for x in args.allowed_hours.split(',') if x.strip()]
+        except Exception:
+            raise SystemExit("--allowed-hours must be a comma-separated list of integers")
+    # Build features/labels if requested
+    df2, target_col = _maybe_build_features_and_label(df, args.set_json, args.label, args.label_params)
+    if args.target_col and args.target_col in df2.columns:
+        target_col = args.target_col
+    res = engine_run_backtest(
+        df2,
+        target_col=target_col,
+        thresholds=thresholds,
+        top_pct=args.top_pct,
+        splits=int(args.splits),
+        embargo=float(args.embargo),
+        allowed_hours=allowed_hours,
+        slippage_bps=float(args.slippage_bps),
+        size_by_conf=bool(args.size_by_conf),
+        conf_cap=float(args.conf_cap),
+    )
+    if args.output:
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.output).write_text(json.dumps(res, indent=2), encoding="utf-8")
+    print(json.dumps(res, indent=2))
 
 
 def main() -> None:
@@ -227,4 +304,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

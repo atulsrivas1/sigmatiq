@@ -44,11 +44,12 @@
   - `artifacts`: { model_uri, calibration_uri, git_sha }.
   - `plan_template` (optional): { stop_atr, tp_atr, max_hold_bars, sizing_hint }.
 - View: `sc.v_model_specs_published` (latest published per model_id).
-- Novice fields on registry rows (DB columns):
-  - `novice_ready` (bool), `beginner_summary` (text),
-  - `simple_defaults` (JSONB: e.g., operation/timeframe/cap),
-  - `explainer_templates` (JSONB: summary/why/how_to_check templates),
-  - `risk_notes` (JSONB: regime/event caveats).
+ - Novice fields on registry rows (DB columns):
+   - `novice_ready` (bool), `beginner_summary` (text),
+   - `simple_defaults` (JSONB: e.g., operation/timeframe/cap),
+   - `explainer_templates` (JSONB: summary/why/how_to_check templates; may include *_alt variants),
+   - `risk_notes` (JSONB: regime/event caveats).
+   - `assistant_hints` (JSONB): tips/cautions for the AI assistant (e.g., { tips:[], cautions:[] }).
  - Taxonomy fields (DB columns) to classify models:
    - `horizon`: one of `0dte|intraday|swing|position|long_term`.
    - `style`: one of `momentum|mean_reversion|trend_follow|breakout|volatility|carry|stat_arb`.
@@ -75,6 +76,17 @@
 - Calibrated thresholds to meet budgets with precision@K targets.
 - LLM explainer templates for plain-language reasons and plan recap.
 - Monitoring: precision@K, alert volume, dismiss/open rate, plan hit rate.
+ - Backtests: one-off backtest, model sweep, and pack consensus sweep with novice guardrails (90‑day window, universe caps).
+ - Leaderboard: persisted backtest runs with plain‑language summaries; filterable by pack, model, tag.
+ - Simple mode: one-tap backtests defaulting to curated sweep presets (e.g., RTH thresholds) to avoid parameter soup.
+
+## Dataset Building (Cohort‑First, Reproducible)
+- Cohort default: train per timeframe/market on preset universes (e.g., `sp500` daily/hourly, `liquid_etfs` 5m). Per‑ticker only for justified microstructure (e.g., SPY 0DTE) declared in `scope`.
+- Bars & caching: use Polygon loaders with file cache; never cache “today”. Prefer adjusted=true for daily (record choice in `training_cfg`).
+- Features: reuse serving sets/strategies via FeatureBuilder; add ATR, regime flags, session context; drop last H rows to prevent leakage.
+- Labels: TP‑before‑SL within `max_hold_bars`; record outcome (`tp_hit|sl_hit|max_hold`) and realized return; optional ATM options proxy labels.
+- Splits: forward‑chaining CV grouped by symbol; record `fold` and `cv` policy in `training_cfg`.
+- Storage: Parquet partitioned by timeframe/date; record dataset/feature hashes in `sc.model_training_runs`.
  - Branding (DB columns):
    - `brand`: namespace/owner, default `'sigmatiq'`.
    - `display_name`: user-facing, plain-language name.

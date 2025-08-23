@@ -116,6 +116,8 @@ def main() -> int:
                 issues.append(f"{prefix}: novice_ready requires beginner_summary")
             if not r.get('explainer_templates'):
                 issues.append(f"{prefix}: novice_ready requires explainer_templates")
+            if not r.get('assistant_hints'):
+                issues.append(f"{prefix}: novice_ready should include assistant_hints for AI surfaces")
         # Taxonomy warnings (DB enforces on publish; warn earlier)
         hz = r.get('horizon'); st = r.get('style')
         if hz and hz not in ('0dte','intraday','swing','position','long_term'):
@@ -140,4 +142,3 @@ def main() -> int:
 
 if __name__ == '__main__':
     sys.exit(main())
-

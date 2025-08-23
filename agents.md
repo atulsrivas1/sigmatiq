@@ -194,6 +194,13 @@ Pending (Data‑Only North Star)
 - Consider making `guardrails` mandatory for `novice_ready` sets/strategies (trigger update).
 - High-Value Additions (TODO)
 
+Todos (Data & API)
+- Dataset builder: add partitioned Parquet output (partition by timeframe/date/symbol) for efficient slicing.
+- Dataset builder: add GET endpoint to fetch a prior run summary by `run_id`.
+- Alerts: implement `/alerts/preview` with optional `pack_id` consensus, budgets/diversity enforcement, and plain-language summaries.
+- Models API: minimal CRUD (`POST /models`, publish/deprecate) with novice/taxonomy/scope validation.
+
+
 - Scanners (TODO)
   - Add Saved Scans schema: `sc.saved_scans` (user_id, recipe_id, name, overrides JSONB, visibility, timestamps).
   - Add Scheduled Scans (later): `sc.scan_runs` + `sc.scan_results` for history and notifications.
@@ -241,7 +248,78 @@ Alerts AI (DB & Registry)
   - Model Packs (0019): `sc.model_packs` + `sc.model_pack_components` with consensus policy (majority/weighted/all), pack lineage on runs/alerts (0020).
   - Scope (0021): `sc.model_specs.scope` declares cohort vs per‑ticker targeting (e.g., allow_presets, allow_symbols, sector filters) to simplify routing and discovery.
   - Novice publish enforcement (0022): DB CHECKs require `beginner_summary` + `explainer_templates` + guardrails/consensus for novice_ready published models/packs.
+  - Training: `training_cfg` JSONB on model_specs; training runs recorded in `sc.model_training_runs` with cfg snapshot, hashes, metrics.
+
+Dataset Building (Cohort‑First)
+- Cohort models per timeframe/market on preset universes (e.g., `sp500` daily/hourly, `liquid_etfs` 5m); per‑ticker only when justified (e.g., SPY 0DTE) and declared in `scope`.
+- Bars via Polygon loaders (file cache); never cache “today”; prefer adjusted=true for daily (record in `training_cfg`).
+- Feature parity with serving (FeatureBuilder over sets/strategies) + ATR, regime flags, session context; drop last H rows to prevent leakage.
+- Labels: TP‑before‑SL within max_hold; record outcome and realized return; optional ATM options proxy labels.
+- CV: forward‑chaining grouped by symbol; store folds and policy in `training_cfg`.
+- Storage: Parquet partitioned by timeframe/date; record dataset/feature hashes and run metrics in `sc.model_training_runs`.
 
 Product Independence
 - Every product must be self‑sufficient: scripts, migrations, and .env live within each product so it can move to its own repo later.
 - The current monorepo layout is for speed; avoid hard dependencies on repo‑root utilities. Prefer per‑product runners (e.g., `products/sigma-core/scripts/apply_migrations.py`).
+
+Backtest TODOs (high‑priority)
+- Add compound index for leaderboard filters: `CREATE INDEX sc_model_backtests_model_tag_idx ON sc.model_backtest_runs (model_id, tag)`.
+- Gate sweep preset listing by visibility and user: list `public` + `team` + `owner_user_id == X-User-Id`; hide `private` from others.
+- Update Postman examples to include `pack_id` for `/backtest/run` and `/models/{id}/backtest/sweep` to encourage pack‑level benchmarking.
+- Add Postman variants to demonstrate consensus policies `majority` and `all` (with `min_quorum`, `min_score`) for `/packs/{id}/backtest/run` and `/packs/{id}/backtest/sweep`.
+
+Backtest/Consensus TODOs (implementation)
+- Universal caps: enforce ≤ 90‑day window and ≤ 50 symbols on `/backtest/run` and `/models/dataset/build` with plain‑language 400s.
+- Global error handler: add FastAPI exception middleware to map DB/network/env errors (e.g., missing `POLYGON_API_KEY`) to novice‑friendly messages with next steps.
+- Summaries: include `summary` field directly in `/backtest/run` response (parity with pack endpoints).
+- Pack sweep simple mode: support `mode: simple` on `/packs/{id}/backtest/sweep` and default to `rth_thresholds_basic` when grid absent.
+- Postman: regenerate collection cleanly with examples for simple mode (`/backtest/run`, model sweep) and consensus policies (pack run: majority, pack sweep: all).
+- Visibility guardrails: implement presetable listing filter by `visibility` and `owner_user_id`; require guardrails on public presets.
+- Metrics explained: add `metrics_explained` block (e.g., Sharpe = steadiness of gains) in responses when `fields=full` or `mode=simple` for novice clarity.
+- Policy echo: include `policy`, `min_quorum`, `min_score` echoed in pack backtest/sweep responses to make consensus explicit.
+- Compatibility validation: pre‑run checks that pack component models share compatible `label_cfg`/timeframes; fail fast with plain guidance.
+- Budgets/limits: add soft per‑user compute limits for auto endpoints (screen/auto, auto_build) with clear throttling errors.
+- Fail‑safe computes: audit indicators/feature paths to ensure zeros/empties instead of exceptions; expand unit coverage if needed.
+- CI: add jobs for `lint-training-cfg` and future `lint-sweep-presets`; block PRs on violations.
+
+Next Session Plan (North‑Star Aligned)
+- Postman (novice‑ready): regenerate a validated collection including simple‑mode, consensus, and pipeline examples. Keep requests copy/paste runnable and safe by default.
+- Responses (clarity): add `metrics_explained` where `mode=simple` or `fields=full` to translate metrics (e.g., Sharpe) into plain language.
+- Pack responses (explicit): echo `policy`, `min_quorum`, `min_score` in `/packs/*/backtest/*` responses.
+- Presets (guardrails): implement `visibility` + `owner_user_id` gating on sweep preset list; require guardrails on public presets.
+- Pipeline (lineage): wire dataset build (Parquet) in pipeline, persist `dataset_run_id`, and include it in pipeline responses.
+- Universal caps (consistency): verify caps enforced across `/backtest/run` and `/models/dataset/build` (≤ 90 days, ≤ 50 symbols) with plain 400s and hints.
+- Error handling (novice): keep global handler; add specific mapping for common DB/network failures with next steps.
+- CI & lints: add `lint-sweep-presets` and include it in `lint-all`; document minimal CI wiring.
+- Docs: add short links to new pipeline endpoints in whiteboarding README; keep examples minimal and safe.
+
+How to Run (quick)
+- Apply migrations: `make -C products/sigma-core db-migrate`
+- Run API (dev): `make -C products/sigma-core api-run` (FastAPI on port 8050)
+- Example (simple backtest): POST `/backtest/run` with `mode:"simple"` and a small preset.
+- Example (pipeline): POST `/models/{model_id}/pipeline/run` with `{ "universe": {"preset_id":"liquid_etfs","cap":20}, "mode":"simple" }`.
+
+Approvals for Next Session
+- Prefer auto‑approval to reduce friction. In Codex CLI: `codex --approvals=never` or set `CODEX_APPROVAL_MODE=never`.
+- Ensure sandbox is `workspace-write` and network access ON if needed; DB env set in `products/sigma-core/.env`.
+
+Novice Audit TODOs (Sigma Core)
+- Centralize error messages: add a global FastAPI exception handler to translate DB/network errors into plain, novice‑friendly messages with next steps.
+- Cap inputs universally: enforce max 90‑day windows and universe caps on `/backtest/run` (not only on sweep) with clear 400s and guidance.
+- Simple presets for backtests: add a `mode: simple|advanced` on `/backtest/run` that defaults to a stored sweep preset (e.g., `rth_thresholds_basic`), minimizing parameter soup.
+- Plain‑language summaries: include `summary` blocks directly in JSON responses for `/backtest/run` and `/models/{id}/backtest/sweep` (not just persisted runs) describing “what it means”.
+- Glossary fields: add beginner translations for metrics like Sharpe (e.g., `metrics_explained`) whenever returned to novices.
+- Visibility guardrails: require `visibility` + `owner_user_id` on sweep preset creation; enforce public presets to include guardrails (`max_combos`, `min_trades`, caps).
+- Rate limits/budgets: add optional per‑user soft limits on auto endpoints (screen/auto, set/auto_build) to prevent runaway workloads (novice safety).
+- Safer defaults on missing data: ensure all compute paths return empty arrays/zeros rather than raising (audit indicators for uniform behavior).
+- Swagger examples: keep all examples “copy/paste runnable” with smallest novice‑safe configs and warnings on heavy operations.
+- Lint coverage: extend lints to check sweep presets for `novice_ready` equivalent (presence of guardrails, RTH hours for intraday, grid size).
+Pack Consensus (Novice Notes)
+- Policies:
+  - weighted: averages model probabilities using component weights (default; simplest to reason about).
+  - majority: a position is taken only if weighted votes exceed `min_quorum` (default 50% of total weight) and each vote meets `min_score` confidence.
+  - all: all models with confidence ≥ `min_score` must agree on direction; else no position.
+- Safety defaults:
+  - 90‑day cap for backtest windows; universe capped (default 50 symbols).
+  - Plain‑language `summary` stored on every persisted run for novice UI.
+  - Override allowed: requests may include `consensus_override` to test policies without editing pack rows (keeps registry stable).

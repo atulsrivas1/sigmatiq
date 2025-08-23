@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Literal, Tuple
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class IndicatorRef(BaseModel):
@@ -22,23 +22,20 @@ class Featureset(BaseModel):
 
     extra_flags: Optional[Dict[str, Any]] = None
 
-    @root_validator
-    def validate_one_source(cls, values):
-        sources = 0
-        if values.get("set_id"):
-            sources += 1
-        if values.get("strategy_id"):
-            sources += 1
-        if values.get("indicators"):
-            sources += 1
+    @model_validator(mode="after")
+    def validate_one_source(self):
+        sources = sum([
+            1 if self.set_id else 0,
+            1 if self.strategy_id else 0,
+            1 if (self.indicators or []) else 0,
+        ])
         if sources != 1:
             raise ValueError("featureset must specify exactly one of set_id, strategy_id, or indicators[]")
-        # version presence
-        if values.get("set_id") and not values.get("version"):
+        if self.set_id and not self.version:
             raise ValueError("featureset.version required when set_id is provided")
-        if values.get("strategy_id") and not values.get("strategy_version"):
+        if self.strategy_id and not self.strategy_version:
             raise ValueError("featureset.strategy_version required when strategy_id is provided")
-        return values
+        return self
 
 
 class OptionsProxyCfg(BaseModel):
@@ -54,13 +51,11 @@ class LabelCfg(BaseModel):
     max_hold_bars: Optional[int] = Field(default=None, ge=1)
     options_proxy: Optional[OptionsProxyCfg] = None
 
-    @root_validator
-    def validate_tp_sl(cls, values):
-        tp = values.get("tp_pct")
-        sl = values.get("sl_pct")
-        if (tp is None) != (sl is None):
+    @model_validator(mode="after")
+    def validate_tp_sl(self):
+        if (self.tp_pct is None) != (self.sl_pct is None):
             raise ValueError("label_cfg.tp_pct and sl_pct must be both provided or both omitted")
-        return values
+        return self
 
 
 class Thresholds(BaseModel):
@@ -70,7 +65,7 @@ class Thresholds(BaseModel):
     budgets: Optional[Dict[str, int]] = None  # { daily:5, hourly:0 }
     diversity: Optional[Dict[str, Any]] = None  # { per_symbol_cooldown_bars: 10 }
 
-    @validator("hold_band")
+    @field_validator("hold_band")
     def validate_hold_band(cls, v):
         if v is None:
             return v

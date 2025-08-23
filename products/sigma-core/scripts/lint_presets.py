@@ -6,9 +6,10 @@ from pathlib import Path
 # Read SQL seeds to ensure presets have beginner_summary set (simple static check fallback)
 # Prefer live DB linter later; for now validate JSON-like expectations via reading seed files present.
 
+base = Path(__file__).resolve().parents[1]  # products/sigma-core
 migs = [
-    Path('products/sigma-core/migrations/0010_sc_seed_universe_presets.sql'),
-    Path('products/sigma-core/migrations/0013_sc_seed_universe_presets_novice.sql'),
+    base / 'migrations' / '0010_sc_seed_universe_presets.sql',
+    base / 'migrations' / '0013_sc_seed_universe_presets_novice.sql',
 ]
 
 required = {
