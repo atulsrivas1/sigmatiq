@@ -1,37 +1,28 @@
-# Pull Request
+## Summary
+- What changed and why (1–3 lines).
 
-- Title:
-- Summary (plain language, 1–2 sentences):
-- Related Issue/Doc link(s):
+## Critic Report (Persona: Code Review Critic)
+- Risks to novices:
+- Safety gaps (caps/guardrails/undo, costs/risks clarity):
+- Complexity increases (simpler alternative):
+- Defaults & scope (safe & reversible; on/off):
+- API & contracts (docs parity; mode:simple; fields:full; consensus echo):
+- Data/migrations (idempotent; novice fields; seeds/lints):
+- Errors & DX (plain 400s; env/DB gating):
+- Tests & Postman (examples copy/paste runnable & safe):
 
-## What’s Changing
-- 
+## Status
+- Blockers:
+- Major issues:
+- Nits:
 
-## Critic Gate (Mandatory)
-Refer to docs/CRITIC_CHECKLIST.md. If any item fails, do not merge.
+## Checklist
+- [ ] Critic pass completed using `docs/personas/code_reviewer.md` and `docs/CODE_REVIEW_GUIDELINES.md`.
+- [ ] Safe defaults + caps enforced (≤90 days, ≤50 symbols, ≤50 combos).
+- [ ] `mode: simple` (where relevant) + `fields=full` extras documented.
+- [ ] Plain-language errors + next steps.
+- [ ] Docs, seeds, and Postman updated.
+- [ ] Tests added/updated where patterns exist.
 
-- [ ] Critic pass completed; notes/mitigations linked here: <!-- link to doc/comment -->
-- [ ] Beginner summary: plain language (no jargon); user understands outcome in seconds
-- [ ] Defaults: safe, reversible, obvious off switch; advanced options hidden
-- [ ] Guardrails: quotas/diversity/undo enforced (DB + code where applicable)
-- [ ] Scope & simplicity: preset/story-driven path; no parameter soup; ≤ 1 screen where feasible
-- [ ] Transparency: risks/costs/delays explained; preview before subscribe/commit; clear opt-out
-- [ ] Data & reproducibility: training-serving parity; avoid caching today; training_cfg captured (if models)
-- [ ] Branding & naming: `sq_` prefix for model/pack IDs; `display_name` set; clear user-facing names
-- [ ] Taxonomy & scope: horizon/style/tags set; scope (cohort/per-ticker) declared if models
-- [ ] Novice publish readiness: beginner_summary + explainer_templates + guardrails/consensus present (models/packs)
-- [ ] Docs updated (agents.md, requirements/whiteboarding, API examples) where applicable
+## Screenshots / Examples (optional)
 
-## Testing
-- How was this tested? Include commands, datasets, and results.
-
-## DB Migrations (if any)
-- [ ] New migrations listed and applied locally
-- List: 
-
-## API & Backwards Compatibility
-- [ ] No breaking changes OR documented migration path
-- Details:
-
-## Screenshots / API Examples (optional)
-- 

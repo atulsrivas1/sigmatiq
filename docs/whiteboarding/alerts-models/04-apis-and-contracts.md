@@ -28,11 +28,15 @@
   - `/screen/auto`, `/indicator_sets/auto_screen`, `/strategies/auto_screen` for rule cohorts.
 - Backtests and datasets (implemented)
   - `POST /models/dataset/build` — builds CSV/Parquet datasets for training/backtests; records `sc.model_training_runs`.
-  - `POST /backtest/run` — backtest a feature set over a universe; supports `mode: simple` (auto‑uses `rth_thresholds_basic`).
-  - `POST /models/{model_id}/backtest/sweep` — grid‑search thresholds/top_pct; persists best; supports `mode: simple` and `sweep_preset_id`.
-  - `POST /packs/{pack_id}/backtest/run` — consensus backtest for a model pack; supports `consensus_override` and `mode: simple`.
-  - `POST /packs/{pack_id}/backtest/sweep` — grid‑search consensus; supports `consensus_override`.
-  - `GET /backtests/leaderboard` — filter by `pack_id|model_id|tag|timeframe`; returns plain‑language `summary`.
+  - `POST /backtest/run` — backtest a feature set over a universe; supports `mode: simple` (auto‑uses `rth_thresholds_basic`). In simple mode, responses include `metrics_explained`. Pass `?fields=full` to include `metrics_explained` in advanced mode.
+  - `POST /models/{model_id}/backtest/sweep` — grid‑search thresholds/top_pct; persists best; supports `mode: simple` and `sweep_preset_id`. In simple mode, responses include `metrics_explained`. Pass `?fields=full` to include `metrics_explained` in advanced mode.
+  - `POST /packs/{pack_id}/backtest/run` — consensus backtest for a model pack; supports `consensus_override` and `mode: simple`. In simple mode, responses include `metrics_explained`. Pass `?fields=full` to include `metrics_explained` in advanced mode.
+  - `POST /packs/{pack_id}/backtest/sweep` — grid‑search consensus; supports `consensus_override`. In simple mode, responses include `metrics_explained`. Pass `?fields=full` to include `metrics_explained` in advanced mode.
+  - `GET /backtests/leaderboard` — filter by `pack_id|model_id|tag|timeframe`; returns plain-language `summary`.
+  - Pass `?fields=full` to include `metrics_explained` (plain definitions for Sharpe, trades, etc.).
+
+List Endpoint Parity
+- Most list endpoints accept `fields=full` (Catalog, Presets, Recipes, Leaderboard). Extras are included where applicable (e.g., `metrics_explained` on leaderboard and backtests); for others it is reserved for parity.
 - Persistence (DB)
   - Runs: `sc.model_backtest_runs`, folds: `sc.model_backtest_folds` (pack_id, metrics, best_config, summary).
   - Presets: `sc.backtest_sweep_presets` — reusable grids/guardrails (e.g., `rth_thresholds_basic`).
@@ -43,3 +47,14 @@ Examples (concise)
   - `POST /backtest/run` body: `{ "timeframe":"hour", "universe": {"preset_id":"liquid_etfs","cap":10}, "features": {"set_id":"macd_trend_pullback_v1","version":1}, "label": {"kind":"hourly_direction","params":{"k_sigma":0.3}}, "mode":"simple" }`
 - Pack backtest with majority override:
   - `POST /packs/consensus_v1/backtest/run` body: `{ "timeframe":"hour", "universe": {"preset_id":"liquid_etfs","cap":10}, "thresholds":[0.55,0.6,0.65], "consensus_override": {"policy":"majority","min_quorum":1.5,"min_score":0.6} }`
+
+Metrics Explained (example)
+```json
+{
+  "metrics_explained": {
+    "avg_sharpe_hourly": "Steadiness of gains per hour (higher is steadier).",
+    "trades_total": "Total number of trades across all folds.",
+    "cum_ret_sum": "Total return across all folds (no compounding)."
+  }
+}
+```

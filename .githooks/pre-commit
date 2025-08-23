@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Advisory reminder for Critic Gate
+echo "[Critic Gate] For non-trivial changes, complete the Critic checklist (docs/CODE_REVIEW_GUIDELINES.md)."
+exit 0
+

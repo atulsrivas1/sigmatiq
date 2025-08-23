@@ -12,6 +12,7 @@
     },
     {
       "name": "Packs / Backtest Run (persist)",
+      "description": "In simple mode or with ?fields=full, response includes metrics_explained and echoes consensus policy.",
       "request": {
         "method": "POST",
         "header": [
@@ -27,13 +28,15 @@
           "path": ["packs","consensus_v1","backtest","run"],
           "query": [
             {"key":"persist","value":"true"},
-            {"key":"tag","value":"pack-demo"}
+            {"key":"tag","value":"pack-demo"},
+            {"key":"fields","value":"full"}
           ]
         }
       }
     },
     {
       "name": "Packs / Backtest Sweep",
+      "description": "Add ?fields=full to include metrics_explained; response echoes consensus policy.",
       "request": {
         "method": "POST",
         "header": [
@@ -43,12 +46,13 @@
           "mode": "raw",
           "raw": "{\n  \"universe\": {\n    \"preset_id\": \"liquid_etfs\",\n    \"cap\": 20\n  },\n  \"grid\": {\n    \"thresholds_list\": [[0.55, 0.6, 0.65]]\n  },\n  \"persist\": true,\n  \"tag\": \"pack-sweep\"\n}"
         },
-        "url": "{{baseUrl}}/packs/consensus_v1/backtest/sweep"
+        "url": "{{baseUrl}}/packs/consensus_v1/backtest/sweep?fields=full"
       }
     },
     {
       "name": "Backtests / Leaderboard",
-      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/backtests/leaderboard?limit=10&order_by=avg_sharpe_hourly", "host": ["{{baseUrl}}"], "path": ["backtests","leaderboard"], "query": [{"key":"limit","value":"10"},{"key":"order_by","value":"avg_sharpe_hourly"}]}}
+      "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/backtests/leaderboard?limit=10&order_by=avg_sharpe_hourly&fields=full", "host": ["{{baseUrl}}"], "path": ["backtests","leaderboard"], "query": [{"key":"limit","value":"10"},{"key":"order_by","value":"avg_sharpe_hourly"},{"key":"fields","value":"full"}]}},
+      "description": "Use fields=full to include metrics_explained for novice-friendly context."
     },
     {
       "name": "Backtests / Sweep Preset Create",
@@ -66,7 +70,7 @@
     },
     {
       "name": "Backtests / Sweep Preset List",
-      "request": {"method": "GET", "url": "{{baseUrl}}/backtests/sweep_presets"}
+      "request": {"method": "GET", "url": "{{baseUrl}}/backtests/sweep_presets?fields=full"}
     },
     {
       "name": "Backtests / Sweep Preset Get",
@@ -74,7 +78,7 @@
     },
     {
       "name": "Presets / List",
-      "request": {"method": "GET", "url": "{{baseUrl}}/presets"}
+      "request": {"method": "GET", "url": "{{baseUrl}}/presets?fields=full"}
     },
     {
       "name": "Presets / Symbols",
@@ -94,7 +98,8 @@
     },
     {
       "name": "Catalog / Indicators",
-      "request": {"method": "GET", "url": "{{baseUrl}}/catalog/indicators?fields=summary&novice_only=true"}
+      "request": {"method": "GET", "url": "{{baseUrl}}/catalog/indicators?fields=full&novice_only=true"},
+      "description": "Use fields=full for detailed explainer fields."
     },
     {
       "name": "Indicators / Validate",
@@ -130,7 +135,7 @@
     },
     {
       "name": "Recipes / List",
-      "request": {"method": "GET", "url": "{{baseUrl}}/recipes"}
+      "request": {"method": "GET", "url": "{{baseUrl}}/recipes?fields=full"}
     },
     {
       "name": "Recipes / Run",
@@ -156,6 +161,7 @@
     },
     {
       "name": "Backtest / Run (persist)",
+      "description": "In simple mode or with ?fields=full, response includes metrics_explained.",
       "request": {
         "method": "POST",
         "header": [
@@ -172,7 +178,8 @@
           "query": [
             {"key":"persist","value":"true"},
             {"key":"tag","value":"demo"},
-            {"key":"pack_id","value":"consensus_v1"}
+            {"key":"pack_id","value":"consensus_v1"},
+            {"key":"fields","value":"full"}
           ]
         }
       }

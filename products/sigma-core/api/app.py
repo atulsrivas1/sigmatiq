@@ -1808,7 +1808,7 @@ def get_workflow(workflow_id: str):
 
 
 @app.get("/recipes", response_model=List[RecipeOut])
-def list_recipes(persona: Optional[str] = None, limit: int = 50):
+def list_recipes(persona: Optional[str] = None, limit: int = 50, fields: str = Query("summary", regex="^(summary|full)$", description="Reserved for parity; currently returns full objects")):
     with get_db() as conn:
         with conn.cursor() as cur:
             if persona:
@@ -1866,7 +1866,7 @@ class SymbolsIn(BaseModel):
 
 
 @app.get("/presets")
-def list_presets():
+def list_presets(fields: str = Query("summary", regex="^(summary|full)$", description="Reserved for parity; currently returns full objects")):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -2457,6 +2457,7 @@ class BacktestRunOut(BaseModel):
     pooled_result: Optional[Dict[str, Any]] = None
     warnings: Optional[List[str]] = None
     summary: Optional[str] = None
+    metrics_explained: Optional[Dict[str, str]] = None
 
 
 def _resolve_symbols_from_universe(u: BacktestUniverseIn, user: User) -> List[str]:
@@ -2561,7 +2562,8 @@ def run_backtest(
     user: User = Depends(get_current_user),
     persist: bool = Query(False, description="Persist backtest summary and folds to DB"),
     tag: Optional[str] = Query(None, description="Optional tag for persisted run"),
-    pack_id: Optional[str] = Query(None, description="Optional pack_id to associate this run with")
+    pack_id: Optional[str] = Query(None, description="Optional pack_id to associate this run with"),
+    fields: str = Query("summary", regex="^(summary|full)$", description="Include extras like metrics_explained when 'full'")
 ):
     start_date = payload.start_date
     end_date = payload.end_date
@@ -2740,6 +2742,7 @@ def run_backtest(
             pass
     # Novice summary
     summary = f"Backtested {len(symbols)} symbols ({payload.timeframe}) from {start_date} to {end_date}. Skipped {skipped}."
+    metrics_expl = _metrics_explained_basic() if ((mode_l == 'simple') or (fields == 'full')) else None
     return BacktestRunOut(
         scope="per_symbol",
         timeframe=payload.timeframe,
@@ -2749,6 +2752,7 @@ def run_backtest(
         pooled_result=pooled_result,
         warnings=[],
         summary=summary,
+        metrics_explained=metrics_expl,
     )
 
 
@@ -2783,6 +2787,20 @@ class BacktestSweepOut(BaseModel):
     best_config: Dict[str, Any]
     metrics: Dict[str, Any]
     summary: str
+    metrics_explained: Optional[Dict[str, str]] = None
+
+# --- Novice-friendly metrics explainer ---
+def _metrics_explained_basic() -> Dict[str, str]:
+    return {
+        "avg_sharpe_hourly": "Steadiness of gains per hour (higher is steadier).",
+        "sharpe_hourly": "Steadiness of gains in a fold (risk-adjusted).",
+        "win_rate": "Share of trades that ended profitably.",
+        "trades_total": "Total number of trades across all folds.",
+        "trades": "Number of trades in this fold.",
+        "cum_ret_sum": "Total return across all folds (no compounding).",
+        "cum_ret": "Cumulative return in this fold (no compounding).",
+        "max_drawdown": "Largest peak-to-trough decline during the test (risk).",
+    }
 
 
 # --- Model Pipeline (build -> sweep/backtest -> leaderboard -> conditional train)
@@ -3041,7 +3059,8 @@ def model_backtest_sweep(
             "tag": "sweep-demo"
         }
     ),
-    user: User = Depends(get_current_user)
+    user: User = Depends(get_current_user),
+    fields: str = Query("summary", regex="^(summary|full)$", description="Include extras like metrics_explained when 'full'")
 ):
     # Load model spec
     with get_db() as conn:
@@ -3225,7 +3244,14 @@ def model_backtest_sweep(
                     run_id = str(rid)
         except Exception:
             run_id = None
-    return BacktestSweepOut(run_id=run_id, best_config=best_cfg, metrics=best_metrics or {}, summary=summary)
+    simple = ((payload.mode or 'advanced').lower() == 'simple')
+    return BacktestSweepOut(
+        run_id=run_id,
+        best_config=best_cfg,
+        metrics=best_metrics or {},
+        summary=summary,
+        metrics_explained=_metrics_explained_basic() if (simple or fields == 'full') else None,
+    )
 
 
 # --- Leaderboard endpoint (top backtest runs) ---
@@ -3240,9 +3266,15 @@ class LeaderboardRow(BaseModel):
     started_at: Optional[str] = None
     pack_id: Optional[str] = None
     summary: Optional[str] = None
+    metrics_explained: Optional[Dict[str, str]] = None
 
 
-@app.get("/backtests/leaderboard", response_model=List[LeaderboardRow], summary="Top backtest runs")
+@app.get(
+    "/backtests/leaderboard",
+    response_model=List[LeaderboardRow],
+    summary="Top backtest runs",
+    description="Returns top backtest runs; pass fields=full to include novice-friendly metrics_explained."
+)
 def backtests_leaderboard(
     model_id: Optional[str] = Query(None),
     tag: Optional[str] = Query(None),
@@ -3250,6 +3282,7 @@ def backtests_leaderboard(
     pack_id: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=200),
     order_by: str = Query("avg_sharpe_hourly", description="one of: avg_sharpe_hourly|cum_ret_sum|trades_total"),
+    fields: str = Query("summary", regex="^(summary|full)$", description="Include extras like metrics_explained when 'full'"),
 ):
     # Build SQL
     order_expr = "(metrics->>'avg_sharpe_hourly')::float DESC"
@@ -3289,6 +3322,7 @@ def backtests_leaderboard(
                     started_at=str(r[7]) if r[7] else None,
                     pack_id=r[8],
                     summary=r[9],
+                    metrics_explained=(_metrics_explained_basic() if fields == 'full' else None),
                 ))
             return out
 
@@ -3319,7 +3353,7 @@ def create_sweep_preset(payload: SweepPresetIn = Body(...)):
 
 
 @app.get("/backtests/sweep_presets", response_model=List[SweepPresetIn])
-def list_sweep_presets():
+def list_sweep_presets(fields: str = Query("summary", regex="^(summary|full)$", description="Reserved for parity; currently returns full objects")):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT preset_id, title, description, grid, guardrails FROM sc.backtest_sweep_presets ORDER BY preset_id")
@@ -3328,7 +3362,7 @@ def list_sweep_presets():
 
 
 @app.get("/backtests/sweep_presets/{preset_id}", response_model=SweepPresetIn)
-def get_sweep_preset(preset_id: str):
+def get_sweep_preset(preset_id: str, fields: str = Query("summary", regex="^(summary|full)$", description="Reserved for parity; currently returns full object")):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT preset_id, title, description, grid, guardrails FROM sc.backtest_sweep_presets WHERE preset_id=%s", (preset_id,))
@@ -3503,7 +3537,8 @@ def pack_backtest_run(
     ),
     user: User = Depends(get_current_user),
     persist: bool = Query(False),
-    tag: Optional[str] = Query(None)
+    tag: Optional[str] = Query(None),
+    fields: str = Query("summary", regex="^(summary|full)$", description="Include extras like metrics_explained when 'full'")
 ):
     # Load pack and components
     with get_db() as conn:
@@ -3649,7 +3684,16 @@ def pack_backtest_run(
                     conn.commit()
         except Exception:
             pass
-    return { 'threshold_results': threshold_results, 'metrics': metrics, 'summary': summary }
+    policy_echo = (consensus or {}).get('policy', 'weighted')
+    simple = ((payload.mode or '').lower() == 'simple')
+    return {
+        'threshold_results': threshold_results,
+        'metrics': metrics,
+        'summary': summary,
+        'consensus': consensus or {'policy': policy_echo},
+        'policy': policy_echo,
+        'metrics_explained': _metrics_explained_basic() if (simple or fields == 'full') else None,
+    }
 
 
 class PackBacktestSweepGrid(BaseModel):
@@ -3683,7 +3727,8 @@ def pack_backtest_sweep(
             "consensus_override": {"policy": "all", "min_score": 0.6}
         }
     ),
-    user: User = Depends(get_current_user)
+    user: User = Depends(get_current_user),
+    fields: str = Query("summary", regex="^(summary|full)$", description="Include extras like metrics_explained when 'full'")
 ):
     # Load pack and models
     with get_db() as conn:
@@ -3825,4 +3870,14 @@ def pack_backtest_sweep(
                     conn.commit(); run_id = str(rid)
         except Exception:
             run_id = None
-    return { 'run_id': run_id, 'best_config': best_cfg, 'metrics': best_metrics or {}, 'summary': summary }
+    policy_echo = (consensus or {}).get('policy', 'weighted')
+    simple = ((payload.mode or 'advanced').lower() == 'simple')
+    return {
+        'run_id': run_id,
+        'best_config': best_cfg,
+        'metrics': best_metrics or {},
+        'summary': summary,
+        'consensus': consensus or {'policy': policy_echo},
+        'policy': policy_echo,
+        'metrics_explained': _metrics_explained_basic() if (simple or fields == 'full') else None,
+    }

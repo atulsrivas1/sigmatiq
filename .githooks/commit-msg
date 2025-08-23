@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Enforce a minimal Critic acknowledgement on impactful commits
+
+MSG_FILE=$1
+MSG=$(cat "$MSG_FILE")
+
+# Detect changes in API or migrations
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+  CHANGED=$(git diff --cached --name-only)
+else
+  CHANGED=$(git ls-files -m)
+fi
+
+if echo "$CHANGED" | grep -E '^(products/sigma-core/api/|products/sigma-core/migrations/)' >/dev/null 2>&1; then
+  if ! echo "$MSG" | grep -i '^Critic-Reviewed:' >/dev/null 2>&1; then
+    echo "Commit touches API/migrations. Add a 'Critic-Reviewed: yes|no' line to the commit message." >&2
+    exit 1
+  fi
+fi
+
+exit 0
+

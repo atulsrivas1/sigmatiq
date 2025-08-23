@@ -1,0 +1,15 @@
+name: Critic Gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+
+jobs:
+  critic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Critic Gate Check
+        run: python3 .github/scripts/critic_gate_check.py
+

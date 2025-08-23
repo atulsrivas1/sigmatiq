@@ -1,0 +1,13 @@
+# CODEOWNERS
+# Replace @your-org/maintainers with your actual GitHub team or usernames.
+
+# Default owners for everything
+* @your-org/maintainers
+
+# Sigma Core API and migrations require the reviewers team
+products/sigma-core/api/ @your-org/reviewers
+products/sigma-core/migrations/ @your-org/reviewers
+
+# Docs owned by docs team (optional)
+docs/** @your-org/docs
+

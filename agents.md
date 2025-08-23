@@ -31,8 +31,17 @@ Critic Gate (Mandatory)
   - Exposing raw technical parameters without presets or explanations.
   - Unbounded universes, unguarded automation, or risky defaults.
   - Multi‑step wizards where a single preset would suffice.
-  - Metrics without context (e.g., Sharpe, AUC) shown to novices without translation.
-  - Irreversible actions or hidden state changes.
+- Metrics without context (e.g., Sharpe, AUC) shown to novices without translation.
+- Irreversible actions or hidden state changes.
+
+Code Review Persona (Use In Reviews)
+- Always run PR reviews using the independent Code Review Critic persona (not the author).
+- Persona spec: see `docs/personas/code_reviewer.md`; checklist in `docs/CODE_REVIEW_GUIDELINES.md`.
+- Output a Critic Report before any approval with:
+  - Risks to novices; safety gaps; complexity increases and simpler alternatives.
+  - Confirmation of safe defaults, scope, reversibility (on/off switches).
+  - API/doc parity, caps/guardrails enforcement, error messages (plain 400s), and tests/examples status.
+  - Decision with Blockers/Majors/Nits and concrete fixes.
 
 Purpose
 - Give future AI agents fast, accurate context to work effectively in this repo.
@@ -149,6 +158,7 @@ Working Style for Future Agents
 - When adding features that affect model inputs, update `FeatureBuilder.select_features()` and provide a brief doc note.
 - Use the seed-generation scripts to keep the catalog in sync with code.
 - Run the Critic checklist (docs/CRITIC_CHECKLIST.md) for all non-trivial work; record findings and resolutions in the PR or session notes.
+ - For PR reviews: act as the Code Review Critic persona (not the implementer); follow `docs/personas/code_reviewer.md` and `docs/CODE_REVIEW_GUIDELINES.md` to produce a Critic Report before approval.
 
 Notes
 - This guide summarizes the current structure; some modules (e.g., live runtime) are intentionally skeletal. Follow the docs for intended behavior and add TODOs where implementation is incomplete.
